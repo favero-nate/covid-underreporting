@@ -1,0 +1,13 @@
+sampling distribution (biased urn draws) https://cran.r-project.org/web/packages/BiasedUrn/vignettes/UrnTheory.pdf
+
+Correcting under-reported COVID-19 case numbers: estimating the true scale of the pandemic https://doi.org/10.1101/2020.03.14.20036178
+
+Using a delay-adjusted case fatalityratio to estimate under-reporting https://fondazionecerm.it/wp-content/uploads/2020/03/Using-a-delay-adjusted-case-fatality-ratio-to-estimate-under-reporting-_-CMMID-Repository.pdf
+
+Level of underreporting including underdiagnosis before the first peak of COVID-19 in various countries https://doi.org/10.1017/ice.2020.116
+
+https://covidtracking.com/api/v1/states/daily.csv
+
+
+
+https://www.pluralsight.com/guides/how-to-use-gitignore-file

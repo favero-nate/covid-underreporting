@@ -1,0 +1,250 @@
+--------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\cleandata.txt
+  log type:  text
+ opened on:   7 May 2020, 00:31:18
+
+. 
+. use "..\data\fipscodes.dta"
+
+. 
+. merge 1:m fips using "..\data\covidtracking.dta", keep(2 3)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                             0
+    matched                             3,489  (_merge==3)
+    -----------------------------------------
+
+. drop _merge
+
+. 
+. merge 1:1 state date using "..\data\cdc_deaths.dta"
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                         3,291
+        from master                     3,019  (_merge==1)
+        from using                        272  (_merge==2)
+
+    matched                               470  (_merge==3)
+    -----------------------------------------
+
+. drop _merge
+
+. 
+. drop fips
+
+. merge m:1 state using "..\data\fipscodes.dta", keep(1 3)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                            14
+        from master                        14  (_merge==1)
+        from using                          0  (_merge==2)
+
+    matched                             3,747  (_merge==3)
+    -----------------------------------------
+
+. drop _merge
+
+. order date fips
+
+. sort fips state date
+
+. 
+. drop if fips > 56
+(281 observations deleted)
+
+. 
+. encode dataqualitygrade, gen(datagrade)
+
+. order datagrade, after(dataqualitygrade)
+
+. drop dataqualitygrade
+
+. 
+. gen end_week = date + mod(6 - dow(date), 7)
+
+. format end_week %tdCCYYNNDD
+
+. order end_week, after(date)
+
+. 
+. foreach var of varlist positive-datagrade death-pneumon_influ_and_covid {
+  2.         gen `var'_mis = (`var'==.)
+  3. }
+
+. collapse (firstnm) state report_date (sum) positive-datagrade death-pneumon_influ_and_covid *_mis, by(end_week fips)
+
+. foreach var of varlist positive-datagrade {
+  2.         replace `var' = . if `var'_mis > 0
+  3. }
+(251 real changes made, 251 to missing)
+(292 real changes made, 292 to missing)
+(691 real changes made, 691 to missing)
+(590 real changes made, 590 to missing)
+(582 real changes made, 582 to missing)
+(680 real changes made, 680 to missing)
+(733 real changes made, 733 to missing)
+(697 real changes made, 697 to missing)
+(758 real changes made, 758 to missing)
+(618 real changes made, 618 to missing)
+(664 real changes made, 664 to missing)
+
+. foreach var of varlist death-pneumon_influ_and_covid {
+  2.         replace `var' = . if `var'_mis > 6 | report_date == .
+  3. }
+(109 real changes made, 109 to missing)
+(269 real changes made, 269 to missing)
+(52 real changes made, 52 to missing)
+(52 real changes made, 52 to missing)
+(52 real changes made, 52 to missing)
+(52 real changes made, 52 to missing)
+(52 real changes made, 52 to missing)
+(52 real changes made, 52 to missing)
+(52 real changes made, 52 to missing)
+(52 real changes made, 52 to missing)
+(171 real changes made, 171 to missing)
+(54 real changes made, 54 to missing)
+(63 real changes made, 63 to missing)
+(105 real changes made, 105 to missing)
+(195 real changes made, 195 to missing)
+(262 real changes made, 262 to missing)
+(92 real changes made, 92 to missing)
+
+. drop *_mis
+
+. 
+. xtset fips end_week, delta(7)
+       panel variable:  fips (unbalanced)
+        time variable:  end_week, 20200125 to 20200509
+                delta:  7 days
+
+. 
+. gen new_pos = d.positive
+(302 missing values generated)
+
+. gen new_neg = d.negative
+(343 missing values generated)
+
+. gen p_pos = new_pos/(new_pos+new_neg)*100
+(343 missing values generated)
+
+. order new_pos-p_pos, after(negative)
+
+. 
+. // adjust expected deaths for reporting lag: https://www.cdc.gov/nchs/data/vsrr/report001.pdf
+. gen days_to_report = report_date - end_week
+(52 missing values generated)
+
+. gen adj_expected_deaths = .
+(766 missing values generated)
+
+. replace adj_expected_deaths = expected_deaths * 4.8 / 100 if days_to_report <= 1*7 & days_to_report != .
+(46 real changes made)
+
+. replace adj_expected_deaths = expected_deaths * 27.2 / 100 if days_to_report > 1*7 & days_to_report <= 2*7
+(49 real changes made)
+
+. replace adj_expected_deaths = expected_deaths * 43.8 / 100 if days_to_report > 2*7 & days_to_report <= 3*7
+(50 real changes made)
+
+. replace adj_expected_deaths = expected_deaths * 54.1 / 100 if days_to_report > 3*7 & days_to_report <= 4*7
+(50 real changes made)
+
+. replace adj_expected_deaths = expected_deaths * 61.9 / 100 if days_to_report > 4*7 & days_to_report <= 5*7
+(51 real changes made)
+
+. replace adj_expected_deaths = expected_deaths * 67.0 / 100 if days_to_report > 5*7 & days_to_report <= 6*7
+(51 real changes made)
+
+. replace adj_expected_deaths = expected_deaths * 71.0 / 100 if days_to_report > 6*7 & days_to_report <= 7*7
+(50 real changes made)
+
+. replace adj_expected_deaths = expected_deaths * 74.5 / 100 if days_to_report > 7*7 & days_to_report <= 8*7
+(50 real changes made)
+
+. replace adj_expected_deaths = expected_deaths * 77.4 / 100 if days_to_report > 8*7 & days_to_report <= 9*7
+(51 real changes made)
+
+. replace adj_expected_deaths = expected_deaths * 79.7 / 100 if days_to_report > 9*7 & days_to_report <= 10*7
+(51 real changes made)
+
+. replace adj_expected_deaths = expected_deaths * 81.4 / 100 if days_to_report > 10*7 & days_to_report <= 11*7
+(51 real changes made)
+
+. replace adj_expected_deaths = expected_deaths * 82.8 / 100 if days_to_report > 11*7 & days_to_report <= 12*7
+(51 real changes made)
+
+. replace adj_expected_deaths = expected_deaths * 83.9 / 100 if days_to_report > 12*7 & days_to_report <= 13*7
+(51 real changes made)
+
+. replace adj_expected_deaths = expected_deaths * 84.9 / 100 if days_to_report > 13*7 & days_to_report <= 14*7
+(51 real changes made)
+
+. replace adj_expected_deaths = expected_deaths * 86.0 / 100 if days_to_report > 14*7 & days_to_report <= 15*7
+(0 real changes made)
+
+. replace adj_expected_deaths = expected_deaths * 86.9 / 100 if days_to_report > 15*7 & days_to_report <= 16*7
+(0 real changes made)
+
+. 
+. gen log_covdeath = log(covid_deaths)
+(565 missing values generated)
+
+. gen log_allcause = log(total_deaths)
+(63 missing values generated)
+
+. gen log_expected = log(adj_expected_deaths)
+(64 missing values generated)
+
+. gen excess_deaths = log_allcause-log_expected
+(64 missing values generated)
+
+. 
+. 
+. reg excess_deaths c.log_covdeath c.p_pos
+
+      Source |       SS           df       MS      Number of obs   =       196
+-------------+----------------------------------   F(2, 193)       =      7.84
+       Model |  5.60325428         2  2.80162714   Prob > F        =    0.0005
+    Residual |  68.9301143       193  .357150851   R-squared       =    0.0752
+-------------+----------------------------------   Adj R-squared   =    0.0656
+       Total |  74.5333686       195  .382222403   Root MSE        =    .59762
+
+------------------------------------------------------------------------------
+excess_dea~s |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+log_covdeath |   .1227273   .0365539     3.36   0.001     .0506309    .1948238
+       p_pos |   .0005451   .0041837     0.13   0.896    -.0077066    .0087968
+       _cons |   .2784411   .1383782     2.01   0.046     .0055135    .5513688
+------------------------------------------------------------------------------
+
+. reg excess_deaths c.log_covdeath##c.p_pos
+
+      Source |       SS           df       MS      Number of obs   =       196
+-------------+----------------------------------   F(3, 192)       =     10.42
+       Model |  10.4393471         3  3.47978236   Prob > F        =    0.0000
+    Residual |  64.0940215       192  .333823029   R-squared       =    0.1401
+-------------+----------------------------------   Adj R-squared   =    0.1266
+       Total |  74.5333686       195  .382222403   Root MSE        =    .57777
+
+----------------------------------------------------------------------------------------
+         excess_deaths |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-----------------------+----------------------------------------------------------------
+          log_covdeath |  -.0729057   .0623759    -1.17   0.244    -.1959357    .0501242
+                 p_pos |  -.0341983   .0099842    -3.43   0.001    -.0538911   -.0145056
+                       |
+c.log_covdeath#c.p_pos |   .0080229   .0021079     3.81   0.000     .0038654    .0121805
+                       |
+                 _cons |   1.050235   .2429302     4.32   0.000     .5710804     1.52939
+----------------------------------------------------------------------------------------
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\cleandata.txt
+  log type:  text
+ closed on:   7 May 2020, 00:31:19
+--------------------------------------------------------------------------------------------------------------------------

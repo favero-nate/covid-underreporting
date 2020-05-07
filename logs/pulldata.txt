@@ -1,0 +1,102 @@
+--------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\pulldata.txt
+  log type:  text
+ opened on:   7 May 2020, 00:16:48
+
+. 
+. import delimited "https://covidtracking.com/api/v1/states/daily.csv", stringcols(1)
+(27 vars, 3,489 obs)
+
+. rename date olddate
+
+. gen date = date(olddate, "YMD")
+
+. format date %tdCCYYNNDD
+
+. order date
+
+. drop olddate
+
+. save "..\data\covidtracking.dta", replace
+file ..\data\covidtracking.dta saved
+
+. 
+. /*
+> insheet using "https://data.cdc.gov/resource/xkkf-xrst.csv", clear
+> gen date = date(substr(week_ending_date,1,10), "YMD")
+> format date %tdCCYYNNDD
+> order date
+> keep date state 
+> save "..\data\allcause.dta", replace
+> */
+. 
+. insheet using "https://data.cdc.gov/resource/r8kw-7aab.csv", clear
+(14 vars, 756 obs)
+
+. gen date = date(substr(end_week,1,10), "YMD")
+
+. format date %tdCCYYNNDD
+
+. gen report_date = date(substr(data_as_of,1,10), "YMD")
+
+. format report_date %tdCCYYNNDD
+
+. order date report_date
+
+. gen expected_deaths = total_deaths / percent_of_expected_deaths
+(12 missing values generated)
+
+. order expected_deaths, after(total_deaths)
+
+. drop start_week group indicator percent_of_expected_deaths footnote
+
+. replace state = "New York" if state == "New York City"
+(14 real changes made)
+
+. rename pneumonia_influenza_and_covid pneumon_influ_and_covid
+
+. 
+. foreach var of varlist covid_deaths-pneumon_influ_and_covid {
+  2.         gen `var'_mis = (`var'==.)
+  3. }
+
+. collapse (sum) covid_deaths-pneumon_influ_and_covid_mis (first) report_date, by(state date)
+
+. foreach var of varlist covid_deaths-pneumon_influ_and_covid {
+  2.         replace `var' = . if `var'_mis > 0
+  3. }
+(130 real changes made, 130 to missing)
+(3 real changes made, 3 to missing)
+(12 real changes made, 12 to missing)
+(81 real changes made, 81 to missing)
+(155 real changes made, 155 to missing)
+(388 real changes made, 388 to missing)
+(64 real changes made, 64 to missing)
+
+. drop *_mis
+
+. 
+. save "..\data\cdc_deaths.dta", replace
+file ..\data\cdc_deaths.dta saved
+
+. 
+. insheet using "https://www2.census.gov/geo/docs/reference/state.txt", clear delimiter("|") 
+(4 vars, 57 obs)
+
+. rename state fips
+
+. rename state_name state
+
+. keep fips state
+
+. save "..\data\fipscodes.dta", replace
+file ..\data\fipscodes.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\pulldata.txt
+  log type:  text
+ closed on:   7 May 2020, 00:16:49
+--------------------------------------------------------------------------------------------------------------------------

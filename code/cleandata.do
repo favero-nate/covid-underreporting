@@ -29,7 +29,7 @@ order end_week, after(date)
 foreach var of varlist positive-datagrade death-pneumon_influ_and_covid {
 	gen `var'_mis = (`var'==.)
 }
-collapse (firstnm) state report_date (lastnm) positive-datagrade population (sum) death-pneumon_influ_and_covid *_mis, by(end_week fips)
+collapse (firstnm) state report_date (lastnm) positive-datagrade population death-posneg (sum) deathincrease-pneumon_influ_and_covid *_mis, by(end_week fips)
 foreach var of varlist positive-datagrade {
 	replace `var' = . if `var'_mis > 0
 }
@@ -61,13 +61,27 @@ replace adj_expected_deaths = expected_deaths * 93 / 212 if days_to_report <= 7 
 replace adj_expected_deaths = expected_deaths * 159 / 212 if days_to_report > 7 & days_to_report <= 14
 replace adj_expected_deaths = expected_deaths * 192 / 212 if days_to_report > 14 & days_to_report <= 21
 
-egen cumulative_covdeath = sum(covid_deaths), by(fips)
+replace covid_deaths = 5 if covid_deaths == . & total_deaths != . //rough imputation for where data is supressed for 1-9 deaths
+
+
+gen cumulative_covdeath = covid_deaths
+replace cumulative_covdeath = cumulative_covdeath + l.cumulative_covdeath if l.cumulative_covdeath != .
+
+gen adj_covid_deaths = covid_deaths
+replace adj_covid_deaths = covid_deaths * 212 / 93 if days_to_report <= 7 & days_to_report != .
+replace adj_covid_deaths = covid_deaths * 212 / 159 if days_to_report > 7 & days_to_report <= 14
+replace adj_covid_deaths = covid_deaths * 212 / 192 if days_to_report > 14 & days_to_report <= 21
+
+gen adj_cumulative_covdeath = adj_covid_deaths
+replace adj_cumulative_covdeath = adj_cumulative_covdeath + l.adj_cumulative_covdeath if l.adj_cumulative_covdeath != .
 
 gen covdeath_pc = covid_deaths*1000000/population
 gen excess_deaths_pc = (total_deaths-adj_expected_deaths)*1000000/population
 gen new_pos_pc = new_pos*1000000/population
 gen new_neg_pc = new_neg*1000000/population
 gen new_tests_pc = new_pos_pc + new_neg_pc
+gen deathincrease_pc = deathincrease*1000000/population
+gen adj_covid_deaths_pc = adj_covid_deaths*1000000/population
 
 gen log_covdeath = log(covid_deaths)
 	//replace log_covdeath = 2 if covid_deaths==0
@@ -93,5 +107,15 @@ reg excess_deaths_pc c.covdeath_pc##c.new_tests_pc##c.p_pos [aweight=population]
 
 reghv excess_deaths_pc covdeath_pc if days_to_report > 14, var( p_pos population) twostage cluster(fips)
 reghv excess_deaths_pc covdeath_pc if days_to_report > 14, var( p_pos population) cluster(fips)
+
+
+
+reg deathincrease_pc adj_covid_deaths_pc [aweight=population] if days_to_report > 7, cluster(fips)
+reg deathincrease_pc adj_covid_deaths_pc l.adj_covid_deaths_pc [aweight=population] if days_to_report > 7, cluster(fips)
+reg deathincrease_pc c.adj_covid_deaths_pc##c.p_pos [aweight=population] if days_to_report > 7, cluster(fips)
+reg deathincrease_pc c.adj_covid_deaths_pc##c.new_tests_pc [aweight=population] if days_to_report > 7, cluster(fips)
+reg deathincrease_pc c.adj_covid_deaths_pc##c.new_tests_pc c.l.adj_covid_deaths_pc##c.new_tests_pc [aweight=population] if days_to_report > 7, cluster(fips)
+reg deathincrease_pc c.excess_deaths_pc##c.new_tests_pc c.l.excess_deaths_pc##c.new_tests_pc [aweight=population] if days_to_report > 7, cluster(fips)
+
 
 log close

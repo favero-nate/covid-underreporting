@@ -8,6 +8,12 @@ Level of underreporting including underdiagnosis before the first peak of COVID-
 
 https://covidtracking.com/api/v1/states/daily.csv
 
+https://data.cdc.gov/resource/xkkf-xrst.csv (see also: https://www.cdc.gov/nchs/nvss/vsrr/covid19/excess_deaths.htm , https://data.cdc.gov/NCHS/Excess-Deaths-Associated-with-COVID-19/xkkf-xrst/ )
+- can sorta infer expected deaths here: https://data.cdc.gov/resource/r8kw-7aab.csv (see also: https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm )
+- estimating delayed reporting: https://www.cdc.gov/nchs/data/vsrr/report001.pdf
+  - see also https://data.cdc.gov/NCHS/Weekly-Counts-of-Deaths-by-State-and-Select-Causes/muzy-jte6
+  - potentially useful if I can download older versions of this dataset: https://data.cdc.gov/NCHS/Provisional-Death-Counts-for-Coronavirus-Disease-C/hc4f-j6nb
+
 
 
 https://www.pluralsight.com/guides/how-to-use-gitignore-file

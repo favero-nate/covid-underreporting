@@ -2,32 +2,36 @@
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\cleandata.txt
   log type:  text
- opened on:   7 May 2020, 12:13:17
+ opened on:   9 May 2020, 14:35:32
 
 . 
-. use "..\data\fipscodes.dta"
+. use "..\data\population.dta" // start from this file because it has both fips codes and state names
 
 . 
 . merge 1:m fips using "..\data\covidtracking.dta", keep(2 3)
 
     Result                           # of obs.
     -----------------------------------------
-    not matched                             0
-    matched                             3,489  (_merge==3)
+    not matched                           270
+        from master                         0  (_merge==1)
+        from using                        270  (_merge==2)
+
+    matched                             3,331  (_merge==3)
     -----------------------------------------
 
-. drop _merge
+. drop _merge population // merge population back in later because want it merged to all observations, even those missing 
+> from the current dataset
 
 . 
 . merge 1:1 state date using "..\data\cdc_deaths.dta"
 
     Result                           # of obs.
     -----------------------------------------
-    not matched                         3,291
-        from master                     3,019  (_merge==1)
-        from using                        272  (_merge==2)
+    not matched                         3,417
+        from master                     3,138  (_merge==1)
+        from using                        279  (_merge==2)
 
-    matched                               470  (_merge==3)
+    matched                               463  (_merge==3)
     -----------------------------------------
 
 . drop _merge
@@ -35,15 +39,15 @@
 . 
 . drop fips
 
-. merge m:1 state using "..\data\fipscodes.dta", keep(1 3)
+. merge m:1 state using "..\data\population.dta", keep(1 3)
 
     Result                           # of obs.
     -----------------------------------------
-    not matched                            14
-        from master                        14  (_merge==1)
+    not matched                           298
+        from master                       298  (_merge==1)
         from using                          0  (_merge==2)
 
-    matched                             3,747  (_merge==3)
+    matched                             3,582  (_merge==3)
     -----------------------------------------
 
 . drop _merge
@@ -54,7 +58,7 @@
 
 . 
 . drop if fips > 56
-(281 observations deleted)
+(298 observations deleted)
 
 . 
 . encode dataqualitygrade, gen(datagrade)
@@ -75,22 +79,23 @@
   2.         gen `var'_mis = (`var'==.)
   3. }
 
-. collapse (firstnm) state report_date (sum) positive-datagrade death-pneumon_influ_and_covid *_mis, by(end_week fips)
+. collapse (firstnm) state report_date (lastnm) positive-datagrade (sum) death-pneumon_influ_and_covid population *_mis, b
+> y(end_week fips)
 
 . foreach var of varlist positive-datagrade {
   2.         replace `var' = . if `var'_mis > 0
   3. }
-(251 real changes made, 251 to missing)
-(292 real changes made, 292 to missing)
-(691 real changes made, 691 to missing)
-(590 real changes made, 590 to missing)
-(582 real changes made, 582 to missing)
-(680 real changes made, 680 to missing)
-(733 real changes made, 733 to missing)
-(697 real changes made, 697 to missing)
-(758 real changes made, 758 to missing)
-(618 real changes made, 618 to missing)
-(664 real changes made, 664 to missing)
+(0 real changes made)
+(16 real changes made, 16 to missing)
+(50 real changes made, 50 to missing)
+(46 real changes made, 46 to missing)
+(47 real changes made, 47 to missing)
+(29 real changes made, 29 to missing)
+(17 real changes made, 17 to missing)
+(26 real changes made, 26 to missing)
+(12 real changes made, 12 to missing)
+(42 real changes made, 42 to missing)
+(51 real changes made, 51 to missing)
 
 . foreach var of varlist death-pneumon_influ_and_covid {
   2.         replace `var' = . if `var'_mis > 6 | report_date == .
@@ -105,13 +110,13 @@
 (52 real changes made, 52 to missing)
 (52 real changes made, 52 to missing)
 (52 real changes made, 52 to missing)
-(171 real changes made, 171 to missing)
-(54 real changes made, 54 to missing)
-(63 real changes made, 63 to missing)
-(105 real changes made, 105 to missing)
-(195 real changes made, 195 to missing)
-(262 real changes made, 262 to missing)
-(92 real changes made, 92 to missing)
+(168 real changes made, 168 to missing)
+(53 real changes made, 53 to missing)
+(61 real changes made, 61 to missing)
+(100 real changes made, 100 to missing)
+(196 real changes made, 196 to missing)
+(269 real changes made, 269 to missing)
+(88 real changes made, 88 to missing)
 
 . drop *_mis
 
@@ -122,14 +127,14 @@
                 delta:  7 days
 
 . 
-. gen new_pos = d.positive
+. gen new_pos = d.positive if d.positive>=0
 (302 missing values generated)
 
-. gen new_neg = d.negative
-(343 missing values generated)
+. gen new_neg = d.negative if d.negative>=0
+(344 missing values generated)
 
 . gen p_pos = new_pos/(new_pos+new_neg)*100
-(343 missing values generated)
+(344 missing values generated)
 
 . order new_pos-p_pos, after(negative)
 
@@ -211,7 +216,7 @@
 
 . replace adj_expected_deaths = expected_deaths * st_expected_death_adj * 4.8 / 100 if days_to_report <= 1*7+3 & days_to_r
 > eport != .
-(46 real changes made)
+(48 real changes made)
 
 . replace adj_expected_deaths = expected_deaths * st_expected_death_adj * 27.2 / 100 if days_to_report > 1*7+3 & days_to_r
 > eport <= 2*7+3
@@ -302,143 +307,190 @@
 (0 real changes made)
 
 . 
+. egen cumulative_covdeath = sum(covid_deaths), by(fips)
+
+. 
+. gen covdeath_pc = covid_deaths*1000000/population
+(168 missing values generated)
+
+. gen excess_deaths_pc = (total_deaths-adj_expected_deaths)*1000000/population
+(61 missing values generated)
+
+. 
 . gen log_covdeath = log(covid_deaths)
-(565 missing values generated)
+(555 missing values generated)
 
-.         replace log_covdeath = 2 if covid_deaths==0
-(394 real changes made)
-
+.         //replace log_covdeath = 2 if covid_deaths==0
 . gen log_allcause = log(total_deaths)
-(63 missing values generated)
+(62 missing values generated)
 
 . gen log_expected = log(adj_expected_deaths)
-(64 missing values generated)
+(62 missing values generated)
 
 . gen excess_deaths = log_allcause-log_expected
-(64 missing values generated)
+(62 missing values generated)
 
 . 
 . 
 . reg excess_deaths c.log_covdeath c.p_pos if days_to_report > 14
 
-      Source |       SS           df       MS      Number of obs   =       190
--------------+----------------------------------   F(2, 187)       =     43.45
-       Model |  16.1953506         2   8.0976753   Prob > F        =    0.0000
-    Residual |  34.8519358       187  .186373988   R-squared       =    0.3173
--------------+----------------------------------   Adj R-squared   =    0.3100
-       Total |  51.0472864       189  .270091463   Root MSE        =    .43171
+      Source |       SS           df       MS      Number of obs   =       150
+-------------+----------------------------------   F(2, 147)       =     28.18
+       Model |  7.38986277         2  3.69493139   Prob > F        =    0.0000
+    Residual |  19.2767358       147  .131134257   R-squared       =    0.2771
+-------------+----------------------------------   Adj R-squared   =    0.2673
+       Total |  26.6665986       149   .17897046   Root MSE        =    .36212
 
 ------------------------------------------------------------------------------
 excess_dea~s |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
-log_covdeath |   .1977564   .0241629     8.18   0.000     .1500895    .2454232
-       p_pos |  -.0008908   .0029221    -0.30   0.761    -.0066553    .0048737
-       _cons |   -.372786   .0846078    -4.41   0.000    -.5396944   -.2058776
+log_covdeath |   .1624941   .0242116     6.71   0.000     .1146462    .2103419
+       p_pos |   .0000707   .0025042     0.03   0.978    -.0048781    .0050195
+       _cons |  -.2658119   .1021055    -2.60   0.010    -.4675962   -.0640276
 ------------------------------------------------------------------------------
 
 . reg excess_deaths c.log_covdeath##c.p_pos if days_to_report > 14
 
-      Source |       SS           df       MS      Number of obs   =       190
--------------+----------------------------------   F(3, 186)       =     32.10
-       Model |  17.4141679         3  5.80472263   Prob > F        =    0.0000
-    Residual |  33.6331185       186  .180823218   R-squared       =    0.3411
--------------+----------------------------------   Adj R-squared   =    0.3305
-       Total |  51.0472864       189  .270091463   Root MSE        =    .42523
+      Source |       SS           df       MS      Number of obs   =       150
+-------------+----------------------------------   F(3, 146)       =     30.04
+       Model |  10.1782217         3  3.39274058   Prob > F        =    0.0000
+    Residual |  16.4883769       146  .112934088   R-squared       =    0.3817
+-------------+----------------------------------   Adj R-squared   =    0.3690
+       Total |  26.6665986       149   .17897046   Root MSE        =    .33606
 
 ----------------------------------------------------------------------------------------
          excess_deaths |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 -----------------------+----------------------------------------------------------------
-          log_covdeath |   .1209908    .037957     3.19   0.002     .0461092    .1958723
-                 p_pos |  -.0144559   .0059653    -2.42   0.016    -.0262242   -.0026877
+          log_covdeath |   .0011985   .0394785     0.03   0.976    -.0768248    .0792217
+                 p_pos |  -.0285257   .0062065    -4.60   0.000    -.0407919   -.0162594
                        |
-c.log_covdeath#c.p_pos |   .0034632   .0013339     2.60   0.010     .0008316    .0060948
+c.log_covdeath#c.p_pos |   .0064656   .0013012     4.97   0.000      .003894    .0090372
                        |
-                 _cons |  -.1086421   .1315166    -0.83   0.410    -.3680981     .150814
+                 _cons |   .3997491   .1640725     2.44   0.016      .075485    .7240131
 ----------------------------------------------------------------------------------------
 
 . 
 . reg excess_deaths c.log_covdeath c.p_pos if days_to_report > 14 & excess_deaths > 0
 
-      Source |       SS           df       MS      Number of obs   =       182
--------------+----------------------------------   F(2, 179)       =    170.61
-       Model |  12.0372905         2  6.01864526   Prob > F        =    0.0000
-    Residual |  6.31446887       179  .035276362   R-squared       =    0.6559
--------------+----------------------------------   Adj R-squared   =    0.6521
-       Total |  18.3517594       181  .101390936   Root MSE        =    .18782
+      Source |       SS           df       MS      Number of obs   =       146
+-------------+----------------------------------   F(2, 143)       =     80.78
+       Model |  7.64423331         2  3.82211666   Prob > F        =    0.0000
+    Residual |  6.76646568       143  .047317942   R-squared       =    0.5305
+-------------+----------------------------------   Adj R-squared   =    0.5239
+       Total |   14.410699       145  .099384131   Root MSE        =    .21753
 
 ------------------------------------------------------------------------------
 excess_dea~s |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
-log_covdeath |   .1608381   .0106684    15.08   0.000     .1397862      .18189
-       p_pos |   .0021386   .0012976     1.65   0.101    -.0004219    .0046991
-       _cons |  -.2119592   .0377725    -5.61   0.000    -.2864958   -.1374226
+log_covdeath |   .1474358   .0146255    10.08   0.000     .1185258    .1763459
+       p_pos |   .0036843    .001529     2.41   0.017     .0006618    .0067067
+       _cons |  -.2139745   .0615717    -3.48   0.001    -.3356829   -.0922661
 ------------------------------------------------------------------------------
 
 . reg excess_deaths c.log_covdeath##c.p_pos if days_to_report > 14 & excess_deaths > 0
 
-      Source |       SS           df       MS      Number of obs   =       182
--------------+----------------------------------   F(3, 178)       =    172.08
-       Model |  13.6463855         3  4.54879517   Prob > F        =    0.0000
-    Residual |  4.70537389       178  .026434685   R-squared       =    0.7436
--------------+----------------------------------   Adj R-squared   =    0.7393
-       Total |  18.3517594       181  .101390936   Root MSE        =    .16259
+      Source |       SS           df       MS      Number of obs   =       146
+-------------+----------------------------------   F(3, 142)       =    102.54
+       Model |  9.85935499         3  3.28645166   Prob > F        =    0.0000
+    Residual |    4.551344       142  .032051718   R-squared       =    0.6842
+-------------+----------------------------------   Adj R-squared   =    0.6775
+       Total |   14.410699       145  .099384131   Root MSE        =    .17903
 
 ----------------------------------------------------------------------------------------
          excess_deaths |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 -----------------------+----------------------------------------------------------------
-          log_covdeath |   .0704505   .0148157     4.76   0.000     .0412135    .0996876
-                 p_pos |  -.0138325    .002335    -5.92   0.000    -.0184403   -.0092247
+          log_covdeath |   .0039579   .0210419     0.19   0.851    -.0376379    .0455537
+                 p_pos |  -.0219321   .0033284    -6.59   0.000    -.0285118   -.0153524
                        |
-c.log_covdeath#c.p_pos |   .0040376   .0005175     7.80   0.000     .0030163    .0050588
+c.log_covdeath#c.p_pos |    .005774   .0006945     8.31   0.000      .004401     .007147
                        |
-                 _cons |   .1029318   .0519435     1.98   0.049     .0004276    .2054361
+                 _cons |   .3783545   .0874336     4.33   0.000     .2055148    .5511943
 ----------------------------------------------------------------------------------------
 
 . 
-. reg excess_deaths c.log_covdeath c.p_pos [aweight=adj_expected_deaths] if days_to_report > 14 // weights should really b
-> e based on population
-(sum of wgt is 162,759.795696259)
+. reg excess_deaths c.log_covdeath c.p_pos [aweight=population] if days_to_report > 14
+(sum of wgt is 8,942,683,309)
 
-      Source |       SS           df       MS      Number of obs   =       190
--------------+----------------------------------   F(2, 187)       =     69.57
-       Model |  25.9888475         2  12.9944238   Prob > F        =    0.0000
-    Residual |  34.9276067       187  .186778645   R-squared       =    0.4266
--------------+----------------------------------   Adj R-squared   =    0.4205
-       Total |  60.9164542       189  .322309281   Root MSE        =    .43218
+      Source |       SS           df       MS      Number of obs   =       150
+-------------+----------------------------------   F(2, 147)       =     69.26
+       Model |  12.3663301         2  6.18316504   Prob > F        =    0.0000
+    Residual |    13.12357       147  .089275987   R-squared       =    0.4851
+-------------+----------------------------------   Adj R-squared   =    0.4781
+       Total |  25.4899001       149  .171073155   Root MSE        =    .29879
 
 ------------------------------------------------------------------------------
 excess_dea~s |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
-log_covdeath |   .2224093   .0229133     9.71   0.000     .1772075    .2676112
-       p_pos |      .0037   .0027513     1.34   0.180    -.0017276    .0091276
-       _cons |  -.6489402     .09472    -6.85   0.000    -.8357972   -.4620832
+log_covdeath |   .1752015   .0190563     9.19   0.000     .1375419    .2128611
+       p_pos |   .0053102     .00205     2.59   0.011      .001259    .0093615
+       _cons |   -.474531   .0917513    -5.17   0.000    -.6558529   -.2932092
 ------------------------------------------------------------------------------
 
-. reg excess_deaths c.log_covdeath##c.p_pos [aweight=adj_expected_deaths] if days_to_report > 14
-(sum of wgt is 162,759.795696259)
+. reg excess_deaths c.log_covdeath##c.p_pos [aweight=population] if days_to_report > 14
+(sum of wgt is 8,942,683,309)
 
-      Source |       SS           df       MS      Number of obs   =       190
--------------+----------------------------------   F(3, 186)       =     47.69
-       Model |  26.4851741         3  8.82839136   Prob > F        =    0.0000
-    Residual |  34.4312801       186  .185114409   R-squared       =    0.4348
--------------+----------------------------------   Adj R-squared   =    0.4257
-       Total |  60.9164542       189  .322309281   Root MSE        =    .43025
+      Source |       SS           df       MS      Number of obs   =       150
+-------------+----------------------------------   F(3, 146)       =     77.64
+       Model |  15.6687516         3   5.2229172   Prob > F        =    0.0000
+    Residual |  9.82114852       146  .067268141   R-squared       =    0.6147
+-------------+----------------------------------   Adj R-squared   =    0.6068
+       Total |  25.4899001       149  .171073155   Root MSE        =    .25936
 
 ----------------------------------------------------------------------------------------
          excess_deaths |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 -----------------------+----------------------------------------------------------------
-          log_covdeath |   .1727037   .0379713     4.55   0.000      .097794    .2476135
-                 p_pos |  -.0055864   .0062981    -0.89   0.376    -.0180114    .0068385
+          log_covdeath |   .0244745   .0271364     0.90   0.369    -.0291565    .0781054
+                 p_pos |  -.0262879   .0048481    -5.42   0.000    -.0358694   -.0167064
                        |
-c.log_covdeath#c.p_pos |    .002078   .0012691     1.64   0.103    -.0004256    .0045816
+c.log_covdeath#c.p_pos |   .0061974   .0008845     7.01   0.000     .0044493    .0079454
                        |
-                 _cons |  -.4471234   .1551869    -2.88   0.004    -.7532761   -.1409707
+                 _cons |   .2449163   .1299474     1.88   0.061    -.0119046    .5017372
 ----------------------------------------------------------------------------------------
+
+. 
+. reg excess_deaths_pc c.covdeath_pc c.p_pos [aweight=population] if days_to_report > 14
+(sum of wgt is 9,674,155,568)
+
+      Source |       SS           df       MS      Number of obs   =       190
+-------------+----------------------------------   F(2, 187)       =    375.76
+       Model |  28751.6967         2  14375.8483   Prob > F        =    0.0000
+    Residual |  7154.25087       187   38.258026   R-squared       =    0.8008
+-------------+----------------------------------   Adj R-squared   =    0.7986
+       Total |  35905.9475       189  189.978558   Root MSE        =    6.1853
+
+------------------------------------------------------------------------------
+excess_dea~c |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+ covdeath_pc |   1.595977   .0705136    22.63   0.000     1.456873    1.735082
+       p_pos |  -.0320125   .0417699    -0.77   0.444    -.1144132    .0503883
+       _cons |   8.333648   .7475174    11.15   0.000     6.858997    9.808299
+------------------------------------------------------------------------------
+
+. reg excess_deaths_pc c.covdeath_pc##c.p_pos [aweight=population] if days_to_report > 14
+(sum of wgt is 9,674,155,568)
+
+      Source |       SS           df       MS      Number of obs   =       190
+-------------+----------------------------------   F(3, 186)       =    267.11
+       Model |  29141.6427         3  9713.88091   Prob > F        =    0.0000
+    Residual |  6764.30482       186  36.3672302   R-squared       =    0.8116
+-------------+----------------------------------   Adj R-squared   =    0.8086
+       Total |  35905.9475       189  189.978558   Root MSE        =    6.0305
+
+---------------------------------------------------------------------------------------
+     excess_deaths_pc |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+----------------------+----------------------------------------------------------------
+          covdeath_pc |   2.389158   .2517956     9.49   0.000     1.892416    2.885901
+                p_pos |   .0038715   .0421733     0.09   0.927    -.0793279     .087071
+                      |
+c.covdeath_pc#c.p_pos |  -.0191771   .0058565    -3.27   0.001    -.0307308   -.0076235
+                      |
+                _cons |   6.864594   .8558253     8.02   0.000     5.176222    8.552966
+---------------------------------------------------------------------------------------
 
 . 
 . log close
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\cleandata.txt
   log type:  text
- closed on:   7 May 2020, 12:13:18
+ closed on:   9 May 2020, 14:35:34
 --------------------------------------------------------------------------------------------------------------------------

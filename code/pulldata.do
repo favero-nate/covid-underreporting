@@ -42,10 +42,12 @@ drop *_mis
 
 save "..\data\cdc_deaths.dta", replace
 
-insheet using "https://www2.census.gov/geo/docs/reference/state.txt", clear delimiter("|") 
+insheet using "https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/national/totals/nst-est2019-alldata.csv", clear
 rename state fips
-rename state_name state
-keep fips state
-save "..\data\fipscodes.dta", replace
+rename name state
+rename popestimate2019 population
+keep if fips > 0 & fips < 60
+keep fips state population
+save "..\data\population.dta", replace
 
 log close

@@ -2,11 +2,11 @@
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\pulldata.txt
   log type:  text
- opened on:   7 May 2020, 00:16:48
+ opened on:   9 May 2020, 13:40:30
 
 . 
 . import delimited "https://covidtracking.com/api/v1/states/daily.csv", stringcols(1)
-(27 vars, 3,489 obs)
+(27 vars, 3,601 obs)
 
 . rename date olddate
 
@@ -32,7 +32,7 @@ file ..\data\covidtracking.dta saved
 > */
 . 
 . insheet using "https://data.cdc.gov/resource/r8kw-7aab.csv", clear
-(14 vars, 756 obs)
+(14 vars, 1,000 obs)
 
 . gen date = date(substr(end_week,1,10), "YMD")
 
@@ -45,7 +45,7 @@ file ..\data\covidtracking.dta saved
 . order date report_date
 
 . gen expected_deaths = total_deaths / percent_of_expected_deaths
-(12 missing values generated)
+(15 missing values generated)
 
 . order expected_deaths, after(total_deaths)
 
@@ -66,13 +66,13 @@ file ..\data\covidtracking.dta saved
 . foreach var of varlist covid_deaths-pneumon_influ_and_covid {
   2.         replace `var' = . if `var'_mis > 0
   3. }
-(130 real changes made, 130 to missing)
-(3 real changes made, 3 to missing)
-(12 real changes made, 12 to missing)
-(81 real changes made, 81 to missing)
-(155 real changes made, 155 to missing)
-(388 real changes made, 388 to missing)
-(64 real changes made, 64 to missing)
+(129 real changes made, 129 to missing)
+(2 real changes made, 2 to missing)
+(10 real changes made, 10 to missing)
+(76 real changes made, 76 to missing)
+(157 real changes made, 157 to missing)
+(395 real changes made, 395 to missing)
+(60 real changes made, 60 to missing)
 
 . drop *_mis
 
@@ -81,22 +81,29 @@ file ..\data\covidtracking.dta saved
 file ..\data\cdc_deaths.dta saved
 
 . 
-. insheet using "https://www2.census.gov/geo/docs/reference/state.txt", clear delimiter("|") 
-(4 vars, 57 obs)
+. insheet using "https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/national/totals/nst-est2019-alldata.cs
+> v", clear
+(151 vars, 57 obs)
 
 . rename state fips
 
-. rename state_name state
+. rename name state
 
-. keep fips state
+. rename popestimate2019 population
 
-. save "..\data\fipscodes.dta", replace
-file ..\data\fipscodes.dta saved
+. keep if fips > 0 & fips < 60
+(6 observations deleted)
+
+. keep fips state population
+
+. save "..\data\population.dta", replace
+(note: file ..\data\population.dta not found)
+file ..\data\population.dta saved
 
 . 
 . log close
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\pulldata.txt
   log type:  text
- closed on:   7 May 2020, 00:16:49
+ closed on:   9 May 2020, 13:40:32
 --------------------------------------------------------------------------------------------------------------------------

@@ -1,12 +1,12 @@
---------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\pulldata.txt
   log type:  text
- opened on:   9 May 2020, 13:40:30
+ opened on:  16 May 2020, 16:53:03
 
 . 
 . import delimited "https://covidtracking.com/api/v1/states/daily.csv", stringcols(1)
-(27 vars, 3,601 obs)
+(27 vars, 4,049 obs)
 
 . rename date olddate
 
@@ -32,7 +32,7 @@ file ..\data\covidtracking.dta saved
 > */
 . 
 . insheet using "https://data.cdc.gov/resource/r8kw-7aab.csv", clear
-(14 vars, 1,000 obs)
+(14 vars, 810 obs)
 
 . gen date = date(substr(end_week,1,10), "YMD")
 
@@ -45,34 +45,34 @@ file ..\data\covidtracking.dta saved
 . order date report_date
 
 . gen expected_deaths = total_deaths / percent_of_expected_deaths
-(15 missing values generated)
+(11 missing values generated)
 
 . order expected_deaths, after(total_deaths)
 
 . drop start_week group indicator percent_of_expected_deaths footnote
 
 . replace state = "New York" if state == "New York City"
-(14 real changes made)
+(15 real changes made)
 
-. rename pneumonia_influenza_and_covid pneumon_influ_and_covid
+. rename pneumonia_influenza_or_covid pneumon_influ_or_covid
 
 . 
-. foreach var of varlist covid_deaths-pneumon_influ_and_covid {
+. foreach var of varlist covid_deaths-pneumon_influ_or_covid {
   2.         gen `var'_mis = (`var'==.)
   3. }
 
-. collapse (sum) covid_deaths-pneumon_influ_and_covid_mis (first) report_date, by(state date)
+. collapse (sum) covid_deaths-pneumon_influ_or_covid_mis (first) report_date, by(state date)
 
-. foreach var of varlist covid_deaths-pneumon_influ_and_covid {
+. foreach var of varlist covid_deaths-pneumon_influ_or_covid {
   2.         replace `var' = . if `var'_mis > 0
   3. }
-(129 real changes made, 129 to missing)
-(2 real changes made, 2 to missing)
-(10 real changes made, 10 to missing)
-(76 real changes made, 76 to missing)
-(157 real changes made, 157 to missing)
-(395 real changes made, 395 to missing)
-(60 real changes made, 60 to missing)
+(136 real changes made, 136 to missing)
+(6 real changes made, 6 to missing)
+(11 real changes made, 11 to missing)
+(69 real changes made, 69 to missing)
+(168 real changes made, 168 to missing)
+(414 real changes made, 414 to missing)
+(54 real changes made, 54 to missing)
 
 . drop *_mis
 
@@ -81,8 +81,8 @@ file ..\data\covidtracking.dta saved
 file ..\data\cdc_deaths.dta saved
 
 . 
-. insheet using "https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/national/totals/nst-est2019-alldata.cs
-> v", clear
+. insheet using "https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/national/totals/n
+> st-est2019-alldata.csv", clear
 (151 vars, 57 obs)
 
 . rename state fips
@@ -97,7 +97,6 @@ file ..\data\cdc_deaths.dta saved
 . keep fips state population
 
 . save "..\data\population.dta", replace
-(note: file ..\data\population.dta not found)
 file ..\data\population.dta saved
 
 . 
@@ -105,5 +104,5 @@ file ..\data\population.dta saved
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\pulldata.txt
   log type:  text
- closed on:   9 May 2020, 13:40:32
---------------------------------------------------------------------------------------------------------------------------
+ closed on:  16 May 2020, 16:53:06
+-----------------------------------------------------------------------------------------------------

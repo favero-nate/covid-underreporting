@@ -26,14 +26,14 @@ gen end_week = date + mod(6 - dow(date), 7)
 format end_week %tdCCYYNNDD
 order end_week, after(date)
 
-foreach var of varlist positive-datagrade death-pneumon_influ_and_covid {
+foreach var of varlist positive-datagrade death-pneumon_influ_or_covid {
 	gen `var'_mis = (`var'==.)
 }
-collapse (firstnm) state report_date (lastnm) positive-datagrade population death-posneg (sum) deathincrease-pneumon_influ_and_covid *_mis, by(end_week fips)
+collapse (firstnm) state report_date (lastnm) positive-datagrade population death-posneg (sum) deathincrease-pneumon_influ_or_covid *_mis, by(end_week fips)
 foreach var of varlist positive-datagrade {
 	replace `var' = . if `var'_mis > 0
 }
-foreach var of varlist death-pneumon_influ_and_covid {
+foreach var of varlist death-pneumon_influ_or_covid {
 	replace `var' = . if `var'_mis > 6 | report_date == .
 }
 drop *_mis
@@ -51,10 +51,15 @@ gen days_to_report = report_date - end_week
 
 drop if fips == 9 | fips == 37 // Connecticut and North Carolina's data look highly problematic, so dropping them
 
-
-//gen allcause_minus_posscovid = total_deaths - pneumon_influ_and_covid
-//gen allcause_pc  = allcause_minus_posscovid*1000000/population
-//bys days_to_report: sum allcause_minus_posscovid_pc
+/*
+gen allcause_minus_posscovid = total_deaths - pneumon_influ_or_covid
+gen allcause_minus_posscovid_pc  = allcause_minus_posscovid*1000000/population
+bys days_to_report: sum allcause_minus_posscovid_pc
+gen adj_allcause_minus_posscovid_pc = allcause_minus_posscovid_pc
+replace adj_allcause_minus_posscovid_pc = allcause_minus_posscovid_pc * 212 / 93 if days_to_report <= 7 & days_to_report != .
+replace adj_allcause_minus_posscovid_pc = allcause_minus_posscovid_pc * 212 / 159 if days_to_report > 7 & days_to_report <= 14
+replace adj_allcause_minus_posscovid_pc = allcause_minus_posscovid_pc * 212 / 192 if days_to_report > 14 & days_to_report <= 21
+*/
 
 gen adj_expected_deaths = expected_deaths
 replace adj_expected_deaths = expected_deaths * 93 / 212 if days_to_report <= 7 & days_to_report != .

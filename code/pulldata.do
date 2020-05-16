@@ -29,13 +29,13 @@ gen expected_deaths = total_deaths / percent_of_expected_deaths
 order expected_deaths, after(total_deaths)
 drop start_week group indicator percent_of_expected_deaths footnote
 replace state = "New York" if state == "New York City"
-rename pneumonia_influenza_and_covid pneumon_influ_and_covid
+rename pneumonia_influenza_or_covid pneumon_influ_or_covid
 
-foreach var of varlist covid_deaths-pneumon_influ_and_covid {
+foreach var of varlist covid_deaths-pneumon_influ_or_covid {
 	gen `var'_mis = (`var'==.)
 }
-collapse (sum) covid_deaths-pneumon_influ_and_covid_mis (first) report_date, by(state date)
-foreach var of varlist covid_deaths-pneumon_influ_and_covid {
+collapse (sum) covid_deaths-pneumon_influ_or_covid_mis (first) report_date, by(state date)
+foreach var of varlist covid_deaths-pneumon_influ_or_covid {
 	replace `var' = . if `var'_mis > 0
 }
 drop *_mis

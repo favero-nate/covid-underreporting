@@ -2,7 +2,7 @@
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\cleandata.txt
   log type:  text
- opened on:  16 May 2020, 17:20:27
+ opened on:  16 May 2020, 17:30:52
 
 . 
 . use "..\data\population.dta" // start from this file because it has both fips codes and state names
@@ -249,6 +249,11 @@
 
 . gen excess_deaths = log_allcause-log_expected
 (53 missing values generated)
+
+. 
+. save "..\data\weeklydata.dta", replace
+(note: file ..\data\weeklydata.dta not found)
+file ..\data\weeklydata.dta saved
 
 . 
 . 
@@ -721,5 +726,5 @@ cL.excess_deaths_pc#c.new_tests_pc |  -.0000593    .000023    -2.59   0.013    -
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\cleandata.txt
   log type:  text
- closed on:  16 May 2020, 17:20:30
+ closed on:  16 May 2020, 17:30:56
 -----------------------------------------------------------------------------------------------------

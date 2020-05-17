@@ -1,0 +1,1019 @@
+-----------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\analysis.txt
+  log type:  text
+ opened on:  17 May 2020, 19:10:00
+
+. 
+. use "..\data\weeklydata.dta"
+
+. 
+. reg f.excess_deaths_pc new_pos_pc new_tests_pc if days_to_report > 21 [aweight=population]
+(sum of wgt is 1,630,801,724)
+
+      Source |       SS           df       MS      Number of obs   =       261
+-------------+----------------------------------   F(2, 258)       =    935.32
+       Model |  1653100.22         2  826550.111   Prob > F        =    0.0000
+    Residual |  227996.154       258  883.706022   R-squared       =    0.8788
+-------------+----------------------------------   Adj R-squared   =    0.8779
+       Total |  1881096.38       260  7234.98606   Root MSE        =    29.727
+
+------------------------------------------------------------------------------
+F.           |
+excess_dea~c |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+  new_pos_pc |   .1376431   .0043949    31.32   0.000     .1289887    .1462975
+new_tests_pc |  -.0122547   .0016305    -7.52   0.000    -.0154655    -.009044
+       _cons |   9.673243    2.94488     3.28   0.001     3.874181    15.47231
+------------------------------------------------------------------------------
+
+. reg f.excess_deaths_pc c.new_pos_pc if days_to_report > 21 [aweight=population]
+(sum of wgt is 1,923,913,767)
+
+      Source |       SS           df       MS      Number of obs   =       299
+-------------+----------------------------------   F(1, 297)       =   1734.62
+       Model |  1618815.04         1  1618815.04   Prob > F        =    0.0000
+    Residual |  277171.248       297  933.236526   R-squared       =    0.8538
+-------------+----------------------------------   Adj R-squared   =    0.8533
+       Total |  1895986.28       298  6362.37008   Root MSE        =    30.549
+
+------------------------------------------------------------------------------
+F.           |
+excess_dea~c |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+  new_pos_pc |   .1105676   .0026548    41.65   0.000      .105343    .1157921
+       _cons |  -4.652893   2.013093    -2.31   0.021    -8.614627   -.6911587
+------------------------------------------------------------------------------
+
+. reg f.excess_deaths_pc c.new_pos_pc c.new_pos_pc#c.p_pos if days_to_report > 21 [aweight=population
+> ]
+(sum of wgt is 1,630,801,724)
+
+      Source |       SS           df       MS      Number of obs   =       261
+-------------+----------------------------------   F(2, 258)       =    926.35
+       Model |  1651161.84         2  825580.918   Prob > F        =    0.0000
+    Residual |   229934.54       258  891.219147   R-squared       =    0.8778
+-------------+----------------------------------   Adj R-squared   =    0.8768
+       Total |  1881096.38       260  7234.98606   Root MSE        =    29.853
+
+--------------------------------------------------------------------------------------
+  F.excess_deaths_pc |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+---------------------+----------------------------------------------------------------
+          new_pos_pc |   .0357877   .0105864     3.38   0.001      .014941    .0566345
+                     |
+c.new_pos_pc#c.p_pos |   .0017443   .0002377     7.34   0.000     .0012762    .0022124
+                     |
+               _cons |   4.355581   2.538488     1.72   0.087    -.6432129    9.354374
+--------------------------------------------------------------------------------------
+
+. gen adj_pos = new_pos_pc*(1+_b[c.new_pos_pc#c.p_pos]/_b[new_pos_pc]*p_pos)
+(329 missing values generated)
+
+. reg f.excess_deaths_pc adj_pos if days_to_report > 21 [aweight=population]
+(sum of wgt is 1,630,801,724)
+
+      Source |       SS           df       MS      Number of obs   =       261
+-------------+----------------------------------   F(1, 259)       =   1859.88
+       Model |  1651161.84         1  1651161.84   Prob > F        =    0.0000
+    Residual |  229934.532       259  887.778116   R-squared       =    0.8778
+-------------+----------------------------------   Adj R-squared   =    0.8773
+       Total |  1881096.38       260  7234.98606   Root MSE        =    29.796
+
+------------------------------------------------------------------------------
+F.           |
+excess_dea~c |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     adj_pos |   .0357877   .0008298    43.13   0.000     .0341536    .0374218
+       _cons |   4.355581   2.036724     2.14   0.033     .3449335    8.366228
+------------------------------------------------------------------------------
+
+. 
+. reg f.excess_deaths_pc c.new_pos_pc##c.p_pos##c.p_pos if days_to_report > 21 [aweight=population], 
+> cluster(fips)
+(sum of wgt is 1,630,801,724)
+
+Linear regression                               Number of obs     =        261
+                                                F(5, 48)          =    2458.94
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.8860
+                                                Root MSE          =     28.998
+
+                                                  (Std. Err. adjusted for 49 clusters in fips)
+----------------------------------------------------------------------------------------------
+                             |               Robust
+          F.excess_deaths_pc |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-----------------------------+----------------------------------------------------------------
+                  new_pos_pc |  -.0390664   .0338301    -1.15   0.254    -.1070863    .0289536
+                       p_pos |   .5486953   .6983969     0.79   0.436    -.8555257    1.952916
+                             |
+        c.new_pos_pc#c.p_pos |   .0058484    .002372     2.47   0.017     .0010792    .0106175
+                             |
+             c.p_pos#c.p_pos |  -.0045404   .0085448    -0.53   0.598    -.0217209      .01264
+                             |
+c.new_pos_pc#c.p_pos#c.p_pos |  -.0000557   .0000388    -1.43   0.158    -.0001337    .0000224
+                             |
+                       _cons |   3.465468   6.219567     0.56   0.580    -9.039809    15.97074
+----------------------------------------------------------------------------------------------
+
+. reg f.excess_deaths_pc c.new_pos_pc c.new_pos_pc#c.p_pos if days_to_report > 21 [aweight=population
+> ], cluster(fips)
+(sum of wgt is 1,630,801,724)
+
+Linear regression                               Number of obs     =        261
+                                                F(2, 48)          =     443.91
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.8778
+                                                Root MSE          =     29.853
+
+                                          (Std. Err. adjusted for 49 clusters in fips)
+--------------------------------------------------------------------------------------
+                     |               Robust
+  F.excess_deaths_pc |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+---------------------+----------------------------------------------------------------
+          new_pos_pc |   .0357877   .0275825     1.30   0.201    -.0196707    .0912461
+                     |
+c.new_pos_pc#c.p_pos |   .0017443   .0007115     2.45   0.018     .0003137    .0031749
+                     |
+               _cons |   4.355581   4.158016     1.05   0.300    -4.004671    12.71583
+--------------------------------------------------------------------------------------
+
+. reg f.excess_deaths_pc c.new_pos_pc#c.p_pos if days_to_report > 21 [aweight=population], cluster(fi
+> ps)
+(sum of wgt is 1,630,801,724)
+
+Linear regression                               Number of obs     =        261
+                                                F(1, 48)          =     192.82
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.8724
+                                                Root MSE          =     30.448
+
+                                          (Std. Err. adjusted for 49 clusters in fips)
+--------------------------------------------------------------------------------------
+                     |               Robust
+  F.excess_deaths_pc |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+---------------------+----------------------------------------------------------------
+c.new_pos_pc#c.p_pos |    .002523   .0001817    13.89   0.000     .0021577    .0028883
+                     |
+               _cons |   9.673744   2.754519     3.51   0.001     4.135412    15.21208
+--------------------------------------------------------------------------------------
+
+. reg f.excess_deaths_pc c.new_pos_pc#c.p_pos c.new_pos_pc#c.p_pos#c.p_pos if days_to_report > 21 [aw
+> eight=population], cluster(fips)
+(sum of wgt is 1,630,801,724)
+
+Linear regression                               Number of obs     =        261
+                                                F(2, 48)          =    1479.99
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.8830
+                                                Root MSE          =     29.212
+
+                                                  (Std. Err. adjusted for 49 clusters in fips)
+----------------------------------------------------------------------------------------------
+                             |               Robust
+          F.excess_deaths_pc |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-----------------------------+----------------------------------------------------------------
+        c.new_pos_pc#c.p_pos |   .0040662   .0008155     4.99   0.000     .0024266    .0057058
+                             |
+c.new_pos_pc#c.p_pos#c.p_pos |  -.0000336   .0000194    -1.74   0.089    -.0000726    5.30e-06
+                             |
+                       _cons |   6.231445   2.899857     2.15   0.037     .4008907      12.062
+----------------------------------------------------------------------------------------------
+
+. reg f.excess_deaths_pc c.new_pos_pc c.new_pos_pc#c.p_pos i.fips if days_to_report > 21 [aweight=pop
+> ulation]
+(sum of wgt is 1,630,801,724)
+
+      Source |       SS           df       MS      Number of obs   =       261
+-------------+----------------------------------   F(50, 210)      =     50.59
+       Model |   1736907.5        50  34738.1501   Prob > F        =    0.0000
+    Residual |  144188.873       210  686.613682   R-squared       =    0.9233
+-------------+----------------------------------   Adj R-squared   =    0.9051
+       Total |  1881096.38       260  7234.98606   Root MSE        =    26.203
+
+--------------------------------------------------------------------------------------
+  F.excess_deaths_pc |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+---------------------+----------------------------------------------------------------
+          new_pos_pc |   .0176397   .0127437     1.38   0.168    -.0074822    .0427616
+                     |
+c.new_pos_pc#c.p_pos |   .0016762   .0002885     5.81   0.000     .0011075    .0022449
+                     |
+                fips |
+                  2  |  -20.08789   34.61177    -0.58   0.562    -88.31893    48.14314
+                  4  |    16.1256   17.83879     0.90   0.367    -19.04046    51.29166
+                  5  |  -1.412574    21.3791    -0.07   0.947    -43.55772    40.73257
+                  6  |   9.575147   15.42558     0.62   0.535    -20.83369    39.98398
+                  8  |   23.72138   18.52377     1.28   0.202    -12.79499    60.23774
+                 10  |  -18.43134   30.87962    -0.60   0.551     -79.3051    42.44242
+                 11  |   4.111709   35.17007     0.12   0.907    -65.21993    73.44335
+                 12  |   12.26385   15.87744     0.77   0.441    -19.03574    43.56344
+                 13  |  -20.33668   18.82949    -1.08   0.281    -57.45572    16.78236
+                 15  |   -2.23263   35.06696    -0.06   0.949      -71.361    66.89574
+                 16  |   5.122937   24.88626     0.21   0.837    -43.93597    54.18185
+                 17  |    22.7384   16.59995     1.37   0.172    -9.985484    55.46229
+                 18  |   15.27712   19.46188     0.78   0.433    -23.08856     53.6428
+                 19  |  -4.106339   21.12471    -0.19   0.846       -45.75    37.53732
+                 20  |   4.592387   21.57682     0.21   0.832    -37.94254    47.12731
+                 21  |  -17.92509   19.50121    -0.92   0.359    -56.36832    20.51814
+                 22  |   4.029673    20.7735     0.19   0.846    -36.92164    44.98099
+                 23  |  -4.714255   27.44112    -0.17   0.864    -58.80961     49.3811
+                 24  |   26.18315   18.36247     1.43   0.155    -10.01525    62.38155
+                 25  |   56.73572   20.33448     2.79   0.006     16.64984    96.82159
+                 26  |   46.37428   17.50835     2.65   0.009     11.85964    80.88891
+                 27  |   10.51812   18.64571     0.56   0.573    -26.23863    47.27486
+                 28  |    20.9787   24.07786     0.87   0.385    -26.48658    68.44399
+                 29  |  -4.426876    19.8368    -0.22   0.824    -43.53165     34.6779
+                 30  |  -3.289288   29.82912    -0.11   0.912    -62.09217     55.5136
+                 31  |  -12.44623   24.28527    -0.51   0.609    -60.32039    35.42793
+                 32  |   3.139828   21.23692     0.15   0.883    -38.72503    45.00469
+                 33  |   11.26716   27.29601     0.41   0.680    -42.54214    65.07646
+                 34  |   42.81694    19.9825     2.14   0.033     3.424946    82.20893
+                 35  |  -.3487451   23.66844    -0.01   0.988    -47.00692    46.30943
+                 36  |   75.27727   17.39361     4.33   0.000     40.98881    109.5657
+                 38  |  -57.04252   34.02656    -1.68   0.095    -124.1199    10.03489
+                 39  |  -14.71377   16.75899    -0.88   0.381    -47.75118    18.32364
+                 40  |  -12.23875   20.93609    -0.58   0.559    -53.51059    29.03309
+                 41  |  -.4548356   19.75183    -0.02   0.982     -39.3921    38.48243
+                 42  |   12.36175   17.50892     0.71   0.481    -22.15402    46.87752
+                 44  |  -40.19264   32.52193    -1.24   0.218    -104.3039    23.91865
+                 45  |   14.90385   18.93095     0.79   0.432     -22.4152     52.2229
+                 46  |  -17.69977   32.04769    -0.55   0.581    -80.87618    45.47664
+                 47  |   1.309394   19.38853     0.07   0.946    -36.91169    39.53048
+                 48  |   2.765477   16.37647     0.17   0.866    -29.51786    35.04882
+                 49  |   5.747864   23.52462     0.24   0.807     -40.6268    52.12252
+                 50  |   10.30514   36.94132     0.28   0.781     -62.5182    83.12848
+                 51  |   14.27698   17.41617     0.82   0.413    -20.05595    48.60991
+                 53  |   10.73058    17.6887     0.61   0.545     -24.1396    45.60075
+                 54  |  -45.84152   24.89012    -1.84   0.067    -94.90803    3.224986
+                 55  |    14.5629   18.50571     0.79   0.432    -21.91787    51.04367
+                 56  |    16.3432   51.86692     0.32   0.753    -85.90334    118.5897
+                     |
+               _cons |  -1.295151   14.95033    -0.09   0.931     -30.7671     28.1768
+--------------------------------------------------------------------------------------
+
+. xtreg f.excess_deaths_pc c.new_pos_pc c.new_pos_pc#c.p_pos if days_to_report > 21, re
+
+Random-effects GLS regression                   Number of obs     =        261
+Group variable: fips                            Number of groups  =         49
+
+R-sq:                                           Obs per group:
+     within  = 0.5635                                         min =          3
+     between = 0.8686                                         avg =        5.3
+     overall = 0.7616                                         max =          6
+
+                                                Wald chi2(2)      =     515.62
+corr(u_i, X)   = 0 (assumed)                    Prob > chi2       =     0.0000
+
+--------------------------------------------------------------------------------------
+  F.excess_deaths_pc |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+---------------------+----------------------------------------------------------------
+          new_pos_pc |  -.0010749   .0097463    -0.11   0.912    -.0201773    .0180274
+                     |
+c.new_pos_pc#c.p_pos |   .0021744     .00024     9.06   0.000      .001704    .0026448
+                     |
+               _cons |   5.184066   3.344223     1.55   0.121    -1.370492    11.73862
+---------------------+----------------------------------------------------------------
+             sigma_u |  16.402342
+             sigma_e |  23.593054
+                 rho |    .325841   (fraction of variance due to u_i)
+--------------------------------------------------------------------------------------
+
+. 
+. 
+. reg f.excess_deaths_pc c.new_pos_pc#c.p_pos c.new_pos_pc#c.p_pos#c.p_pos if days_to_report > 21 [aw
+> eight=population], cluster(fips)
+(sum of wgt is 1,630,801,724)
+
+Linear regression                               Number of obs     =        261
+                                                F(2, 48)          =    1479.99
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.8830
+                                                Root MSE          =     29.212
+
+                                                  (Std. Err. adjusted for 49 clusters in fips)
+----------------------------------------------------------------------------------------------
+                             |               Robust
+          F.excess_deaths_pc |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-----------------------------+----------------------------------------------------------------
+        c.new_pos_pc#c.p_pos |   .0040662   .0008155     4.99   0.000     .0024266    .0057058
+                             |
+c.new_pos_pc#c.p_pos#c.p_pos |  -.0000336   .0000194    -1.74   0.089    -.0000726    5.30e-06
+                             |
+                       _cons |   6.231445   2.899857     2.15   0.037     .4008907      12.062
+----------------------------------------------------------------------------------------------
+
+. margins, at(p_pos=(5(5)30) new_pos_pc=(100 500))
+
+Adjusted predictions                            Number of obs     =        261
+Model VCE    : Robust
+
+Expression   : Linear prediction, predict()
+
+1._at        : new_pos_pc      =         100
+               p_pos           =           5
+
+2._at        : new_pos_pc      =         100
+               p_pos           =          10
+
+3._at        : new_pos_pc      =         100
+               p_pos           =          15
+
+4._at        : new_pos_pc      =         100
+               p_pos           =          20
+
+5._at        : new_pos_pc      =         100
+               p_pos           =          25
+
+6._at        : new_pos_pc      =         100
+               p_pos           =          30
+
+7._at        : new_pos_pc      =         500
+               p_pos           =           5
+
+8._at        : new_pos_pc      =         500
+               p_pos           =          10
+
+9._at        : new_pos_pc      =         500
+               p_pos           =          15
+
+10._at       : new_pos_pc      =         500
+               p_pos           =          20
+
+11._at       : new_pos_pc      =         500
+               p_pos           =          25
+
+12._at       : new_pos_pc      =         500
+               p_pos           =          30
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         _at |
+          1  |   8.180436   2.720633     3.01   0.004     2.710237    13.65064
+          2  |   9.961224   2.612843     3.81   0.000     4.707752     15.2147
+          3  |   11.57381   2.555859     4.53   0.000      6.43491    16.71271
+          4  |   13.01819    2.53425     5.14   0.000     7.922738    18.11364
+          5  |   14.29437   2.541144     5.63   0.000     9.185056    19.40368
+          6  |   15.40234   2.579545     5.97   0.000     10.21582    20.58886
+          7  |    15.9764   2.440513     6.55   0.000     11.06942    20.88338
+          8  |   24.88034    2.87093     8.67   0.000     19.10795    30.65273
+          9  |   32.94327   3.386122     9.73   0.000     26.13501    39.75152
+         10  |   40.16517   3.637494    11.04   0.000      32.8515    47.47884
+         11  |   46.54606   3.542545    13.14   0.000      39.4233    53.66883
+         12  |   52.08593   3.136505    16.61   0.000     45.77957     58.3923
+------------------------------------------------------------------------------
+
+. marginsplot
+
+  Variables that uniquely identify margins: p_pos new_pos_pc
+
+. 
+. gen f_excess_deaths_pc = f.excess_deaths_pc
+(101 missing values generated)
+
+. gen f_covdeath_pc = f.covdeath_pc
+(98 missing values generated)
+
+. 
+. 
+. capture program drop weibull_growth
+
+. program weibull_growth
+  1.         args lnf alpha pos tests delta
+  2.         quietly replace `lnf' = ///
+>                 ln(normalden( $ML_y1,  `alpha' - `alpha'*exp(-(exp(`tests') * $ML_y2 )^(1/(1+exp(-`
+> delta')))), exp(`pos')))
+  3. end
+
+. 
+. ml model lf weibull_growth ///
+>         (alpha: f_excess_deaths_pc, nocons) ///
+>         (pos: new_pos_pc = ) ///
+>         (tests: new_tests_pc = ) ///
+>         /delta ///
+>         if days_to_report > 21 & f_excess_deaths_pc >= 0 [aweight=population]
+
+. ml maximize
+
+initial:       log likelihood =     -<inf>  (could not be evaluated)
+feasible:      log likelihood = -2074.7449
+rescale:       log likelihood = -2074.7449
+rescale eq:    log likelihood = -1459.8293
+numerical derivatives are approximate
+flat or discontinuous region encountered
+numerical derivatives are approximate
+flat or discontinuous region encountered
+Iteration 0:   log likelihood = -1459.8293  (not concave)
+Iteration 1:   log likelihood = -1455.7743  (not concave)
+Iteration 2:   log likelihood = -1450.2643  (not concave)
+Iteration 3:   log likelihood = -1441.4743  (not concave)
+Iteration 4:   log likelihood = -1338.2224  
+Iteration 5:   log likelihood = -1332.1441  (not concave)
+Iteration 6:   log likelihood = -1331.9184  
+Iteration 7:   log likelihood = -1331.2333  
+Iteration 8:   log likelihood = -1330.1435  
+Iteration 9:   log likelihood = -1329.7828  
+Iteration 10:  log likelihood = -1329.4588  
+Iteration 11:  log likelihood = -1329.2837  
+Iteration 12:  log likelihood = -1329.1918  
+Iteration 13:  log likelihood = -1329.0944  
+Iteration 14:  log likelihood = -1329.0566  (not concave)
+Iteration 15:  log likelihood = -1328.9305  
+Iteration 16:  log likelihood = -1328.8913  (not concave)
+Iteration 17:  log likelihood = -1328.8378  (not concave)
+Iteration 18:  log likelihood = -1328.8352  
+Iteration 19:  log likelihood = -1328.8058  (not concave)
+Iteration 20:  log likelihood = -1328.8027  (not concave)
+Iteration 21:  log likelihood = -1328.8023  
+Iteration 22:  log likelihood = -1328.7571  
+Iteration 23:  log likelihood = -1328.7306  
+Iteration 24:  log likelihood = -1328.7017  (not concave)
+Iteration 25:  log likelihood = -1328.6995  
+Iteration 26:  log likelihood = -1328.6881  (not concave)
+Iteration 27:  log likelihood = -1328.6852  
+Iteration 28:  log likelihood = -1328.6592  
+Iteration 29:  log likelihood =  -1328.648  
+Iteration 30:  log likelihood = -1328.6297  (not concave)
+Iteration 31:  log likelihood = -1328.6186  (not concave)
+Iteration 32:  log likelihood = -1328.6174  (not concave)
+Iteration 33:  log likelihood = -1328.6133  (not concave)
+Iteration 34:  log likelihood = -1328.6099  
+Iteration 35:  log likelihood = -1328.5893  (not concave)
+Iteration 36:  log likelihood = -1328.5692  
+Iteration 37:  log likelihood = -1328.5549  (not concave)
+Iteration 38:  log likelihood =  -1328.553  
+Iteration 39:  log likelihood = -1328.5452  
+Iteration 40:  log likelihood = -1328.5439  (not concave)
+Iteration 41:  log likelihood = -1328.5439  (not concave)
+Iteration 42:  log likelihood = -1328.5438  (not concave)
+Iteration 43:  log likelihood = -1328.5437  (not concave)
+Iteration 44:  log likelihood = -1328.5436  (not concave)
+Iteration 45:  log likelihood = -1328.5436  (not concave)
+Iteration 46:  log likelihood = -1328.5435  
+Iteration 47:  log likelihood = -1328.5425  (not concave)
+Iteration 48:  log likelihood = -1328.5425  (not concave)
+Iteration 49:  log likelihood = -1328.5424  (not concave)
+Iteration 50:  log likelihood = -1328.5424  (not concave)
+Iteration 51:  log likelihood = -1328.5424  
+Iteration 52:  log likelihood =   -1328.54  
+Iteration 53:  log likelihood = -1328.5384  
+Iteration 54:  log likelihood = -1328.5375  
+Iteration 55:  log likelihood = -1328.5334  
+Iteration 56:  log likelihood = -1328.5275  
+Iteration 57:  log likelihood = -1328.5233  (not concave)
+Iteration 58:  log likelihood = -1328.5227  
+Iteration 59:  log likelihood = -1328.5215  
+Iteration 60:  log likelihood = -1328.5114  (not concave)
+Iteration 61:  log likelihood = -1328.5091  (not concave)
+Iteration 62:  log likelihood =  -1328.509  
+Iteration 63:  log likelihood = -1328.5083  (not concave)
+Iteration 64:  log likelihood = -1328.5081  (not concave)
+Iteration 65:  log likelihood = -1328.5081  (not concave)
+Iteration 66:  log likelihood = -1328.5081  (not concave)
+Iteration 67:  log likelihood =  -1328.508  
+Iteration 68:  log likelihood = -1328.5076  
+Iteration 69:  log likelihood = -1328.5067  (not concave)
+Iteration 70:  log likelihood = -1328.5067  
+Iteration 71:  log likelihood = -1328.5064  
+Iteration 72:  log likelihood = -1328.5041  (not concave)
+Iteration 73:  log likelihood = -1328.5039  (not concave)
+Iteration 74:  log likelihood = -1328.5039  (not concave)
+Iteration 75:  log likelihood = -1328.5038  (not concave)
+Iteration 76:  log likelihood = -1328.5038  
+Iteration 77:  log likelihood = -1328.5024  (not concave)
+Iteration 78:  log likelihood = -1328.5023  (not concave)
+Iteration 79:  log likelihood = -1328.5023  (not concave)
+Iteration 80:  log likelihood = -1328.5023  (not concave)
+Iteration 81:  log likelihood = -1328.5021  (not concave)
+Iteration 82:  log likelihood = -1328.5019  (not concave)
+Iteration 83:  log likelihood = -1328.5019  
+Iteration 84:  log likelihood = -1328.5012  
+Iteration 85:  log likelihood = -1328.5007  (not concave)
+Iteration 86:  log likelihood = -1328.5007  (not concave)
+Iteration 87:  log likelihood = -1328.5007  (not concave)
+Iteration 88:  log likelihood = -1328.5007  (not concave)
+Iteration 89:  log likelihood = -1328.5007  
+Iteration 90:  log likelihood = -1328.4959  (not concave)
+Iteration 91:  log likelihood = -1328.4954  (not concave)
+Iteration 92:  log likelihood = -1328.4954  (not concave)
+Iteration 93:  log likelihood = -1328.4953  
+Iteration 94:  log likelihood = -1328.4922  (not concave)
+Iteration 95:  log likelihood = -1328.4922  
+Iteration 96:  log likelihood = -1328.4913  (not concave)
+Iteration 97:  log likelihood = -1328.4913  (not concave)
+Iteration 98:  log likelihood = -1328.4913  
+Iteration 99:  log likelihood =   -1328.49  
+Iteration 100: log likelihood =  -1328.489  (not concave)
+Iteration 101: log likelihood = -1328.4889  
+Iteration 102: log likelihood = -1328.4886  (not concave)
+Iteration 103: log likelihood = -1328.4886  (not concave)
+Iteration 104: log likelihood = -1328.4886  (not concave)
+Iteration 105: log likelihood = -1328.4886  
+Iteration 106: log likelihood = -1328.4882  
+Iteration 107: log likelihood = -1328.4872  (not concave)
+Iteration 108: log likelihood = -1328.4869  (not concave)
+Iteration 109: log likelihood = -1328.4869  
+Iteration 110: log likelihood = -1328.4867  (not concave)
+Iteration 111: log likelihood = -1328.4867  (not concave)
+Iteration 112: log likelihood = -1328.4867  
+Iteration 113: log likelihood = -1328.4865  
+Iteration 114: log likelihood = -1328.4836  
+Iteration 115: log likelihood = -1328.4822  
+Iteration 116: log likelihood =   -1328.48  
+Iteration 117: log likelihood = -1328.4782  
+Iteration 118: log likelihood = -1328.4779  
+Iteration 119: log likelihood = -1328.4759  
+Iteration 120: log likelihood = -1328.4745  
+Iteration 121: log likelihood = -1328.4741  
+Iteration 122: log likelihood = -1328.4733  
+Iteration 123: log likelihood =  -1328.473  (not concave)
+Iteration 124: log likelihood =  -1328.473  
+Iteration 125: log likelihood = -1328.4707  
+Iteration 126: log likelihood = -1328.4706  
+Iteration 127: log likelihood =  -1328.469  
+Iteration 128: log likelihood = -1328.4681  
+Iteration 129: log likelihood = -1328.4664  (not concave)
+Iteration 130: log likelihood = -1328.4661  (not concave)
+Iteration 131: log likelihood = -1328.4661  (not concave)
+Iteration 132: log likelihood = -1328.4661  (not concave)
+Iteration 133: log likelihood = -1328.4648  (not concave)
+Iteration 134: log likelihood = -1328.4648  (not concave)
+Iteration 135: log likelihood = -1328.4648  (not concave)
+Iteration 136: log likelihood = -1328.4648  
+Iteration 137: log likelihood = -1328.4644  (not concave)
+Iteration 138: log likelihood = -1328.4644  
+Iteration 139: log likelihood = -1328.4605  (not concave)
+Iteration 140: log likelihood = -1328.4605  (not concave)
+Iteration 141: log likelihood = -1328.4605  (not concave)
+Iteration 142: log likelihood = -1328.4604  (not concave)
+Iteration 143: log likelihood = -1328.4604  
+Iteration 144: log likelihood = -1328.4602  
+Iteration 145: log likelihood = -1328.4601  
+Iteration 146: log likelihood = -1328.4601  (not concave)
+Iteration 147: log likelihood = -1328.4601  
+Iteration 148: log likelihood = -1328.4599  (not concave)
+Iteration 149: log likelihood = -1328.4597  (not concave)
+Iteration 150: log likelihood = -1328.4597  
+Iteration 151: log likelihood = -1328.4596  (not concave)
+Iteration 152: log likelihood = -1328.4596  (not concave)
+Iteration 153: log likelihood = -1328.4596  (not concave)
+Iteration 154: log likelihood = -1328.4596  
+Iteration 155: log likelihood = -1328.4595  (not concave)
+Iteration 156: log likelihood = -1328.4595  (not concave)
+Iteration 157: log likelihood = -1328.4595  (not concave)
+Iteration 158: log likelihood = -1328.4595  (not concave)
+Iteration 159: log likelihood = -1328.4595  
+Iteration 160: log likelihood = -1328.4594  
+Iteration 161: log likelihood = -1328.4593  (not concave)
+Iteration 162: log likelihood = -1328.4593  
+Iteration 163: log likelihood = -1328.4586  
+Iteration 164: log likelihood = -1328.4584  
+Iteration 165: log likelihood = -1328.4575  (not concave)
+Iteration 166: log likelihood = -1328.4571  
+Iteration 167: log likelihood =  -1328.457  
+Iteration 168: log likelihood = -1328.4569  (not concave)
+Iteration 169: log likelihood = -1328.4569  (not concave)
+Iteration 170: log likelihood = -1328.4569  
+Iteration 171: log likelihood = -1328.4568  (not concave)
+Iteration 172: log likelihood = -1328.4568  (not concave)
+Iteration 173: log likelihood = -1328.4568  
+Iteration 174: log likelihood = -1328.4563  (not concave)
+Iteration 175: log likelihood = -1328.4561  
+Iteration 176: log likelihood = -1328.4558  
+Iteration 177: log likelihood = -1328.4555  
+Iteration 178: log likelihood = -1328.4554  (not concave)
+Iteration 179: log likelihood = -1328.4554  (not concave)
+Iteration 180: log likelihood = -1328.4554  (not concave)
+Iteration 181: log likelihood = -1328.4554  (not concave)
+Iteration 182: log likelihood = -1328.4554  (not concave)
+Iteration 183: log likelihood = -1328.4554  (not concave)
+Iteration 184: log likelihood = -1328.4554  (not concave)
+Iteration 185: log likelihood = -1328.4554  
+Iteration 186: log likelihood = -1328.4553  (not concave)
+Iteration 187: log likelihood = -1328.4553  
+Iteration 188: log likelihood = -1328.4552  (not concave)
+Iteration 189: log likelihood = -1328.4552  
+Iteration 190: log likelihood = -1328.4551  
+Iteration 191: log likelihood = -1328.4539  (not concave)
+Iteration 192: log likelihood = -1328.4537  (not concave)
+Iteration 193: log likelihood = -1328.4537  
+Iteration 194: log likelihood = -1328.4536  (not concave)
+Iteration 195: log likelihood = -1328.4535  (not concave)
+Iteration 196: log likelihood = -1328.4535  
+Iteration 197: log likelihood = -1328.4534  
+Iteration 198: log likelihood = -1328.4533  (not concave)
+Iteration 199: log likelihood = -1328.4533  (not concave)
+Iteration 200: log likelihood = -1328.4533  
+Iteration 201: log likelihood = -1328.4532  
+Iteration 202: log likelihood = -1328.4531  
+Iteration 203: log likelihood = -1328.4531  (not concave)
+Iteration 204: log likelihood = -1328.4531  (not concave)
+Iteration 205: log likelihood = -1328.4531  
+Iteration 206: log likelihood = -1328.4529  
+Iteration 207: log likelihood = -1328.4517  (not concave)
+Iteration 208: log likelihood = -1328.4514  
+Iteration 209: log likelihood = -1328.4513  
+Iteration 210: log likelihood = -1328.4504  (not concave)
+Iteration 211: log likelihood =   -1328.45  
+Iteration 212: log likelihood = -1328.4499  
+Iteration 213: log likelihood = -1328.4498  
+Iteration 214: log likelihood = -1328.4498  
+Iteration 215: log likelihood = -1328.4497  
+Iteration 216: log likelihood = -1328.4497  
+Iteration 217: log likelihood = -1328.4487  
+Iteration 218: log likelihood = -1328.4485  
+Iteration 219: log likelihood = -1328.4485  (not concave)
+Iteration 220: log likelihood = -1328.4484  
+Iteration 221: log likelihood = -1328.4484  
+Iteration 222: log likelihood = -1328.4482  
+Iteration 223: log likelihood = -1328.4482  (not concave)
+Iteration 224: log likelihood = -1328.4482  (not concave)
+Iteration 225: log likelihood = -1328.4482  
+Iteration 226: log likelihood = -1328.4481  (not concave)
+Iteration 227: log likelihood = -1328.4481  (not concave)
+Iteration 228: log likelihood = -1328.4481  (not concave)
+Iteration 229: log likelihood = -1328.4481  (not concave)
+Iteration 230: log likelihood = -1328.4481  
+
+                                                Number of obs     =        190
+                                                Wald chi2(1)      =     165.05
+Log likelihood = -1328.4481                     Prob > chi2       =     0.0000
+
+------------------------------------------------------------------------------------
+                   |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------------+----------------------------------------------------------------
+alpha              |
+f_excess_deaths_pc |    165.951    12.9173    12.85   0.000     140.6336    191.2685
+-------------------+----------------------------------------------------------------
+pos                |
+             _cons |   5.572894   .0512989   108.64   0.000      5.47235    5.673438
+-------------------+----------------------------------------------------------------
+tests              |
+             _cons |  -18.05902   2.405592    -7.51   0.000    -22.77389   -13.34415
+-------------------+----------------------------------------------------------------
+            /delta |  -.7699361   .3741378    -2.06   0.040    -1.503233   -.0366395
+------------------------------------------------------------------------------------
+
+. 
+. ml model lf weibull_growth ///
+>         (alpha: f_covdeath_pc, nocons) ///
+>         (pos: new_pos_pc = ) ///
+>         (tests: new_tests_pc = ) ///
+>         /delta ///
+>         if days_to_report > 21 [aweight=population]
+
+. ml maximize
+
+initial:       log likelihood =     -<inf>  (could not be evaluated)
+feasible:      log likelihood = -2850.0225
+rescale:       log likelihood = -2850.0225
+rescale eq:    log likelihood = -1789.5928
+numerical derivatives are approximate
+flat or discontinuous region encountered
+numerical derivatives are approximate
+flat or discontinuous region encountered
+Iteration 0:   log likelihood = -1789.5928  (not concave)
+Iteration 1:   log likelihood = -1786.9246  (not concave)
+Iteration 2:   log likelihood = -1784.3172  (not concave)
+Iteration 3:   log likelihood = -1775.1262  (not concave)
+Iteration 4:   log likelihood =  -1769.842  
+Iteration 5:   log likelihood =  -1751.192  
+Iteration 6:   log likelihood = -1750.9833  
+Iteration 7:   log likelihood = -1750.8059  (not concave)
+Iteration 8:   log likelihood = -1750.8018  
+Iteration 9:   log likelihood = -1750.7301  
+Iteration 10:  log likelihood =  -1750.721  (not concave)
+Iteration 11:  log likelihood = -1750.7055  
+Iteration 12:  log likelihood = -1750.6714  (not concave)
+Iteration 13:  log likelihood = -1750.6688  
+Iteration 14:  log likelihood = -1750.6406  (not concave)
+Iteration 15:  log likelihood = -1750.6152  
+Iteration 16:  log likelihood = -1750.5993  (not concave)
+Iteration 17:  log likelihood = -1750.5831  
+Iteration 18:  log likelihood = -1750.5604  (not concave)
+Iteration 19:  log likelihood = -1750.5553  
+Iteration 20:  log likelihood = -1750.5467  (not concave)
+Iteration 21:  log likelihood = -1750.5444  
+Iteration 22:  log likelihood = -1750.5307  (not concave)
+Iteration 23:  log likelihood = -1750.5303  (not concave)
+Iteration 24:  log likelihood = -1750.5298  
+Iteration 25:  log likelihood = -1750.5269  
+Iteration 26:  log likelihood = -1750.5223  
+Iteration 27:  log likelihood = -1750.5172  (not concave)
+Iteration 28:  log likelihood = -1750.5147  (not concave)
+Iteration 29:  log likelihood = -1750.5146  (not concave)
+Iteration 30:  log likelihood = -1750.5146  
+Iteration 31:  log likelihood = -1750.5105  
+Iteration 32:  log likelihood = -1750.5105  
+Iteration 33:  log likelihood =  -1750.502  
+Iteration 34:  log likelihood = -1750.4989  
+Iteration 35:  log likelihood = -1750.4963  (not concave)
+Iteration 36:  log likelihood = -1750.4961  
+Iteration 37:  log likelihood = -1750.4936  (not concave)
+Iteration 38:  log likelihood = -1750.4928  (not concave)
+Iteration 39:  log likelihood = -1750.4928  (not concave)
+Iteration 40:  log likelihood = -1750.4927  
+Iteration 41:  log likelihood = -1750.4921  (not concave)
+Iteration 42:  log likelihood =  -1750.492  (not concave)
+Iteration 43:  log likelihood =  -1750.492  (not concave)
+Iteration 44:  log likelihood =  -1750.492  (not concave)
+Iteration 45:  log likelihood =  -1750.492  
+Iteration 46:  log likelihood =  -1750.491  (not concave)
+Iteration 47:  log likelihood = -1750.4862  (not concave)
+Iteration 48:  log likelihood =  -1750.486  
+Iteration 49:  log likelihood = -1750.4839  
+Iteration 50:  log likelihood = -1750.4831  
+Iteration 51:  log likelihood = -1750.4828  
+Iteration 52:  log likelihood = -1750.4814  (not concave)
+Iteration 53:  log likelihood = -1750.4812  
+Iteration 54:  log likelihood = -1750.4808  (not concave)
+Iteration 55:  log likelihood = -1750.4808  (not concave)
+Iteration 56:  log likelihood = -1750.4808  
+Iteration 57:  log likelihood = -1750.4762  (not concave)
+Iteration 58:  log likelihood = -1750.4762  
+Iteration 59:  log likelihood = -1750.4743  (not concave)
+Iteration 60:  log likelihood = -1750.4741  (not concave)
+Iteration 61:  log likelihood = -1750.4741  
+Iteration 62:  log likelihood = -1750.4731  (not concave)
+Iteration 63:  log likelihood = -1750.4728  (not concave)
+Iteration 64:  log likelihood = -1750.4728  
+Iteration 65:  log likelihood = -1750.4719  
+Iteration 66:  log likelihood = -1750.4712  
+Iteration 67:  log likelihood = -1750.4705  
+Iteration 68:  log likelihood = -1750.4703  (not concave)
+Iteration 69:  log likelihood = -1750.4703  (not concave)
+Iteration 70:  log likelihood = -1750.4703  (not concave)
+Iteration 71:  log likelihood = -1750.4703  (not concave)
+Iteration 72:  log likelihood = -1750.4703  (not concave)
+Iteration 73:  log likelihood = -1750.4703  (not concave)
+Iteration 74:  log likelihood = -1750.4703  (not concave)
+Iteration 75:  log likelihood = -1750.4703  (not concave)
+Iteration 76:  log likelihood = -1750.4703  (not concave)
+Iteration 77:  log likelihood = -1750.4703  (not concave)
+Iteration 78:  log likelihood = -1750.4703  (not concave)
+Iteration 79:  log likelihood = -1750.4703  (not concave)
+Iteration 80:  log likelihood = -1750.4703  (not concave)
+Iteration 81:  log likelihood = -1750.4703  (not concave)
+Iteration 82:  log likelihood = -1750.4703  (not concave)
+Iteration 83:  log likelihood = -1750.4703  (not concave)
+Iteration 84:  log likelihood = -1750.4703  
+Iteration 85:  log likelihood =   -1750.47  (not concave)
+Iteration 86:  log likelihood = -1750.4698  (not concave)
+Iteration 87:  log likelihood = -1750.4698  
+Iteration 88:  log likelihood = -1750.4696  (not concave)
+Iteration 89:  log likelihood = -1750.4696  (not concave)
+Iteration 90:  log likelihood = -1750.4696  (not concave)
+Iteration 91:  log likelihood = -1750.4696  
+Iteration 92:  log likelihood = -1750.4692  
+Iteration 93:  log likelihood = -1750.4686  
+Iteration 94:  log likelihood =  -1750.467  (not concave)
+Iteration 95:  log likelihood = -1750.4669  
+Iteration 96:  log likelihood = -1750.4668  
+Iteration 97:  log likelihood = -1750.4667  (not concave)
+Iteration 98:  log likelihood = -1750.4667  
+Iteration 99:  log likelihood = -1750.4657  
+Iteration 100: log likelihood = -1750.4653  (not concave)
+Iteration 101: log likelihood = -1750.4653  
+Iteration 102: log likelihood = -1750.4653  
+Iteration 103: log likelihood = -1750.4652  
+Iteration 104: log likelihood = -1750.4648  (not concave)
+Iteration 105: log likelihood = -1750.4648  (not concave)
+Iteration 106: log likelihood = -1750.4648  
+Iteration 107: log likelihood = -1750.4647  
+Iteration 108: log likelihood = -1750.4646  
+Iteration 109: log likelihood = -1750.4645  (not concave)
+Iteration 110: log likelihood = -1750.4645  (not concave)
+Iteration 111: log likelihood = -1750.4645  (not concave)
+Iteration 112: log likelihood = -1750.4645  
+Iteration 113: log likelihood =  -1750.464  (not concave)
+Iteration 114: log likelihood =  -1750.464  
+Iteration 115: log likelihood = -1750.4637  
+Iteration 116: log likelihood = -1750.4635  
+Iteration 117: log likelihood = -1750.4634  (not concave)
+Iteration 118: log likelihood = -1750.4634  
+Iteration 119: log likelihood = -1750.4631  
+Iteration 120: log likelihood =  -1750.463  (not concave)
+Iteration 121: log likelihood =  -1750.463  (not concave)
+Iteration 122: log likelihood =  -1750.463  
+Iteration 123: log likelihood = -1750.4623  
+Iteration 124: log likelihood = -1750.4621  
+Iteration 125: log likelihood =  -1750.462  
+Iteration 126: log likelihood = -1750.4619  (not concave)
+Iteration 127: log likelihood = -1750.4619  (not concave)
+Iteration 128: log likelihood = -1750.4619  (not concave)
+Iteration 129: log likelihood = -1750.4619  (not concave)
+Iteration 130: log likelihood = -1750.4619  (not concave)
+Iteration 131: log likelihood = -1750.4619  
+Iteration 132: log likelihood = -1750.4612  
+Iteration 133: log likelihood =  -1750.461  (not concave)
+Iteration 134: log likelihood =  -1750.461  
+Iteration 135: log likelihood = -1750.4608  
+Iteration 136: log likelihood = -1750.4603  (not concave)
+Iteration 137: log likelihood = -1750.4601  
+Iteration 138: log likelihood = -1750.4598  
+Iteration 139: log likelihood = -1750.4591  
+Iteration 140: log likelihood =  -1750.458  
+Iteration 141: log likelihood = -1750.4574  (not concave)
+Iteration 142: log likelihood = -1750.4573  
+Iteration 143: log likelihood = -1750.4568  (not concave)
+Iteration 144: log likelihood = -1750.4567  
+Iteration 145: log likelihood = -1750.4565  (not concave)
+Iteration 146: log likelihood = -1750.4565  (not concave)
+Iteration 147: log likelihood = -1750.4565  
+Iteration 148: log likelihood = -1750.4565  (not concave)
+Iteration 149: log likelihood = -1750.4565  
+Iteration 150: log likelihood = -1750.4564  (not concave)
+Iteration 151: log likelihood = -1750.4563  (not concave)
+Iteration 152: log likelihood = -1750.4563  
+Iteration 153: log likelihood = -1750.4562  (not concave)
+Iteration 154: log likelihood = -1750.4562  (not concave)
+Iteration 155: log likelihood = -1750.4562  (not concave)
+Iteration 156: log likelihood = -1750.4562  
+Iteration 157: log likelihood = -1750.4562  
+
+                                                Number of obs     =        261
+                                                Wald chi2(1)      =      55.76
+Log likelihood = -1750.4562                     Prob > chi2       =     0.0000
+
+-------------------------------------------------------------------------------
+              |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+--------------+----------------------------------------------------------------
+alpha         |
+f_covdeath_pc |   64.73632    8.66937     7.47   0.000     47.74466    81.72797
+--------------+----------------------------------------------------------------
+pos           |
+        _cons |    5.28779   .0437688   120.81   0.000     5.202005    5.373575
+--------------+----------------------------------------------------------------
+tests         |
+        _cons |  -23.98696   7.467334    -3.21   0.001    -38.62266    -9.35125
+--------------+----------------------------------------------------------------
+       /delta |  -2.162641   .5316229    -4.07   0.000    -3.204602   -1.120679
+-------------------------------------------------------------------------------
+
+. 
+. 
+. 
+. capture program drop weibull_growth
+
+. program weibull_growth
+  1.         args lnf alpha pos tests lnsigma
+  2.         quietly replace `lnf' = ///
+>                 ln(normalden( $ML_y1,  `alpha' + `pos'/(1-exp(-(exp(`tests') * $ML_y2 )^.5)), exp(`
+> lnsigma')))
+  3. end
+
+. 
+. ml model lf weibull_growth ///
+>         (alpha: f_excess_deaths_pc = ) ///
+>         (pos: new_pos_pc, nocons) ///
+>         (tests: new_tests_pc = ) ///
+>         /lnsigma ///
+>         if days_to_report > 21 [aweight=population]
+
+. ml maximize
+
+initial:       log likelihood =     -<inf>  (could not be evaluated)
+feasible:      log likelihood = -8315.1624
+rescale:       log likelihood = -1592.0674
+rescale eq:    log likelihood = -1556.2508
+Iteration 0:   log likelihood = -1556.2508  
+Iteration 1:   log likelihood = -1370.1969  (not concave)
+Iteration 2:   log likelihood = -1319.1149  (not concave)
+Iteration 3:   log likelihood = -1300.4972  
+Iteration 4:   log likelihood = -1271.6581  
+Iteration 5:   log likelihood = -1270.7823  
+Iteration 6:   log likelihood = -1270.3722  
+Iteration 7:   log likelihood = -1270.3673  
+Iteration 8:   log likelihood = -1270.3672  
+
+                                                Number of obs     =        261
+                                                Wald chi2(0)      =          .
+Log likelihood = -1270.3672                     Prob > chi2       =          .
+
+------------------------------------------------------------------------------
+             |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+alpha        |
+       _cons |  -16.92334   3.221254    -5.25   0.000    -23.23688    -10.6098
+-------------+----------------------------------------------------------------
+pos          |
+  new_pos_pc |   .0823041   .0123164     6.68   0.000     .0581644    .1064439
+-------------+----------------------------------------------------------------
+tests        |
+       _cons |  -8.287117   .6102133   -13.58   0.000    -9.483113   -7.091121
+-------------+----------------------------------------------------------------
+    /lnsigma |   3.448369   .0437688    78.79   0.000     3.362584    3.534154
+------------------------------------------------------------------------------
+
+. 
+. 
+. capture program drop weibull_growth
+
+. program weibull_growth
+  1.         args lnf alpha pos tests delta lnsigma
+  2.         quietly replace `lnf' = ///
+>                 ln(normalden( $ML_y1,  `alpha' + `pos'/(1-exp(-(exp(`tests') * $ML_y2 )^(1/(1+exp(-
+> `delta'))))), exp(`lnsigma')))
+  3. end
+
+. 
+. ml model lf weibull_growth ///
+>         (alpha: f_excess_deaths_pc = ) ///
+>         (pos: new_pos_pc, nocons) ///
+>         (tests: new_tests_pc = ) ///
+>         /delta /lnsigma ///
+>         if days_to_report > 21 [aweight=population]
+
+. ml maximize
+
+initial:       log likelihood =     -<inf>  (could not be evaluated)
+feasible:      log likelihood = -8315.1624
+rescale:       log likelihood = -1592.0674
+rescale eq:    log likelihood = -1556.2508
+numerical derivatives are approximate
+flat or discontinuous region encountered
+numerical derivatives are approximate
+flat or discontinuous region encountered
+Iteration 0:   log likelihood = -1556.2508  (not concave)
+Iteration 1:   log likelihood = -1496.4194  (not concave)
+Iteration 2:   log likelihood = -1381.5416  
+Iteration 3:   log likelihood = -1369.4441  (not concave)
+Iteration 4:   log likelihood = -1305.6872  (not concave)
+Iteration 5:   log likelihood = -1272.9538  (not concave)
+Iteration 6:   log likelihood = -1270.9714  
+Iteration 7:   log likelihood = -1270.4545  
+Iteration 8:   log likelihood = -1270.3597  
+Iteration 9:   log likelihood = -1270.2358  
+Iteration 10:  log likelihood = -1270.2046  
+Iteration 11:  log likelihood = -1270.1665  
+Iteration 12:  log likelihood = -1270.1574  
+Iteration 13:  log likelihood = -1270.1431  
+Iteration 14:  log likelihood = -1270.1355  
+Iteration 15:  log likelihood =  -1270.135  
+Iteration 16:  log likelihood =   -1270.13  (not concave)
+Iteration 17:  log likelihood = -1270.1299  (not concave)
+Iteration 18:  log likelihood = -1270.1299  
+Iteration 19:  log likelihood = -1270.1289  
+Iteration 20:  log likelihood = -1270.1277  (not concave)
+Iteration 21:  log likelihood = -1270.1277  
+Iteration 22:  log likelihood = -1270.1269  
+Iteration 23:  log likelihood = -1270.1255  
+Iteration 24:  log likelihood = -1270.1253  
+Iteration 25:  log likelihood = -1270.1248  
+Iteration 26:  log likelihood = -1270.1245  (not concave)
+Iteration 27:  log likelihood = -1270.1244  
+Iteration 28:  log likelihood = -1270.1243  (not concave)
+Iteration 29:  log likelihood = -1270.1243  (not concave)
+Iteration 30:  log likelihood = -1270.1243  (not concave)
+Iteration 31:  log likelihood = -1270.1243  
+Iteration 32:  log likelihood = -1270.1243  (not concave)
+Iteration 33:  log likelihood = -1270.1243  
+Iteration 34:  log likelihood = -1270.1242  (not concave)
+Iteration 35:  log likelihood = -1270.1241  
+Iteration 36:  log likelihood = -1270.1241  (not concave)
+Iteration 37:  log likelihood = -1270.1241  (not concave)
+Iteration 38:  log likelihood = -1270.1241  
+Iteration 39:  log likelihood = -1270.1241  
+Iteration 40:  log likelihood =  -1270.124  (not concave)
+Iteration 41:  log likelihood =  -1270.124  
+Iteration 42:  log likelihood =  -1270.124  
+Iteration 43:  log likelihood = -1270.1239  
+Iteration 44:  log likelihood = -1270.1239  (not concave)
+Iteration 45:  log likelihood = -1270.1239  
+
+                                                Number of obs     =        261
+                                                Wald chi2(0)      =          .
+Log likelihood = -1270.1239                     Prob > chi2       =          .
+
+------------------------------------------------------------------------------
+             |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+alpha        |
+       _cons |  -15.85348   3.431972    -4.62   0.000    -22.58002   -9.126936
+-------------+----------------------------------------------------------------
+pos          |
+  new_pos_pc |   .0418046   .0299872     1.39   0.163    -.0169692    .1005785
+-------------+----------------------------------------------------------------
+tests        |
+       _cons |  -10.99475   3.010757    -3.65   0.000    -16.89573   -5.093778
+-------------+----------------------------------------------------------------
+      /delta |  -.6082704   .3972201    -1.53   0.126    -1.386807    .1702667
+    /lnsigma |   3.447437   .0437688    78.76   0.000     3.361651    3.533222
+------------------------------------------------------------------------------
+
+. 
+. 
+. 
+. xtset fips end_week, delta(7)
+       panel variable:  fips (unbalanced)
+        time variable:  end_week, 20200125 to 20200516
+                delta:  7 days
+
+. 
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\analysis.txt
+  log type:  text
+ closed on:  17 May 2020, 19:10:33
+-----------------------------------------------------------------------------------------------------

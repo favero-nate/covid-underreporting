@@ -94,6 +94,8 @@ gen log_allcause = log(total_deaths)
 gen log_expected = log(adj_expected_deaths)
 gen excess_deaths = log_allcause-log_expected
 
+save "..\data\weeklydata.dta", replace
+
 
 reg excess_deaths_pc covdeath_pc [aweight=population] if days_to_report > 14, cluster(fips) nocons
 margins, dydx(covdeath_pc)

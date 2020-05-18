@@ -2,11 +2,11 @@
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\pulldata.txt
   log type:  text
- opened on:  16 May 2020, 16:53:03
+ opened on:  17 May 2020, 22:58:48
 
 . 
 . import delimited "https://covidtracking.com/api/v1/states/daily.csv", stringcols(1)
-(27 vars, 4,049 obs)
+(27 vars, 4,105 obs)
 
 . rename date olddate
 
@@ -30,6 +30,77 @@ file ..\data\covidtracking.dta saved
 > keep date state 
 > save "..\data\allcause.dta", replace
 > */
+. 
+. insheet using "..\data\Weekly_Counts_of_Deaths_by_State_and_Select_Causes__2014-2018.csv", clear
+(30 vars, 13,833 obs)
+
+. gen date = date(weekendingdate, "MDY")
+
+. format date %tdCCYYNNDD
+
+. rename jurisdictionofoccurrence state
+
+. replace state = "New York" if state == "New York City"
+(261 real changes made)
+
+. foreach var of varlist allcause-cerebrovasculardiseasesi60i69 {
+  2.         replace `var' = 5 if `var' == .
+  3. }
+(0 real changes made)
+(0 real changes made)
+(6,147 real changes made)
+(10 real changes made)
+(3,546 real changes made)
+(2,822 real changes made)
+(5,006 real changes made)
+(1,901 real changes made)
+(6,147 real changes made)
+(5,487 real changes made)
+(6,886 real changes made)
+(17 real changes made)
+(2,144 real changes made)
+
+. collapse (sum) allcause-cerebrovasculardiseasesi60i69 (first) mmwryear mmwrweek, by(state date)
+
+. save "..\data\cdc_1418deaths.dta", replace
+(note: file ..\data\cdc_1418deaths.dta not found)
+file ..\data\cdc_1418deaths.dta saved
+
+. 
+. insheet using "..\data\Weekly_Counts_of_Deaths_by_State_and_Select_Causes__2019-2020.csv", clear
+(34 vars, 3,786 obs)
+
+. gen date = date(weekendingdate, "MDY")
+
+. format date %tdCCYYNNDD
+
+. rename jurisdictionofoccurrence state
+
+. replace state = "New York" if state == "New York City"
+(72 real changes made)
+
+. foreach var of varlist allcause-cerebrovasculardiseasesi60i69 {
+  2.         replace `var' = 5 if `var' == .
+  3. }
+(24 real changes made)
+(24 real changes made)
+(1,686 real changes made)
+(36 real changes made)
+(898 real changes made)
+(710 real changes made)
+(1,358 real changes made)
+(527 real changes made)
+(1,552 real changes made)
+(1,432 real changes made)
+(1,532 real changes made)
+(38 real changes made)
+(589 real changes made)
+
+. collapse (sum) allcause-cerebrovasculardiseasesi60i69 (first) mmwryear mmwrweek, by(state date)
+
+. save "..\data\cdc_1920deaths.dta", replace
+file ..\data\cdc_1920deaths.dta saved
+
 . 
 . insheet using "https://data.cdc.gov/resource/r8kw-7aab.csv", clear
 (14 vars, 810 obs)
@@ -58,51 +129,21 @@ file ..\data\covidtracking.dta saved
 
 . 
 . foreach var of varlist covid_deaths-pneumon_influ_or_covid {
-  2.         gen `var'_mis = (`var'==.)
+  2.         replace `var' = 5 if `var' == .
   3. }
+(137 real changes made)
+(6 real changes made)
+(11 real changes made)
+(69 real changes made)
+(169 real changes made)
+(416 real changes made)
+(54 real changes made)
 
 . collapse (sum) covid_deaths-pneumon_influ_or_covid_mis (first) report_date, by(state date)
+variable pneumon_influ_or_covid_mis not found
+r(111);
 
-. foreach var of varlist covid_deaths-pneumon_influ_or_covid {
-  2.         replace `var' = . if `var'_mis > 0
-  3. }
-(136 real changes made, 136 to missing)
-(6 real changes made, 6 to missing)
-(11 real changes made, 11 to missing)
-(69 real changes made, 69 to missing)
-(168 real changes made, 168 to missing)
-(414 real changes made, 414 to missing)
-(54 real changes made, 54 to missing)
+end of do-file
 
-. drop *_mis
+r(111);
 
-. 
-. save "..\data\cdc_deaths.dta", replace
-file ..\data\cdc_deaths.dta saved
-
-. 
-. insheet using "https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/national/totals/n
-> st-est2019-alldata.csv", clear
-(151 vars, 57 obs)
-
-. rename state fips
-
-. rename name state
-
-. rename popestimate2019 population
-
-. keep if fips > 0 & fips < 60
-(6 observations deleted)
-
-. keep fips state population
-
-. save "..\data\population.dta", replace
-file ..\data\population.dta saved
-
-. 
-. log close
-      name:  <unnamed>
-       log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\pulldata.txt
-  log type:  text
- closed on:  16 May 2020, 16:53:06
------------------------------------------------------------------------------------------------------

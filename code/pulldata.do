@@ -19,6 +19,28 @@ keep date state
 save "..\data\allcause.dta", replace
 */
 
+insheet using "..\data\Weekly_Counts_of_Deaths_by_State_and_Select_Causes__2014-2018.csv", clear
+gen date = date(weekendingdate, "MDY")
+format date %tdCCYYNNDD
+rename jurisdictionofoccurrence state
+replace state = "New York" if state == "New York City"
+foreach var of varlist allcause-cerebrovasculardiseasesi60i69 {
+	replace `var' = 5 if `var' == .
+}
+collapse (sum) allcause-cerebrovasculardiseasesi60i69 (first) mmwryear mmwrweek, by(state date)
+save "..\data\cdc_1418deaths.dta", replace
+
+insheet using "..\data\Weekly_Counts_of_Deaths_by_State_and_Select_Causes__2019-2020.csv", clear
+gen date = date(weekendingdate, "MDY")
+format date %tdCCYYNNDD
+rename jurisdictionofoccurrence state
+replace state = "New York" if state == "New York City"
+foreach var of varlist allcause-cerebrovasculardiseasesi60i69 {
+	replace `var' = 5 if `var' == .
+}
+collapse (sum) allcause-cerebrovasculardiseasesi60i69 (first) mmwryear mmwrweek, by(state date)
+save "..\data\cdc_1920deaths.dta", replace
+
 insheet using "https://data.cdc.gov/resource/r8kw-7aab.csv", clear
 gen date = date(substr(end_week,1,10), "YMD")
 format date %tdCCYYNNDD
@@ -32,13 +54,9 @@ replace state = "New York" if state == "New York City"
 rename pneumonia_influenza_or_covid pneumon_influ_or_covid
 
 foreach var of varlist covid_deaths-pneumon_influ_or_covid {
-	gen `var'_mis = (`var'==.)
+	replace `var' = 5 if `var' == .
 }
 collapse (sum) covid_deaths-pneumon_influ_or_covid_mis (first) report_date, by(state date)
-foreach var of varlist covid_deaths-pneumon_influ_or_covid {
-	replace `var' = . if `var'_mis > 0
-}
-drop *_mis
 
 save "..\data\cdc_deaths.dta", replace
 

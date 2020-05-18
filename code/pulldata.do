@@ -56,7 +56,7 @@ rename pneumonia_influenza_or_covid pneumon_influ_or_covid
 foreach var of varlist covid_deaths-pneumon_influ_or_covid {
 	replace `var' = 5 if `var' == .
 }
-collapse (sum) covid_deaths-pneumon_influ_or_covid_mis (first) report_date, by(state date)
+collapse (sum) covid_deaths-pneumon_influ_or_covid (first) report_date, by(state date)
 
 save "..\data\cdc_deaths.dta", replace
 

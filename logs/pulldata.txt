@@ -2,7 +2,7 @@
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\pulldata.txt
   log type:  text
- opened on:  17 May 2020, 22:58:48
+ opened on:  17 May 2020, 23:00:44
 
 . 
 . import delimited "https://covidtracking.com/api/v1/states/daily.csv", stringcols(1)
@@ -63,7 +63,6 @@ file ..\data\covidtracking.dta saved
 . collapse (sum) allcause-cerebrovasculardiseasesi60i69 (first) mmwryear mmwrweek, by(state date)
 
 . save "..\data\cdc_1418deaths.dta", replace
-(note: file ..\data\cdc_1418deaths.dta not found)
 file ..\data\cdc_1418deaths.dta saved
 
 . 
@@ -139,11 +138,35 @@ file ..\data\cdc_1920deaths.dta saved
 (416 real changes made)
 (54 real changes made)
 
-. collapse (sum) covid_deaths-pneumon_influ_or_covid_mis (first) report_date, by(state date)
-variable pneumon_influ_or_covid_mis not found
-r(111);
+. collapse (sum) covid_deaths-pneumon_influ_or_covid (first) report_date, by(state date)
 
-end of do-file
+. 
+. save "..\data\cdc_deaths.dta", replace
+file ..\data\cdc_deaths.dta saved
 
-r(111);
+. 
+. insheet using "https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/national/totals/n
+> st-est2019-alldata.csv", clear
+(151 vars, 57 obs)
 
+. rename state fips
+
+. rename name state
+
+. rename popestimate2019 population
+
+. keep if fips > 0 & fips < 60
+(6 observations deleted)
+
+. keep fips state population
+
+. save "..\data\population.dta", replace
+file ..\data\population.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\pulldata.txt
+  log type:  text
+ closed on:  17 May 2020, 23:00:56
+-----------------------------------------------------------------------------------------------------

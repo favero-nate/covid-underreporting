@@ -10,6 +10,11 @@ drop _merge population // merge population back in later because want it merged 
 merge 1:1 state date using "..\data\cdc_deaths.dta"
 drop _merge
 
+merge 1:1 state date using "..\data\cdc_1920deaths.dta"
+drop _merge
+
+append using "..\data\cdc_1418deaths.dta"
+
 drop fips
 merge m:1 state using "..\data\population.dta", keep(1 3)
 drop _merge
@@ -26,15 +31,28 @@ gen end_week = date + mod(6 - dow(date), 7)
 format end_week %tdCCYYNNDD
 order end_week, after(date)
 
-foreach var of varlist positive-datagrade death-pneumon_influ_or_covid {
+rename septicemiaa40a41 septicemia
+rename malignantneoplasmsc00c97 malignantneoplasms
+rename diabetesmellituse10e14 diabetesmellitus
+rename alzheimerdiseaseg30 alzheimerdisease
+rename influenzaandpneumoniaj10j18 influenzaandpneumonia
+rename chroniclowerrespiratorydiseasesj chroniclowerresp
+rename otherdiseasesofrespiratorysystem otherrespiratory
+rename nephritisnephroticsyndromeandnep nephritis
+rename symptomssignsandabnormalclinical symptomssignsandabnormal
+rename diseasesofhearti00i09i11i13i20i5 diseasesofheart
+rename cerebrovasculardiseasesi60i69 cerebrovasculardiseases
+
+foreach var of varlist positive-datagrade death-pneumon_influ_or_covid allcause-mmwrweek {
 	gen `var'_mis = (`var'==.)
 }
-collapse (firstnm) state report_date (lastnm) positive-datagrade population death-posneg (sum) deathincrease-pneumon_influ_or_covid *_mis, by(end_week fips)
+gen dayscollapsed = 1
+collapse (firstnm) state report_date (lastnm) positive-datagrade population death-posneg (sum) deathincrease-pneumon_influ_or_covid allcause-mmwrweek *_mis dayscollapsed, by(end_week fips)
 foreach var of varlist positive-datagrade {
 	replace `var' = . if `var'_mis > 0
 }
-foreach var of varlist death-pneumon_influ_or_covid {
-	replace `var' = . if `var'_mis > 6 | report_date == .
+foreach var of varlist death-pneumon_influ_or_covid allcause-mmwrweek {
+	replace `var' = . if `var'_mis == dayscollapsed
 }
 drop *_mis
 
@@ -66,6 +84,17 @@ replace adj_expected_deaths = expected_deaths * 93 / 212 if days_to_report <= 7 
 replace adj_expected_deaths = expected_deaths * 159 / 212 if days_to_report > 7 & days_to_report <= 14
 replace adj_expected_deaths = expected_deaths * 192 / 212 if days_to_report > 14 & days_to_report <= 21
 
+
+gen pneumon_or_influ = pneumon_influ_or_covid- covid_deaths
+reg pneumon_or_influ influenzaandpneumonia if total_deaths== allcause, nocons
+
+egen expected_influ_pneu_deaths = mean(2.85868*influenzaandpneumonia) if mmwrweek != ., by(fips mmwrweek)
+gen adj_expected_influ_pneu_deaths = expected_influ_pneu_deaths
+replace adj_expected_influ_pneu_deaths = expected_influ_pneu_deaths * 93 / 212 if days_to_report <= 7 & days_to_report != .
+replace adj_expected_influ_pneu_deaths = expected_influ_pneu_deaths * 159 / 212 if days_to_report > 7 & days_to_report <= 14
+replace adj_expected_influ_pneu_deaths = expected_influ_pneu_deaths * 192 / 212 if days_to_report > 14 & days_to_report <= 21
+
+
 replace covid_deaths = 5 if covid_deaths == . & total_deaths != . //rough imputation for where data is supressed for 1-9 deaths
 
 
@@ -82,6 +111,7 @@ replace adj_cumulative_covdeath = adj_cumulative_covdeath + l.adj_cumulative_cov
 
 gen covdeath_pc = covid_deaths*1000000/population
 gen excess_deaths_pc = (total_deaths-adj_expected_deaths)*1000000/population
+gen excess_respir_deaths_pc = (pneumon_influ_or_covid-adj_expected_influ_pneu_deaths)*1000000/population
 gen new_pos_pc = new_pos*1000000/population
 gen new_neg_pc = new_neg*1000000/population
 gen new_tests_pc = new_pos_pc + new_neg_pc
@@ -123,6 +153,16 @@ reg deathincrease_pc c.adj_covid_deaths_pc##c.p_pos [aweight=population] if days
 reg deathincrease_pc c.adj_covid_deaths_pc##c.new_tests_pc [aweight=population] if days_to_report > 7, cluster(fips)
 reg deathincrease_pc c.adj_covid_deaths_pc##c.new_tests_pc c.l.adj_covid_deaths_pc##c.new_tests_pc [aweight=population] if days_to_report > 7, cluster(fips)
 reg deathincrease_pc c.excess_deaths_pc##c.new_tests_pc c.l.excess_deaths_pc##c.new_tests_pc [aweight=population] if days_to_report > 7, cluster(fips)
+
+
+reg excess_deaths_pc covdeath_pc [aweight=population] if days_to_report > 14, cluster(fips)
+reg excess_respir_deaths_pc covdeath_pc [aweight=population] if days_to_report > 14, cluster(fips)
+
+reg excess_deaths_pc c.covdeath_pc##c.p_pos [aweight=population] if days_to_report > 14, cluster(fips)
+reg excess_respir_deaths_pc c.covdeath_pc##c.p_pos [aweight=population] if days_to_report > 14, cluster(fips)
+
+reg f.excess_deaths_pc c.new_pos_pc##c.p_pos [aweight=population] if days_to_report > 14, cluster(fips)
+reg f.excess_respir_deaths_pc c.new_pos_pc##c.p_pos [aweight=population] if days_to_report > 14, cluster(fips)
 
 
 log close

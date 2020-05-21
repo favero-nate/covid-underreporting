@@ -2,7 +2,7 @@
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\pulldata.txt
   log type:  text
- opened on:  21 May 2020, 13:39:53
+ opened on:  21 May 2020, 14:16:32
 
 . 
 . import delimited "https://covidtracking.com/api/v1/states/daily.csv", stringcols(1)
@@ -25,8 +25,7 @@ file ..\data\covidtracking.dta saved
 . insheet using "..\data\source_files\State_Custom_Data.csv", clear
 (10 vars, 19,968 obs)
 
-. tostring week, gen(week_str)
-week_str generated as str2
+. gen week_str = string(week,"%02.0f")
 
 . gen yr = substr(season,3,2) if week > 39
 (15,184 missing values generated)
@@ -67,7 +66,8 @@ file ..\data\cdc_historical_deaths.dta saved
 . insheet using "https://data.cdc.gov/resource/r8kw-7aab.csv", clear
 (14 vars, 864 obs)
 
-. export delimited using "..\data\past_reports\unprocessed_files/$S_DATE cdc_deaths_raw"
+. export delimited using "..\data\past_reports\unprocessed_files/$S_DATE cdc_deaths_raw", replace
+(note: file ..\data\past_reports\unprocessed_files/21 May 2020 cdc_deaths_raw.csv not found)
 file ..\data\past_reports\unprocessed_files/21 May 2020 cdc_deaths_raw.csv saved
 
 . gen date = date(substr(end_week,1,10), "YMD")
@@ -111,7 +111,6 @@ file ..\data\past_reports\unprocessed_files/21 May 2020 cdc_deaths_raw.csv saved
 file ..\data\cdc_deaths.dta saved
 
 . save "..\data\past_reports/$S_DATE cdc_deaths.dta", replace
-(note: file ..\data\past_reports/21 May 2020 cdc_deaths.dta not found)
 file ..\data\past_reports/21 May 2020 cdc_deaths.dta saved
 
 . 
@@ -138,5 +137,5 @@ file ..\data\population.dta saved
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\pulldata.txt
   log type:  text
- closed on:  21 May 2020, 13:40:01
+ closed on:  21 May 2020, 14:16:47
 -----------------------------------------------------------------------------------------------------

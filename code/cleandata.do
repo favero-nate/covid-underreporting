@@ -10,10 +10,8 @@ drop _merge population // merge population back in later because want it merged 
 merge 1:1 state date using "..\data\cdc_deaths.dta"
 drop _merge
 
-merge 1:1 state date using "..\data\cdc_1920deaths.dta"
+merge 1:1 state date using "..\data\cdc_historical_deaths.dta"
 drop _merge
-
-append using "..\data\cdc_1418deaths.dta"
 
 drop fips
 merge m:1 state using "..\data\population.dta", keep(1 3)
@@ -31,27 +29,15 @@ gen end_week = date + mod(6 - dow(date), 7)
 format end_week %tdCCYYNNDD
 order end_week, after(date)
 
-rename septicemiaa40a41 septicemia
-rename malignantneoplasmsc00c97 malignantneoplasms
-rename diabetesmellituse10e14 diabetesmellitus
-rename alzheimerdiseaseg30 alzheimerdisease
-rename influenzaandpneumoniaj10j18 influenzaandpneumonia
-rename chroniclowerrespiratorydiseasesj chroniclowerresp
-rename otherdiseasesofrespiratorysystem otherrespiratory
-rename nephritisnephroticsyndromeandnep nephritis
-rename symptomssignsandabnormalclinical symptomssignsandabnormal
-rename diseasesofhearti00i09i11i13i20i5 diseasesofheart
-rename cerebrovasculardiseasesi60i69 cerebrovasculardiseases
-
-foreach var of varlist positive-datagrade death-pneumon_influ_or_covid allcause-mmwrweek {
+foreach var of varlist positive-datagrade death-pneumon_influ_or_covid numinfluenzadeaths-percentcomplete {
 	gen `var'_mis = (`var'==.)
 }
 gen dayscollapsed = 1
-collapse (firstnm) state report_date (lastnm) positive-datagrade population death-posneg (sum) deathincrease-pneumon_influ_or_covid allcause-mmwrweek *_mis dayscollapsed, by(end_week fips)
+collapse (firstnm) state report_date epi_week (lastnm) positive-datagrade population death-posneg (sum) deathincrease-pneumon_influ_or_covid numinfluenzadeaths-percentcomplete *_mis dayscollapsed, by(end_week fips)
 foreach var of varlist positive-datagrade {
 	replace `var' = . if `var'_mis > 0
 }
-foreach var of varlist death-pneumon_influ_or_covid allcause-mmwrweek {
+foreach var of varlist death-pneumon_influ_or_covid numinfluenzadeaths-percentcomplete {
 	replace `var' = . if `var'_mis == dayscollapsed
 }
 drop *_mis
@@ -84,11 +70,10 @@ replace adj_expected_deaths = expected_deaths * 93 / 212 if days_to_report <= 7 
 replace adj_expected_deaths = expected_deaths * 159 / 212 if days_to_report > 7 & days_to_report <= 14
 replace adj_expected_deaths = expected_deaths * 192 / 212 if days_to_report > 14 & days_to_report <= 21
 
+gen pneumon_or_influ_fluview = numinfluenzadeaths + numpneumoniadeaths if end_week < date("20200201","YMD")
+gen mmwrweek = substr(epi_week,-2,2)
 
-gen pneumon_or_influ = pneumon_influ_or_covid- covid_deaths
-reg pneumon_or_influ influenzaandpneumonia if total_deaths== allcause, nocons
-
-egen expected_influ_pneu_deaths = mean(2.85868*influenzaandpneumonia) if mmwrweek != ., by(fips mmwrweek)
+egen expected_influ_pneu_deaths = mean(pneumon_or_influ_fluview), by(fips mmwrweek)
 gen adj_expected_influ_pneu_deaths = expected_influ_pneu_deaths
 replace adj_expected_influ_pneu_deaths = expected_influ_pneu_deaths * 93 / 212 if days_to_report <= 7 & days_to_report != .
 replace adj_expected_influ_pneu_deaths = expected_influ_pneu_deaths * 159 / 212 if days_to_report > 7 & days_to_report <= 14

@@ -11,7 +11,7 @@ drop olddate
 save "..\data\covidtracking.dta", replace
 
 insheet using "..\data\source_files\State_Custom_Data.csv", clear
-tostring week, gen(week_str)
+gen week_str = string(week,"%02.0f")
 gen yr = substr(season,3,2) if week > 39
 replace yr = substr(season,-2,2) if week <= 39
 gen epi_week = "20"+yr+"w"+week_str
@@ -26,7 +26,7 @@ collapse (sum) numinfluenzadeaths-percentcomplete (first) season epi_week, by(st
 save "..\data\cdc_historical_deaths.dta", replace
 
 insheet using "https://data.cdc.gov/resource/r8kw-7aab.csv", clear
-export delimited using "..\data\past_reports\unprocessed_files/$S_DATE cdc_deaths_raw"
+export delimited using "..\data\past_reports\unprocessed_files/$S_DATE cdc_deaths_raw", replace
 gen date = date(substr(end_week,1,10), "YMD")
 format date %tdCCYYNNDD
 gen report_date = date(substr(data_as_of,1,10), "YMD")

@@ -10,38 +10,23 @@ order date
 drop olddate
 save "..\data\covidtracking.dta", replace
 
-/*
-insheet using "https://data.cdc.gov/resource/xkkf-xrst.csv", clear
-gen date = date(substr(week_ending_date,1,10), "YMD")
+insheet using "..\data\source_files\State_Custom_Data.csv", clear
+tostring week, gen(week_str)
+gen yr = substr(season,3,2) if week > 39
+replace yr = substr(season,-2,2) if week <= 39
+gen epi_week = "20"+yr+"w"+week_str
+epiweek2 epi_week, start(weekstartingdate) end(date) // requires userwritten package EPIWEEK
 format date %tdCCYYNNDD
+destring numinfluenzadeaths-percentcomplete, replace ignore("Insufficient Data" "," ">" "<" "%")
+drop percentpi week_str area agegroup yr weekstartingdate
 order date
-keep date state 
-save "..\data\allcause.dta", replace
-*/
-
-insheet using "..\data\Weekly_Counts_of_Deaths_by_State_and_Select_Causes__2014-2018.csv", clear
-gen date = date(weekendingdate, "MDY")
-format date %tdCCYYNNDD
-rename jurisdictionofoccurrence state
+rename subarea state
 replace state = "New York" if state == "New York City"
-foreach var of varlist allcause-cerebrovasculardiseasesi60i69 {
-	replace `var' = 5 if `var' == .
-}
-collapse (sum) allcause-cerebrovasculardiseasesi60i69 (first) mmwryear mmwrweek, by(state date)
-save "..\data\cdc_1418deaths.dta", replace
-
-insheet using "..\data\Weekly_Counts_of_Deaths_by_State_and_Select_Causes__2019-2020.csv", clear
-gen date = date(weekendingdate, "MDY")
-format date %tdCCYYNNDD
-rename jurisdictionofoccurrence state
-replace state = "New York" if state == "New York City"
-foreach var of varlist allcause-cerebrovasculardiseasesi60i69 {
-	replace `var' = 5 if `var' == .
-}
-collapse (sum) allcause-cerebrovasculardiseasesi60i69 (first) mmwryear mmwrweek, by(state date)
-save "..\data\cdc_1920deaths.dta", replace
+collapse (sum) numinfluenzadeaths-percentcomplete (first) season epi_week, by(state date)
+save "..\data\cdc_historical_deaths.dta", replace
 
 insheet using "https://data.cdc.gov/resource/r8kw-7aab.csv", clear
+export delimited using "..\data\past_reports\unprocessed_files/$S_DATE cdc_deaths_raw"
 gen date = date(substr(end_week,1,10), "YMD")
 format date %tdCCYYNNDD
 gen report_date = date(substr(data_as_of,1,10), "YMD")
@@ -59,6 +44,7 @@ foreach var of varlist covid_deaths-pneumon_influ_or_covid {
 collapse (sum) covid_deaths-pneumon_influ_or_covid (first) report_date, by(state date)
 
 save "..\data\cdc_deaths.dta", replace
+save "..\data\past_reports/$S_DATE cdc_deaths.dta", replace
 
 insheet using "https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/national/totals/nst-est2019-alldata.csv", clear
 rename state fips

@@ -10,7 +10,7 @@ nationwide_saturday_reports.csv: weekly changes in reported deaths (on Saturdays
 * https://web.archive.org/web/20200509055545/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
 * https://web.archive.org/web/20200516012808/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
 
-[date]_cdc_deaths.dta
+[date] cdc_deaths.dta
 * These files are based on my own pulling of data (see "../code/pulldata.do") from this API on various days: https://data.cdc.gov/resource/r8kw-7aab.csv
 * These data files have been lightly processed (again, see "../code/pulldata.do"), and I unfortunately did not save the original files
   * I did change the way I was handling missing (suppressed because underlying value is between 1-9) data at one point (in later files, missing/suppressed is replaced by 5)

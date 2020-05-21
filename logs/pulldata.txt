@@ -2,11 +2,11 @@
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\pulldata.txt
   log type:  text
- opened on:  17 May 2020, 23:00:44
+ opened on:  21 May 2020, 13:39:53
 
 . 
 . import delimited "https://covidtracking.com/api/v1/states/daily.csv", stringcols(1)
-(27 vars, 4,105 obs)
+(27 vars, 4,273 obs)
 
 . rename date olddate
 
@@ -22,87 +22,53 @@
 file ..\data\covidtracking.dta saved
 
 . 
-. /*
-> insheet using "https://data.cdc.gov/resource/xkkf-xrst.csv", clear
-> gen date = date(substr(week_ending_date,1,10), "YMD")
-> format date %tdCCYYNNDD
-> order date
-> keep date state 
-> save "..\data\allcause.dta", replace
-> */
-. 
-. insheet using "..\data\Weekly_Counts_of_Deaths_by_State_and_Select_Causes__2014-2018.csv", clear
-(30 vars, 13,833 obs)
+. insheet using "..\data\source_files\State_Custom_Data.csv", clear
+(10 vars, 19,968 obs)
 
-. gen date = date(weekendingdate, "MDY")
+. tostring week, gen(week_str)
+week_str generated as str2
 
-. format date %tdCCYYNNDD
+. gen yr = substr(season,3,2) if week > 39
+(15,184 missing values generated)
 
-. rename jurisdictionofoccurrence state
+. replace yr = substr(season,-2,2) if week <= 39
+(15,184 real changes made)
 
-. replace state = "New York" if state == "New York City"
-(261 real changes made)
+. gen epi_week = "20"+yr+"w"+week_str
 
-. foreach var of varlist allcause-cerebrovasculardiseasesi60i69 {
-  2.         replace `var' = 5 if `var' == .
-  3. }
-(0 real changes made)
-(0 real changes made)
-(6,147 real changes made)
-(10 real changes made)
-(3,546 real changes made)
-(2,822 real changes made)
-(5,006 real changes made)
-(1,901 real changes made)
-(6,147 real changes made)
-(5,487 real changes made)
-(6,886 real changes made)
-(17 real changes made)
-(2,144 real changes made)
-
-. collapse (sum) allcause-cerebrovasculardiseasesi60i69 (first) mmwryear mmwrweek, by(state date)
-
-. save "..\data\cdc_1418deaths.dta", replace
-file ..\data\cdc_1418deaths.dta saved
-
-. 
-. insheet using "..\data\Weekly_Counts_of_Deaths_by_State_and_Select_Causes__2019-2020.csv", clear
-(34 vars, 3,786 obs)
-
-. gen date = date(weekendingdate, "MDY")
+. epiweek2 epi_week, start(weekstartingdate) end(date) // requires userwritten package EPIWEEK
 
 . format date %tdCCYYNNDD
 
-. rename jurisdictionofoccurrence state
+. destring numinfluenzadeaths-percentcomplete, replace ignore("Insufficient Data" "," ">" "<" "%")
+numinfluenzadeaths: characters I n s u f i c e t space D a removed; replaced as int
+(25 missing values generated)
+numpneumoniadeaths: characters I n s u f i c e t space D a , removed; replaced as int
+(25 missing values generated)
+totaldeaths: characters I n s u f i c e t space D a , removed; replaced as int
+(25 missing values generated)
+percentcomplete: characters space > < % removed; replaced as double
+
+. drop percentpi week_str area agegroup yr weekstartingdate
+
+. order date
+
+. rename subarea state
 
 . replace state = "New York" if state == "New York City"
-(72 real changes made)
+(384 real changes made)
 
-. foreach var of varlist allcause-cerebrovasculardiseasesi60i69 {
-  2.         replace `var' = 5 if `var' == .
-  3. }
-(24 real changes made)
-(24 real changes made)
-(1,686 real changes made)
-(36 real changes made)
-(898 real changes made)
-(710 real changes made)
-(1,358 real changes made)
-(527 real changes made)
-(1,552 real changes made)
-(1,432 real changes made)
-(1,532 real changes made)
-(38 real changes made)
-(589 real changes made)
+. collapse (sum) numinfluenzadeaths-percentcomplete (first) season epi_week, by(state date)
 
-. collapse (sum) allcause-cerebrovasculardiseasesi60i69 (first) mmwryear mmwrweek, by(state date)
-
-. save "..\data\cdc_1920deaths.dta", replace
-file ..\data\cdc_1920deaths.dta saved
+. save "..\data\cdc_historical_deaths.dta", replace
+file ..\data\cdc_historical_deaths.dta saved
 
 . 
 . insheet using "https://data.cdc.gov/resource/r8kw-7aab.csv", clear
-(14 vars, 810 obs)
+(14 vars, 864 obs)
+
+. export delimited using "..\data\past_reports\unprocessed_files/$S_DATE cdc_deaths_raw"
+file ..\data\past_reports\unprocessed_files/21 May 2020 cdc_deaths_raw.csv saved
 
 . gen date = date(substr(end_week,1,10), "YMD")
 
@@ -115,14 +81,14 @@ file ..\data\cdc_1920deaths.dta saved
 . order date report_date
 
 . gen expected_deaths = total_deaths / percent_of_expected_deaths
-(11 missing values generated)
+(9 missing values generated)
 
 . order expected_deaths, after(total_deaths)
 
 . drop start_week group indicator percent_of_expected_deaths footnote
 
 . replace state = "New York" if state == "New York City"
-(15 real changes made)
+(16 real changes made)
 
 . rename pneumonia_influenza_or_covid pneumon_influ_or_covid
 
@@ -130,19 +96,23 @@ file ..\data\cdc_1920deaths.dta saved
 . foreach var of varlist covid_deaths-pneumon_influ_or_covid {
   2.         replace `var' = 5 if `var' == .
   3. }
-(137 real changes made)
-(6 real changes made)
-(11 real changes made)
-(69 real changes made)
-(169 real changes made)
-(416 real changes made)
-(54 real changes made)
+(145 real changes made)
+(5 real changes made)
+(9 real changes made)
+(90 real changes made)
+(189 real changes made)
+(434 real changes made)
+(66 real changes made)
 
 . collapse (sum) covid_deaths-pneumon_influ_or_covid (first) report_date, by(state date)
 
 . 
 . save "..\data\cdc_deaths.dta", replace
 file ..\data\cdc_deaths.dta saved
+
+. save "..\data\past_reports/$S_DATE cdc_deaths.dta", replace
+(note: file ..\data\past_reports/21 May 2020 cdc_deaths.dta not found)
+file ..\data\past_reports/21 May 2020 cdc_deaths.dta saved
 
 . 
 . insheet using "https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/national/totals/n
@@ -168,5 +138,5 @@ file ..\data\population.dta saved
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\pulldata.txt
   log type:  text
- closed on:  17 May 2020, 23:00:56
+ closed on:  21 May 2020, 13:40:01
 -----------------------------------------------------------------------------------------------------

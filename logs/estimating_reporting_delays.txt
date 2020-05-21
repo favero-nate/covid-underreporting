@@ -1,0 +1,529 @@
+-----------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\estimating_reporting_
+> delays.txt
+  log type:  text
+ opened on:  21 May 2020, 19:05:28
+
+. 
+. insheet using "..\data\past_reports\nationwide_saturday_reports.csv"
+(9 vars, 75 obs)
+
+. 
+. rename end_week end_week_str
+
+. rename report_date report_date_str
+
+. gen end_week = date(end_week_str, "MDY")
+
+. gen report_date = date(report_date_str, "MDY")
+
+. format end_week %tdCCYYNNDD
+
+. format report_date %tdCCYYNNDD
+
+. 
+. gen days_to_report = report_date - end_week
+
+. sum days_to_report
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+days_to_re~t |         75    48.06667     26.7255          7        105
+
+. gen days_since_first_report = days_to_report - r(min)
+
+. 
+. order end_week report_date days_to_report
+
+. sort end_week report_date
+
+. 
+. destring covid_deaths- pneumon_influ_or_covid, replace ignore(",")
+covid_deaths: character , removed; replaced as int
+total_deaths: character , removed; replaced as long
+percent_of_expected_deaths already numeric; no replace
+pneumonia_deaths: character , removed; replaced as int
+pneumonia_and_covid_deaths: character , removed; replaced as int
+influenza_deaths already numeric; no replace
+pneumon_influ_or_covid: character , removed; replaced as int
+(21 missing values generated)
+
+. 
+. xtset end_week report_date, delta(7)
+       panel variable:  end_week (unbalanced)
+        time variable:  report_date, 20200411 to 20200516
+                delta:  7 days
+
+. 
+. gen growth_total_deaths = f.total_deaths / total_deaths
+(15 missing values generated)
+
+. 
+. bys days_to_report: sum growth_total_deaths
+
+-----------------------------------------------------------------------------------------------------
+-> days_to_report = 7
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_tot~s |          5    1.733615    .1327209   1.627368   1.886368
+
+-----------------------------------------------------------------------------------------------------
+-> days_to_report = 14
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_tot~s |          5    1.163302    .0246872   1.140447   1.205091
+
+-----------------------------------------------------------------------------------------------------
+-> days_to_report = 21
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_tot~s |          5    1.055341    .0061777   1.048168   1.062903
+
+-----------------------------------------------------------------------------------------------------
+-> days_to_report = 28
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_tot~s |          5    1.024915    .0035242   1.020561   1.029189
+
+-----------------------------------------------------------------------------------------------------
+-> days_to_report = 35
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_tot~s |          5    1.014131    .0027023   1.010143   1.016524
+
+-----------------------------------------------------------------------------------------------------
+-> days_to_report = 42
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_tot~s |          5     1.01353    .0051443   1.008201   1.019091
+
+-----------------------------------------------------------------------------------------------------
+-> days_to_report = 49
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_tot~s |          5    1.015894    .0020991   1.012537   1.017601
+
+-----------------------------------------------------------------------------------------------------
+-> days_to_report = 56
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_tot~s |          5    1.014075     .003125   1.010217   1.017506
+
+-----------------------------------------------------------------------------------------------------
+-> days_to_report = 63
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_tot~s |          5    1.007821    .0015398   1.006341   1.009723
+
+-----------------------------------------------------------------------------------------------------
+-> days_to_report = 70
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_tot~s |          5    1.005286    .0026744   1.002977   1.009292
+
+-----------------------------------------------------------------------------------------------------
+-> days_to_report = 77
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_tot~s |          4    1.006835     .002782   1.003499   1.009843
+
+-----------------------------------------------------------------------------------------------------
+-> days_to_report = 84
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_tot~s |          3    1.003927    .0027262     1.0021   1.007061
+
+-----------------------------------------------------------------------------------------------------
+-> days_to_report = 91
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_tot~s |          2    1.004791    .0023802   1.003108   1.006474
+
+-----------------------------------------------------------------------------------------------------
+-> days_to_report = 98
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_tot~s |          1    1.001584           .   1.001584   1.001584
+
+-----------------------------------------------------------------------------------------------------
+-> days_to_report = 105
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_tot~s |          0
+
+
+. 
+. gen est_real_total_deaths = 1.005286 * total_deaths if days_to_report==70
+(69 missing values generated)
+
+. replace est_real_total_deaths = 1.005286 * 1.007821 * total_deaths if days_to_report==63
+(6 real changes made)
+
+. replace est_real_total_deaths = 1.005286 * 1.007821 * 1.014075 * total_deaths if days_to_report==56
+(6 real changes made)
+
+. replace est_real_total_deaths = 1.005286 * 1.007821 * 1.014075 * 1.015894 * total_deaths if days_to
+> _report==49
+(6 real changes made)
+
+. replace est_real_total_deaths = 1.005286 * 1.007821 * 1.014075 * 1.015894 * 1.01353 * total_deaths 
+> if days_to_report==42
+(6 real changes made)
+
+. replace est_real_total_deaths = 1.005286 * 1.007821 * 1.014075 * 1.015894 * 1.01353 * 1.014131 * to
+> tal_deaths if days_to_report==35
+(6 real changes made)
+
+. replace est_real_total_deaths = 1.005286 * 1.007821 * 1.014075 * 1.015894 * 1.01353 * 1.014131 * 1.
+> 024915 * total_deaths if days_to_report==28
+(6 real changes made)
+
+. replace est_real_total_deaths = 1.005286 * 1.007821 * 1.014075 * 1.015894 * 1.01353 * 1.014131 * 1.
+> 024915 * 1.055341 * total_deaths if days_to_report==21
+(6 real changes made)
+
+. replace est_real_total_deaths = 1.005286 * 1.007821 * 1.014075 * 1.015894 * 1.01353 * 1.014131 * 1.
+> 024915 * 1.055341 * 1.163302 * total_deaths if days_to_report==14
+(6 real changes made)
+
+. replace est_real_total_deaths = 1.005286 * 1.007821 * 1.014075 * 1.015894 * 1.01353 * 1.014131 * 1.
+> 024915 * 1.055341 * 1.163302 * 1.733615 * total_deaths if days_to_report==7
+(6 real changes made)
+
+. 
+. order est_real_total_deaths
+
+. 
+. 
+. capture program drop reporting_delays
+
+. program reporting_delays
+  1.         args lnf detected time alpha lnsigma
+  2.         quietly replace `lnf' = ///
+>                 ln(normalden( $ML_y1,  `alpha' - `alpha'*exp(-(exp(`time') * $ML_y2 )), exp(`lnsigm
+> a'+`detected'*$ML_y2 )))
+  3. end
+
+. 
+. ml model lf reporting_delays ///
+>         (detected: total_deaths = ) ///
+>         (time: days_to_report = ) ///
+>         (alpha: i.end_week) ///
+>         (lnsigma: ) if end_week < date("20200418","YMD")
+
+. ml maximize
+
+initial:       log likelihood =     -<inf>  (could not be evaluated)
+feasible:      log likelihood = -4474.6491
+rescale:       log likelihood = -4474.6491
+rescale eq:    log likelihood =  -4244.304
+Iteration 0:   log likelihood =  -4244.304  (not concave)
+Iteration 1:   log likelihood = -3897.8321  (not concave)
+Iteration 2:   log likelihood = -3416.1434  (not concave)
+Iteration 3:   log likelihood = -3102.7965  (not concave)
+Iteration 4:   log likelihood = -2678.2652  (not concave)
+Iteration 5:   log likelihood = -2510.9161  (not concave)
+numerical derivatives are approximate
+nearby values are missing
+Iteration 6:   log likelihood = -1377.5745  (not concave)
+Iteration 7:   log likelihood = -937.01255  (not concave)
+Iteration 8:   log likelihood = -817.41599  (not concave)
+Iteration 9:   log likelihood = -789.00399  (not concave)
+Iteration 10:  log likelihood = -748.10967  (not concave)
+Iteration 11:  log likelihood = -708.01853  (not concave)
+Iteration 12:  log likelihood =  -689.0915  (not concave)
+Iteration 13:  log likelihood = -685.86368  
+Iteration 14:  log likelihood = -678.39831  
+Iteration 15:  log likelihood =  -670.7739  
+Iteration 16:  log likelihood = -668.97339  (not concave)
+Iteration 17:  log likelihood = -653.13168  (not concave)
+Iteration 18:  log likelihood = -649.56273  (not concave)
+Iteration 19:  log likelihood = -646.46781  (not concave)
+Iteration 20:  log likelihood = -644.42102  (not concave)
+Iteration 21:  log likelihood = -642.79662  (not concave)
+Iteration 22:  log likelihood = -641.16625  (not concave)
+Iteration 23:  log likelihood = -637.96227  
+Iteration 24:  log likelihood = -625.57438  
+Iteration 25:  log likelihood = -600.63243  (not concave)
+Iteration 26:  log likelihood = -594.50913  (not concave)
+Iteration 27:  log likelihood = -582.15426  (not concave)
+Iteration 28:  log likelihood = -569.72778  (not concave)
+Iteration 29:  log likelihood =  -563.0921  (not concave)
+Iteration 30:  log likelihood = -557.31483  (not concave)
+Iteration 31:  log likelihood = -551.51094  (not concave)
+Iteration 32:  log likelihood = -545.68135  (not concave)
+Iteration 33:  log likelihood =  -540.6151  
+Iteration 34:  log likelihood = -526.96542  (not concave)
+Iteration 35:  log likelihood = -525.14408  (not concave)
+Iteration 36:  log likelihood =  -525.1435  (backed up)
+Iteration 37:  log likelihood =  -520.3166  
+Iteration 38:  log likelihood = -519.83344  
+Iteration 39:  log likelihood = -519.82865  
+Iteration 40:  log likelihood = -519.82865  
+
+                                                Number of obs     =         65
+                                                Wald chi2(0)      =          .
+Log likelihood = -519.82865                     Prob > chi2       =          .
+
+------------------------------------------------------------------------------
+             |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+detected     |
+       _cons |   -.066074   .0040101   -16.48   0.000    -.0739335   -.0582144
+-------------+----------------------------------------------------------------
+time         |
+       _cons |  -2.904685   .0267437  -108.61   0.000    -2.957102   -2.852268
+-------------+----------------------------------------------------------------
+alpha        |
+    end_week |
+      21953  |   615.7255   38.11669    16.15   0.000     541.0182    690.4329
+      21960  |   99.40021   59.56485     1.67   0.095    -17.34475    216.1452
+      21967  |   344.3021   93.83821     3.67   0.000     160.3826    528.2216
+      21974  |   932.5076   147.2307     6.33   0.000     643.9408    1221.074
+      21981  |   1057.984   225.1012     4.70   0.000     616.7939    1499.174
+      21988  |   114.5583   347.9228     0.33   0.742     -567.358    796.4745
+      21995  |   1434.293   544.8692     2.63   0.008     366.3689    2502.217
+      22002  |   6793.189   874.6003     7.77   0.000     5079.004    8507.374
+      22009  |   18520.67   1447.666    12.79   0.000      15683.3    21358.04
+      22016  |   29678.75   2444.122    12.14   0.000     24888.36    34469.14
+             |
+       _cons |   57707.63   41.62831  1386.26   0.000     57626.04    57789.22
+-------------+----------------------------------------------------------------
+lnsigma      |
+       _cons |   10.10068   .2310598    43.71   0.000     9.647807    10.55355
+------------------------------------------------------------------------------
+
+. 
+. display "k="exp(_b[#2:_cons])
+k=.05476604
+
+. 
+. gen delay_adj_total_deaths = total_deaths / (1-exp(-exp(_b[#2:_cons])*days_to_report))
+
+. 
+. 
+. 
+. 
+. egen min_realdeaths = max(total_deaths), by(end_week)
+
+. 
+. 
+. capture program drop reporting_delays
+
+. program reporting_delays
+  1.         args lnf detected time missed_realdeaths lnsigma delta
+  2.         quietly replace `lnf' = ///
+>                 ln(normalden( $ML_y1,  ($ML_y3 + exp(`missed_realdeaths')) - (1/(1+exp(-`delta')))*
+> ($ML_y3 + exp(`missed_realdeaths'))*exp(-(exp(`time') * $ML_y2 )), exp(`lnsigma'+`detected'*$ML_y2 
+> )))
+  3. end
+
+. 
+. ml model lf reporting_delays ///
+>         (detected: total_deaths = ) ///
+>         (time: days_to_report = ) ///
+>         (missed_realdeaths: min_realdeaths = i.end_week) ///
+>         (lnsigma: ) /delta if end_week < date("20200418","YMD")
+
+. ml maximize
+
+initial:       log likelihood =     -<inf>  (could not be evaluated)
+feasible:      log likelihood = -4474.8323
+rescale:       log likelihood = -4474.8323
+rescale eq:    log likelihood = -4230.6891
+Iteration 0:   log likelihood = -4230.6891  (not concave)
+Iteration 1:   log likelihood = -4061.9061  (not concave)
+Iteration 2:   log likelihood = -3449.7407  (not concave)
+Iteration 3:   log likelihood = -3183.5681  (not concave)
+Iteration 4:   log likelihood = -3159.4745  (not concave)
+Iteration 5:   log likelihood = -2866.7071  (not concave)
+Iteration 6:   log likelihood = -2655.5524  (not concave)
+Iteration 7:   log likelihood = -2367.2946  (not concave)
+Iteration 8:   log likelihood = -2361.4193  (not concave)
+Iteration 9:   log likelihood = -2150.0204  (not concave)
+Iteration 10:  log likelihood = -2036.4442  (not concave)
+Iteration 11:  log likelihood = -1829.1317  (not concave)
+Iteration 12:  log likelihood = -1709.9891  (not concave)
+Iteration 13:  log likelihood = -1464.0843  (not concave)
+Iteration 14:  log likelihood = -1343.8935  (not concave)
+Iteration 15:  log likelihood =  -1125.599  (not concave)
+Iteration 16:  log likelihood = -1006.3945  (not concave)
+Iteration 17:  log likelihood = -874.88977  (not concave)
+Iteration 18:  log likelihood = -747.17742  (not concave)
+Iteration 19:  log likelihood = -739.19368  (not concave)
+Iteration 20:  log likelihood = -620.84896  (not concave)
+Iteration 21:  log likelihood = -559.67318  (not concave)
+Iteration 22:  log likelihood = -550.07279  (not concave)
+Iteration 23:  log likelihood = -546.26096  (not concave)
+Iteration 24:  log likelihood = -546.26054  
+Iteration 25:  log likelihood = -535.91467  (not concave)
+Iteration 26:  log likelihood = -527.80498  (not concave)
+Iteration 27:  log likelihood = -527.55511  (not concave)
+Iteration 28:  log likelihood = -526.40435  (not concave)
+Iteration 29:  log likelihood = -524.58566  (not concave)
+Iteration 30:  log likelihood =  -524.4637  (not concave)
+Iteration 31:  log likelihood = -524.27786  (not concave)
+Iteration 32:  log likelihood =  -516.3072  (not concave)
+Iteration 33:  log likelihood = -515.08737  
+Iteration 34:  log likelihood = -514.51946  
+Iteration 35:  log likelihood = -506.34486  
+Iteration 36:  log likelihood =  -504.9546  (not concave)
+Iteration 37:  log likelihood =  -504.9537  
+Iteration 38:  log likelihood = -504.93505  (not concave)
+Iteration 39:  log likelihood = -504.80887  (not concave)
+Iteration 40:  log likelihood = -503.38122  (not concave)
+Iteration 41:  log likelihood = -502.89412  
+Iteration 42:  log likelihood = -502.71968  
+Iteration 43:  log likelihood = -502.18049  
+Iteration 44:  log likelihood = -502.17309  
+Iteration 45:  log likelihood = -502.17307  
+
+                                                Number of obs     =         65
+                                                Wald chi2(0)      =          .
+Log likelihood = -502.17307                     Prob > chi2       =          .
+
+-----------------------------------------------------------------------------------
+                  |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+------------------+----------------------------------------------------------------
+detected          |
+            _cons |  -.0445955   .0025642   -17.39   0.000    -.0496213   -.0395698
+------------------+----------------------------------------------------------------
+time              |
+            _cons |  -2.956398   .0299013   -98.87   0.000    -3.015004   -2.897793
+------------------+----------------------------------------------------------------
+missed_realdeaths |
+         end_week |
+           21953  |  -42.80436          .        .       .            .           .
+           21960  |  -908.7669          .        .       .            .           .
+           21967  |   1.140006   .5713961     2.00   0.046     .0200906    2.259922
+           21974  |   1.646225   .5452348     3.02   0.003     .5775849    2.714866
+           21981  |   2.283528   .5232076     4.36   0.000      1.25806    3.308996
+           21988  |   2.603078   .5302212     4.91   0.000     1.563863    3.642292
+           21995  |   3.148221   .5255558     5.99   0.000     2.118151    4.178292
+           22002  |   3.719564   .5231243     7.11   0.000      2.69426    4.744869
+           22009  |    4.15793   .5256114     7.91   0.000     3.127751    5.188109
+           22016  |   4.527875   .5314242     8.52   0.000     3.486303    5.569448
+                  |
+            _cons |   4.467461   .5172346     8.64   0.000       3.4537    5.481223
+------------------+----------------------------------------------------------------
+lnsigma           |
+            _cons |   8.684086   .1624096    53.47   0.000     8.365769    9.002403
+------------------+----------------------------------------------------------------
+           /delta |    .353389   .1711349     2.06   0.039     .0179708    .6888073
+-----------------------------------------------------------------------------------
+
+. 
+. display "k="exp(_b[#2:_cons])
+k=.05200588
+
+. 
+. 
+. capture program drop reporting_delays
+
+. program reporting_delays
+  1.         args lnf time detected0 missed_realdeaths lnsigma
+  2.         quietly replace `lnf' = ///
+>                 ln(normalden( $ML_y1,  -(1/exp(`time')) * log( ($ML_y3 + exp(`missed_realdeaths') -
+>  $ML_y2 )/(($ML_y3 + exp(`missed_realdeaths'))*1/(1+exp(-`detected0'))) ), exp(`lnsigma')))
+  3. end
+
+. 
+. ml model lf reporting_delays ///
+>         (time: days_since_first_report = ) ///
+>         (detected0: total_deaths = ) ///
+>         (missed_realdeaths: min_realdeaths = i.end_week) ///
+>         (lnsigma: ) if end_week < date("20200418","YMD")
+
+. ml maximize
+
+initial:       log likelihood =     -<inf>  (could not be evaluated)
+feasible:      log likelihood = -7104.8236
+rescale:       log likelihood = -388.77576
+rescale eq:    log likelihood = -279.32272
+Iteration 0:   log likelihood = -279.32272  (not concave)
+Iteration 1:   log likelihood = -250.62704  (not concave)
+Iteration 2:   log likelihood = -230.52276  (not concave)
+Iteration 3:   log likelihood = -225.11521  (not concave)
+Iteration 4:   log likelihood = -212.39939  (not concave)
+Iteration 5:   log likelihood = -212.23006  (not concave)
+Iteration 6:   log likelihood = -208.17711  
+Iteration 7:   log likelihood = -204.01013  
+Iteration 8:   log likelihood = -193.51105  
+Iteration 9:   log likelihood =   -182.638  
+Iteration 10:  log likelihood = -172.34167  
+Iteration 11:  log likelihood = -169.41614  
+Iteration 12:  log likelihood = -169.30961  
+Iteration 13:  log likelihood = -169.30928  
+Iteration 14:  log likelihood = -169.30928  
+
+                                                Number of obs     =         65
+                                                Wald chi2(0)      =          .
+Log likelihood = -169.30928                     Prob > chi2       =          .
+
+-----------------------------------------------------------------------------------
+                  |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+------------------+----------------------------------------------------------------
+time              |
+            _cons |  -3.144844   .0351389   -89.50   0.000    -3.213715   -3.075973
+------------------+----------------------------------------------------------------
+detected0         |
+            _cons |  -.5306241   .0903107    -5.88   0.000    -.7076299   -.3536183
+------------------+----------------------------------------------------------------
+missed_realdeaths |
+         end_week |
+           21953  |   .1270899   .1451767     0.88   0.381    -.1574511     .411631
+           21960  |     .47081   .1446439     3.25   0.001     .1873132    .7543067
+           21967  |   .8305639   .1465742     5.67   0.000     .5432838    1.117844
+           21974  |   1.157065   .1515986     7.63   0.000     .8599369    1.454193
+           21981  |    1.57999   .1563326    10.11   0.000     1.273584    1.886396
+           21988  |   1.849575    .167081    11.07   0.000     1.522103    2.177048
+           21995  |   2.264526   .1753993    12.91   0.000      1.92075    2.608303
+           22002  |   2.736706   .1833046    14.93   0.000     2.377435    3.095976
+           22009  |   3.095632   .1945884    15.91   0.000     2.714245    3.477018
+           22016  |    3.39129   .2082579    16.28   0.000     2.983112    3.799467
+                  |
+            _cons |   5.762154   .1720744    33.49   0.000     5.424894    6.099414
+------------------+----------------------------------------------------------------
+lnsigma           |
+            _cons |    1.18582   .0877058    13.52   0.000     1.013919     1.35772
+-----------------------------------------------------------------------------------
+
+. 
+. display "k="exp(_b[#1:_cons])
+k=.04307364
+
+. display "beta=limit*"(1-1/(1+exp(-_b[#2:_cons])))
+beta=limit*.62962866
+
+. display "alpha="(1/(1+exp(-_b[#2:_cons])))
+alpha=.37037134
+
+. 
+. gen est_real_total_deaths2 = total_deaths/(1-1/(1+exp(-_b[#2:_cons]))*exp(-exp(_b[#1:_cons])*days_s
+> ince_first_report))
+
+. 
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\estimating_reporting_
+> delays.txt
+  log type:  text
+ closed on:  21 May 2020, 19:05:33
+-----------------------------------------------------------------------------------------------------

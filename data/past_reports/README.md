@@ -2,7 +2,7 @@
 
 This folder contains (CDC) files released/downloaded at various points in time, which I can use to evaluate reporting delays.
 
-nationwide_saturday_reports.csv: weekly changes in reported deaths (on Saturdays), assembled based on Internet Archive (IA) records of a CDC webpage (https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm); based on earliest crawl available from IA on each Saturday
+nationwide_saturday_reports.csv: weekly changes in reported deaths (on Saturdays), assembled based on Internet Archive (IA) records of a CDC webpage (https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm); based on earliest crawl available from IA on each Saturday (variable report_date indicates Fridays because that's the date listed for when the data was updated)
 * https://web.archive.org/web/20200411005433/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
 * https://web.archive.org/web/20200418084016/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
 * https://web.archive.org/web/20200425031314/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm

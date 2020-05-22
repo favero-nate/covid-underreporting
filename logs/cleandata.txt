@@ -2,7 +2,7 @@
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\data\..\logs\cleandata.txt
   log type:  text
- opened on:  22 May 2020, 15:59:28
+ opened on:  22 May 2020, 16:17:14
 
 . 
 . use "..\data\population.dta" // start from this file because it has both fips codes and state names
@@ -207,10 +207,9 @@
 (98 missing values generated)
 
 . 
-. egen old_expected_influ_pneu_deaths = mean(pneumon_or_influ_fluview), by(fips mmwrweek)
-(98 missing values generated)
-
+. //egen old_expected_influ_pneu_deaths = mean(pneumon_or_influ_fluview), by(fips mmwrweek)
 . 
+. // generate expected influenza/pneumonia deaths based on historical patterns
 .         gen epi_year = substr(epi_week,1,4)
 (98 missing values generated)
 
@@ -243,6 +242,8 @@ mmwrweek: all characters numeric; replaced as byte
 (833 missing values generated)
 
 .         
+.         // most year-to-year variation in influenza severity seems to be from weeks 50 to 8; thus, 
+> create a sin spike for this period with a year-varying coefficient
 .         gen fluseason = 0 if mmwrweek != .
 (98 missing values generated)
 
@@ -252,6 +253,7 @@ mmwrweek: all characters numeric; replaced as byte
 .         gen fluseason_sin_time = sin(fluseason*_pi*(mmwrweek2-10)/12)
 (98 missing values generated)
 
+.         
 .         reg pneumon_or_influ_fluview_pc i.fips i.epi_year i.mmwrweek i.epi_year#c.fluseason_sin_tim
 > e [aweight=population]
 (sum of wgt is 115,934,690,088)
@@ -738,62 +740,70 @@ Linear regression                               Number of obs     =        358
 -----------------------------------------------------------------------------------------------
 
 . 
-. reghv excess_deaths_pc covdeath_pc if days_to_report > 14, var( p_pos population) twostage cluster(
-> fips)
+. gen covdeath_pcXp_pos = covdeath_pc * p_pos
+(18,458 missing values generated)
+
+. reghv excess_deaths_pc covdeath_pc p_pos covdeath_pcXp_pos if days_to_report > 14, var( new_tests_p
+> c covdeath_pc population) twostage cluster(fips)
 
 Multiplicative heteroscedastic regression             Number of obs  =     358
-Estimator: 2sls                                       Model chi2(3)  = 616.968
+Estimator: 2sls                                       Model chi2(6)  = 820.322
                                                       Prob > chi2    =   0.000
-Log Likelihood              = -1655.261               Pseudo R2      =  0.1571
-                                                      VWLS R2        =  0.8257
+Log Likelihood              = -1553.584               Pseudo R2      =  0.2089
+                                                      VWLS R2        =  0.9563
                                   (Std. Err. adjusted for 49 clusters in fips)
 ------------------------------------------------------------------------------
              |               Robust
 excess_dea~c |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
 lp_mean      |
- covdeath_pc |   1.379847   .0415769    33.19   0.000     1.298357    1.461336
-       _cons |  -1.258815   2.333267    -0.54   0.590    -5.831935    3.314304
+ covdeath_pc |   .9872306   .1003906     9.83   0.000     .7904686    1.183993
+       p_pos |    .055501   .0786084     0.71   0.480    -.0985685    .2095706
+covdeath_p~s |   .0098665    .002531     3.90   0.000     .0049058    .0148272
+       _cons |    .759112   2.038971     0.37   0.710    -3.237198    4.755422
 -------------+----------------------------------------------------------------
 lp_lnvar     |
-       p_pos |   .0144188   .0625765     0.23   0.818    -.1082288    .1370664
-  population |  -1.86e-08   1.16e-07    -0.16   0.872    -2.46e-07    2.09e-07
-       _cons |   5.553869   2.706342     2.05   0.040     .2495362     10.8582
+new_tests_pc |   .0002623   .0002183     1.20   0.230    -.0001655    .0006901
+ covdeath_pc |  -.0080674   .0133221    -0.61   0.545    -.0341782    .0180434
+  population |  -1.80e-08   7.58e-08    -0.24   0.812    -1.67e-07    1.31e-07
+       _cons |   5.100591   .9276403     5.50   0.000      3.28245    6.918733
 ------------------------------------------------------------------------------
 
-. reghv excess_deaths_pc covdeath_pc if days_to_report > 14, var( p_pos population) cluster(fips)
+. reghv excess_deaths_pc covdeath_pc p_pos covdeath_pcXp_pos if days_to_report > 14, var( new_tests_p
+> c covdeath_pc population) cluster(fips)
 
-iteration 1:  Log-likelihood =     -1630  |delta-b|     1.816 
-iteration 2:  Log-likelihood =     -1601  |delta-b|     3.776 
-iteration 3:  Log-likelihood =     -1596  |delta-b|      1.01 
-iteration 4:  Log-likelihood =     -1596  |delta-b|     .6029 
-iteration 5:  Log-likelihood =     -1596  |delta-b|     .1251 
-iteration 6:  Log-likelihood =     -1596  |delta-b|    .01095 
-iteration 7:  Log-likelihood =     -1596  |delta-b|    .01819 
-iteration 8:  Log-likelihood =     -1596  |delta-b|   .001546 
-iteration 9:  Log-likelihood =     -1596  |delta-b|   .002674 
-iteration 10:  Log-likelihood =     -1596  |delta-b|  .0002324 
-iteration 11:  Log-likelihood =     -1596  |delta-b|  .0003931 
+iteration 1:  Log-likelihood =     -1535  |delta-b|     2.058 
+iteration 2:  Log-likelihood =     -1532  |delta-b|     .9949 
+iteration 3:  Log-likelihood =     -1532  |delta-b|     .8195 
+iteration 4:  Log-likelihood =     -1532  |delta-b|     .1012 
+iteration 5:  Log-likelihood =     -1532  |delta-b|    .05409 
+iteration 6:  Log-likelihood =     -1532  |delta-b|  .0009588 
+iteration 7:  Log-likelihood =     -1532  |delta-b|   .002975 
 
 Multiplicative heteroscedastic regression             Number of obs  =     358
-Estimator: mle                                        Model chi2(3)  = 736.247
+Estimator: mle                                        Model chi2(6)  = 864.102
                                                       Prob > chi2    =   0.000
-Log Likelihood              = -1595.622               Pseudo R2      =  0.1875
-                                                      VWLS R2        =  0.9243
+Log Likelihood              = -1531.694               Pseudo R2      =  0.2200
+                                                      VWLS R2        =  0.9049
                                   (Std. Err. adjusted for 49 clusters in fips)
 ------------------------------------------------------------------------------
              |               Robust
 excess_dea~c |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
 lp_mean      |
- covdeath_pc |    1.37418   .0228197    60.22   0.000     1.329454    1.418905
-       _cons |   2.475878   1.758606     1.41   0.159    -.9709258    5.922682
+ covdeath_pc |   1.176968   .1076485    10.93   0.000     .9659808    1.387955
+       p_pos |  -.0854838   .0710914    -1.20   0.229    -.2248203    .0538527
+covdeath_p~s |   .0060955   .0024537     2.48   0.013     .0012864    .0109046
+       _cons |   4.753579   1.811164     2.62   0.009     1.203764    8.303395
 -------------+----------------------------------------------------------------
 lp_lnvar     |
-       p_pos |   .0038293   .0147009     0.26   0.794    -.0249839    .0326425
-  population |  -8.51e-08   2.81e-08    -3.03   0.002    -1.40e-07   -3.00e-08
-       _cons |   6.558712   .5166574    12.69   0.000     5.546082    7.571342
+new_tests_pc |   .0002678   .0000776     3.45   0.001     .0001157    .0004198
+ covdeath_pc |  -.0013171    .004054    -0.32   0.745    -.0092627    .0066286
+  population |  -7.74e-08   1.97e-08    -3.94   0.000    -1.16e-07   -3.88e-08
+       _cons |    5.42963   .3352084    16.20   0.000     4.772634    6.086626
 ------------------------------------------------------------------------------
+
+. drop covdeath_pcXp_pos
 
 . 
 . 
@@ -1087,5 +1097,5 @@ c.new_pos_pc#c.p_pos |   .0014172   .0004528     3.13   0.003     .0005068    .0
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\data\..\logs\cleandata.txt
   log type:  text
- closed on:  22 May 2020, 15:59:42
+ closed on:  22 May 2020, 16:17:28
 -----------------------------------------------------------------------------------------------------

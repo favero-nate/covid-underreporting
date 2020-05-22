@@ -75,8 +75,9 @@ order adj_expected_deaths, after(expected_deaths)
 gen pneumon_or_influ_fluview = numinfluenzadeaths + numpneumoniadeaths if end_week < date("20200201","YMD")
 gen mmwrweek = substr(epi_week,-2,2)
 
-egen old_expected_influ_pneu_deaths = mean(pneumon_or_influ_fluview), by(fips mmwrweek)
+//egen old_expected_influ_pneu_deaths = mean(pneumon_or_influ_fluview), by(fips mmwrweek)
 
+// generate expected influenza/pneumonia deaths based on historical patterns
 	gen epi_year = substr(epi_week,1,4)
 	destring epi_year mmwrweek, replace
 	replace epi_year = epi_year + 1 if mmwrweek >= 40
@@ -92,9 +93,11 @@ egen old_expected_influ_pneu_deaths = mean(pneumon_or_influ_fluview), by(fips mm
 
 	gen pneumon_or_influ_fluview_pc = pneumon_or_influ_fluview * 1000000 / population
 	
+	// most year-to-year variation in influenza severity seems to be from weeks 50 to 8; thus, create a sin spike for this period with a year-varying coefficient
 	gen fluseason = 0 if mmwrweek != .
 	replace fluseason = 1 if (mmwrweek >= 50 | mmwrweek <= 8) & mmwrweek != .
 	gen fluseason_sin_time = sin(fluseason*_pi*(mmwrweek2-10)/12)
+	
 	reg pneumon_or_influ_fluview_pc i.fips i.epi_year i.mmwrweek i.epi_year#c.fluseason_sin_time [aweight=population]
 	predict expected_influ_pneu_deaths_pc
 	gen expected_influ_pneu_deaths = expected_influ_pneu_deaths_pc * population / 1000000
@@ -158,8 +161,10 @@ reg excess_deaths_pc c.covdeath_pc##c.new_tests_pc [aweight=population] if days_
 reg excess_deaths_pc c.covdeath_pc##c.new_tests_pc c.covdeath_pc##c.p_pos [aweight=population] if days_to_report > 14, cluster(fips)
 reg excess_deaths_pc c.covdeath_pc##c.new_tests_pc##c.p_pos [aweight=population] if days_to_report > 14, cluster(fips)
 
-reghv excess_deaths_pc covdeath_pc if days_to_report > 14, var( p_pos population) twostage cluster(fips)
-reghv excess_deaths_pc covdeath_pc if days_to_report > 14, var( p_pos population) cluster(fips)
+gen covdeath_pcXp_pos = covdeath_pc * p_pos
+reghv excess_deaths_pc covdeath_pc p_pos covdeath_pcXp_pos if days_to_report > 14, var( new_tests_pc covdeath_pc population) twostage cluster(fips)
+reghv excess_deaths_pc covdeath_pc p_pos covdeath_pcXp_pos if days_to_report > 14, var( new_tests_pc covdeath_pc population) cluster(fips)
+drop covdeath_pcXp_pos
 
 
 

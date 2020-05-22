@@ -2,13 +2,36 @@
 
 This folder contains (CDC) files released/downloaded at various points in time, which I can use to evaluate reporting delays.
 
-nationwide_saturday_reports.csv: weekly changes in reported deaths (on Saturdays), assembled based on Internet Archive (IA) records of a CDC webpage (https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm); based on earliest crawl available from IA on each Saturday (variable report_date indicates Fridays because that's the date listed for when the data was updated)
+nationwide_historical_reports.csv: weekly changes in reported deaths (on Saturdays), assembled based on Internet Archive (IA) records of a CDC webpage (https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm); based on earliest crawl available each day where a snapshot is available (variable report_date indicates the date listed on the CDC for when the data was updated)
+* https://web.archive.org/web/20200405161118/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
+* https://web.archive.org/web/20200407110620/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
+* https://web.archive.org/web/20200408022418/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
+* https://web.archive.org/web/20200409065657/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
+* https://web.archive.org/web/20200410111303/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
 * https://web.archive.org/web/20200411005433/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
+* https://web.archive.org/web/20200413180223/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
+* https://web.archive.org/web/20200414141018/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
+* https://web.archive.org/web/20200416052129/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
+* https://web.archive.org/web/20200417105517/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
 * https://web.archive.org/web/20200418084016/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
+* https://web.archive.org/web/20200421013720/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
+* https://web.archive.org/web/20200422015741/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
+* https://web.archive.org/web/20200423063304/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
+* https://web.archive.org/web/20200424062406/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
 * https://web.archive.org/web/20200425031314/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
+* https://web.archive.org/web/20200430055237/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
 * https://web.archive.org/web/20200502031208/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
+* https://web.archive.org/web/20200505001236/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
+* https://web.archive.org/web/20200506000738/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
+* https://web.archive.org/web/20200507065017/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
+* https://web.archive.org/web/20200508015836/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
 * https://web.archive.org/web/20200509055545/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
+* https://web.archive.org/web/20200512043426/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
+* https://web.archive.org/web/20200513124755/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
+* https://web.archive.org/web/20200515081734/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
 * https://web.archive.org/web/20200516012808/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
+* https://web.archive.org/web/20200519020840/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
+* https://web.archive.org/web/20200520200030/https://www.cdc.gov/nchs/nvss/vsrr/covid19/index.htm
 
 [date] cdc_deaths.dta
 * These files are based on my own pulling of data (see "../code/pulldata.do") from this API on various days: https://data.cdc.gov/resource/r8kw-7aab.csv

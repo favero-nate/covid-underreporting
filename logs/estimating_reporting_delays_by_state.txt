@@ -1,0 +1,488 @@
+-----------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\favero\Documents\GitHub\covid-underreporting\data\..\logs\estimating_reporting_
+> delays_by_state.txt
+  log type:  text
+ opened on:  25 May 2020, 12:20:00
+
+. 
+. use "..\data\past_reports\9 May 2020 cdc_deaths.dta"
+
+. //drop if _n <=228 // these observations appear to be corrupted; see readme file in this folder for
+>  explantion
+. drop _all
+
+. append using "..\data\past_reports\7 May 2020 cdc_deaths.dta"
+
+. rename pneumon_influ_and_covid pneumon_influ_or_covid
+
+. append using "..\data\past_reports\16 May 2020 cdc_deaths.dta"
+
+. append using "..\data\past_reports\21 May 2020 cdc_deaths.dta"
+
+. append using "..\data\past_reports\22 May 2020 cdc_deaths.dta"
+
+. 
+. //drop if state == "United States" | state == "Connecticut" | state == "North Carolina" | state == 
+> "Puerto Rico" | state == "West Virginia"
+. //drop if  state == "Connecticut" | state == "North Carolina" | state == "Puerto Rico" | state == "
+> West Virginia"
+. 
+. rename date end_week
+
+. 
+. gen days_to_report = report_date - end_week
+
+. sum days_to_report
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+days_to_re~t |      3,233    55.31148    31.07878          4        111
+
+. gen days_since_first_report = days_to_report - r(min)
+
+. 
+. order end_week report_date days_to_report
+
+. sort end_week report_date
+
+. 
+. foreach var of varlist covid_deaths- pneumon_influ_or_covid {
+  2.     replace `var' = 5 if `var' == .
+  3. }
+(266 real changes made)
+(9 real changes made)
+(23 real changes made)
+(150 real changes made)
+(323 real changes made)
+(802 real changes made)
+(118 real changes made)
+
+. 
+. //following code commented out because it only works with weekly data:
+. /*
+> xtset end_week report_date, delta(7)
+> gen growth_total_deaths = f.total_deaths / total_deaths
+> bys days_to_report: sum growth_total_deaths
+> gen est_real_total_deaths = 1.005286 * total_deaths if days_to_report==70
+> replace est_real_total_deaths = 1.005286 * 1.007821 * total_deaths if days_to_report==63
+> replace est_real_total_deaths = 1.005286 * 1.007821 * 1.014075 * total_deaths if days_to_report==56
+> replace est_real_total_deaths = 1.005286 * 1.007821 * 1.014075 * 1.015894 * total_deaths if days_to
+> _report==49
+> replace est_real_total_deaths = 1.005286 * 1.007821 * 1.014075 * 1.015894 * 1.01353 * total_deaths 
+> if days_to_report==42
+> replace est_real_total_deaths = 1.005286 * 1.007821 * 1.014075 * 1.015894 * 1.01353 * 1.014131 * to
+> tal_deaths if days_to_report==35
+> replace est_real_total_deaths = 1.005286 * 1.007821 * 1.014075 * 1.015894 * 1.01353 * 1.014131 * 1.
+> 024915 * total_deaths if days_to_report==28
+> replace est_real_total_deaths = 1.005286 * 1.007821 * 1.014075 * 1.015894 * 1.01353 * 1.014131 * 1.
+> 024915 * 1.055341 * total_deaths if days_to_report==21
+> replace est_real_total_deaths = 1.005286 * 1.007821 * 1.014075 * 1.015894 * 1.01353 * 1.014131 * 1.
+> 024915 * 1.055341 * 1.163302 * total_deaths if days_to_report==14
+> replace est_real_total_deaths = 1.005286 * 1.007821 * 1.014075 * 1.015894 * 1.01353 * 1.014131 * 1.
+> 024915 * 1.055341 * 1.163302 * 1.733615 * total_deaths if days_to_report==7
+> */
+. 
+. // create week marker, with new weeks starting on Fridays (since there's always a Friday report ava
+> ilable)
+. gen weeks_to_report = .
+(3,233 missing values generated)
+
+. forvalues i=0/20 {
+  2.     replace weeks_to_report = `i' if days_to_report + 1 >= 7*`i' & days_to_report + 1 < 7*(`i'+1
+> )
+  3. }
+(106 real changes made)
+(212 real changes made)
+(212 real changes made)
+(212 real changes made)
+(212 real changes made)
+(212 real changes made)
+(212 real changes made)
+(212 real changes made)
+(212 real changes made)
+(212 real changes made)
+(212 real changes made)
+(212 real changes made)
+(212 real changes made)
+(212 real changes made)
+(159 real changes made)
+(159 real changes made)
+(53 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+. egen state_end_week = group(state end_week)
+
+. sort state_end_week report_date
+
+. egen ts = fill(0 1)
+
+. xtset state_end_week ts
+       panel variable:  state_end_week (unbalanced)
+        time variable:  ts, 0 to 3232
+                delta:  1 unit
+
+. gen growth_per_day = (log(f.total_deaths) - log(total_deaths))/(f.days_to_report - days_to_report)
+(865 missing values generated)
+
+. bys weeks_to_report: sum growth_per_day
+
+-----------------------------------------------------------------------------------------------------
+-> weeks_to_report = 0
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_per~y |        101    .0961553    .0867329          0   .4054651
+
+-----------------------------------------------------------------------------------------------------
+-> weeks_to_report = 1
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_per~y |        151    .0721022    .1227797   -.002845   1.280934
+
+-----------------------------------------------------------------------------------------------------
+-> weeks_to_report = 2
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_per~y |        158    .0250821    .0527334          0   .5746286
+
+-----------------------------------------------------------------------------------------------------
+-> weeks_to_report = 3
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_per~y |        158    .0188737    .0730279          0   .7884573
+
+-----------------------------------------------------------------------------------------------------
+-> weeks_to_report = 4
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_per~y |        159    .0092086    .0330974  -.0008071   .3177144
+
+-----------------------------------------------------------------------------------------------------
+-> weeks_to_report = 5
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_per~y |        159    .0057929    .0346779          0   .4274915
+
+-----------------------------------------------------------------------------------------------------
+-> weeks_to_report = 6
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_per~y |        159    .0045726    .0283656          0   .3423208
+
+-----------------------------------------------------------------------------------------------------
+-> weeks_to_report = 7
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_per~y |        158    .0039821    .0246623  -.0003708   .2530777
+
+-----------------------------------------------------------------------------------------------------
+-> weeks_to_report = 8
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_per~y |        159    .0049332    .0484303  -.0006952   .6088754
+
+-----------------------------------------------------------------------------------------------------
+-> weeks_to_report = 9
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_per~y |        158    .0015135    .0088144  -.0014306   .1022134
+
+-----------------------------------------------------------------------------------------------------
+-> weeks_to_report = 10
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_per~y |        159    .0051417    .0474306  -.0003469   .5867435
+
+-----------------------------------------------------------------------------------------------------
+-> weeks_to_report = 11
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_per~y |        159    .0012733    .0084169  -.0008753   .0912917
+
+-----------------------------------------------------------------------------------------------------
+-> weeks_to_report = 12
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_per~y |        159    .0010068    .0075258  -.0009667    .091575
+
+-----------------------------------------------------------------------------------------------------
+-> weeks_to_report = 13
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_per~y |        159    .0003346    .0016316  -.0001157   .0163143
+
+-----------------------------------------------------------------------------------------------------
+-> weeks_to_report = 14
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_per~y |        106    .0002707    .0018494          0   .0187837
+
+-----------------------------------------------------------------------------------------------------
+-> weeks_to_report = 15
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_per~y |        106    .0000927    .0003058          0   .0027343
+
+-----------------------------------------------------------------------------------------------------
+-> weeks_to_report = 16
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+growth_per~y |          0
+
+
+. 
+. egen state_id = group(state)
+
+. order state_id, after(state)
+
+. gen loglog_days_to_report = log(log(days_to_report))
+
+. 
+. reg growth_per_day c.loglog_days_to_report##b46.state_id
+
+      Source |       SS           df       MS      Number of obs   =     2,368
+-------------+----------------------------------   F(105, 2262)    =     15.13
+       Model |  2.91480057       105  .027760005   Prob > F        =    0.0000
+    Residual |  4.14926807     2,262  .001834336   R-squared       =    0.4126
+-------------+----------------------------------   Adj R-squared   =    0.3854
+       Total |  7.06406865     2,367  .002984397   Root MSE        =    .04283
+
+--------------------------------------------------------------------------------------------------
+                  growth_per_day |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+---------------------------------+----------------------------------------------------------------
+           loglog_days_to_report |  -.0724483   .0227964    -3.18   0.002    -.1171524   -.0277442
+                                 |
+                        state_id |
+                              1  |   .0301653   .0424051     0.71   0.477    -.0529917    .1133223
+                              2  |   .0808338   .0424051     1.91   0.057    -.0023231    .1639908
+                              3  |  -.0227207   .0424051    -0.54   0.592    -.1058777    .0604363
+                              4  |   .0148339   .0424051     0.35   0.727    -.0683231    .0979909
+                              5  |  -.0105834   .0424051    -0.25   0.803    -.0937404    .0725736
+                              6  |   .0251155   .0424051     0.59   0.554    -.0580415    .1082725
+                              7  |    .145278   .0542298     2.68   0.007     .0389326    .2516234
+                              8  |   .2671154   .0424051     6.30   0.000     .1839584    .3502724
+                              9  |     .03164   .0424051     0.75   0.456     -.051517     .114797
+                             10  |  -.0234994   .0424051    -0.55   0.580    -.1066564    .0596576
+                             11  |   .0136294   .0424051     0.32   0.748    -.0695276    .0967864
+                             12  |    .027143   .0424051     0.64   0.522     -.056014       .1103
+                             13  |  -.0422467   .0424051    -1.00   0.319    -.1254036    .0409103
+                             14  |  -.0407999   .0424051    -0.96   0.336    -.1239568    .0423571
+                             15  |   .0687417   .0424051     1.62   0.105    -.0144153    .1518987
+                             16  |  -.0427192   .0424051    -1.01   0.314    -.1258762    .0404378
+                             17  |  -.0404452   .0424051    -0.95   0.340    -.1236021    .0427118
+                             18  |   .0204253   .0424051     0.48   0.630    -.0627317    .1035823
+                             19  |   .0471455   .0424051     1.11   0.266    -.0360115    .1303025
+                             20  |   -.064177   .0424051    -1.51   0.130     -.147334      .01898
+                             21  |  -.0052433   .0424051    -0.12   0.902    -.0884003    .0779137
+                             22  |  -.0347172   .0424051    -0.82   0.413    -.1178742    .0484398
+                             23  |   .0243518   .0424051     0.57   0.566    -.0588052    .1075088
+                             24  |   -.029446   .0424051    -0.69   0.488     -.112603     .053711
+                             25  |  -.0296749   .0424051    -0.70   0.484    -.1128319    .0534821
+                             26  |  -.0045591   .0424051    -0.11   0.914    -.0877161    .0785979
+                             27  |  -.0302643    .044352    -0.68   0.495    -.1172391    .0567105
+                             28  |   .0254373   .0424051     0.60   0.549    -.0577197    .1085943
+                             29  |   .0977352   .0424051     2.30   0.021     .0145783    .1808922
+                             30  |  -.0684306   .0424051    -1.61   0.107    -.1515876    .0147264
+                             31  |   .0071222   .0424051     0.17   0.867    -.0760348    .0902792
+                             32  |   .0616558   .0424051     1.45   0.146    -.0215012    .1448128
+                             33  |  -.0327151   .0424051    -0.77   0.440    -.1158721    .0504419
+                             34  |   .2888417    .074842     3.86   0.000     .1420756    .4356079
+                             35  |  -.0357067   .0424051    -0.84   0.400    -.1188637    .0474503
+                             36  |   .2008281   .0424051     4.74   0.000     .1176711    .2839851
+                             37  |   .0678819   .0424051     1.60   0.110    -.0152751    .1510389
+                             38  |   .0261317   .0424051     0.62   0.538    -.0570253    .1092887
+                             39  |   .0473383   .0424051     1.12   0.264    -.0358187    .1304953
+                             40  |   .1010415   .0424051     2.38   0.017     .0178845    .1841985
+                             41  |   .1499878   .0424051     3.54   0.000     .0668308    .2331448
+                             42  |   .0937427   .0424051     2.21   0.027     .0105857    .1768997
+                             43  |   .0168319   .0424051     0.40   0.691    -.0663251    .0999888
+                             44  |   .0104064   .0424051     0.25   0.806    -.0727506    .0935633
+                             45  |   .0037022   .0424051     0.09   0.930    -.0794548    .0868592
+                             47  |  -.0612533   .0424051    -1.44   0.149    -.1444103    .0219037
+                             48  |   -.053189   .0424051    -1.25   0.210     -.136346     .029968
+                             49  |   .0046791   .0424051     0.11   0.912    -.0784779    .0878361
+                             50  |   .0592039   .0424051     1.40   0.163    -.0239531    .1423609
+                             51  |   .8769308   .0587932    14.92   0.000     .7616366    .9922249
+                             52  |  -.0055242   .0424051    -0.13   0.896    -.0886812    .0776328
+                             53  |   .0155817   .0424051     0.37   0.713    -.0675753    .0987387
+                                 |
+state_id#c.loglog_days_to_report |
+                              1  |  -.0213568    .032239    -0.66   0.508     -.084578    .0418643
+                              2  |  -.0572781    .032239    -1.78   0.076    -.1204992     .005943
+                              3  |   .0150365    .032239     0.47   0.641    -.0481847    .0782576
+                              4  |  -.0107114    .032239    -0.33   0.740    -.0739325    .0525098
+                              5  |   .0067646    .032239     0.21   0.834    -.0564565    .0699857
+                              6  |  -.0191607    .032239    -0.59   0.552    -.0823819    .0440604
+                              7  |  -.0371127   .0403375    -0.92   0.358    -.1162152    .0419897
+                              8  |  -.1888876    .032239    -5.86   0.000    -.2521087   -.1256664
+                              9  |  -.0219213    .032239    -0.68   0.497    -.0851424    .0412998
+                             10  |   .0155174    .032239     0.48   0.630    -.0477037    .0787386
+                             11  |  -.0100898    .032239    -0.31   0.754    -.0733109    .0531313
+                             12  |  -.0209437    .032239    -0.65   0.516    -.0841648    .0422774
+                             13  |   .0284738    .032239     0.88   0.377    -.0347473     .091695
+                             14  |   .0280948    .032239     0.87   0.384    -.0351264    .0913159
+                             15  |  -.0477634    .032239    -1.48   0.139    -.1109846    .0154577
+                             16  |   .0294391    .032239     0.91   0.361    -.0337821    .0926602
+                             17  |   .0276345    .032239     0.86   0.391    -.0355866    .0908557
+                             18  |  -.0136911    .032239    -0.42   0.671    -.0769122      .04953
+                             19  |   -.031539    .032239    -0.98   0.328    -.0947602    .0316821
+                             20  |   .0442918    .032239     1.37   0.170    -.0189293     .107513
+                             21  |   .0029174    .032239     0.09   0.928    -.0603037    .0661385
+                             22  |   .0233352    .032239     0.72   0.469    -.0398859    .0865564
+                             23  |  -.0183241    .032239    -0.57   0.570    -.0815452    .0448971
+                             24  |   .0200078    .032239     0.62   0.535    -.0432133    .0832289
+                             25  |   .0202406    .032239     0.63   0.530    -.0429805    .0834618
+                             26  |   .0033368    .032239     0.10   0.918    -.0598844    .0665579
+                             27  |   .0230269   .0335546     0.69   0.493    -.0427741    .0888278
+                             28  |  -.0181977    .032239    -0.56   0.572    -.0814188    .0450234
+                             29  |  -.0716039    .032239    -2.22   0.026    -.1348251   -.0083828
+                             30  |   .0473543    .032239     1.47   0.142    -.0158668    .1105755
+                             31  |  -.0054417    .032239    -0.17   0.866    -.0686629    .0577794
+                             32  |  -.0450455    .032239    -1.40   0.162    -.1082666    .0181756
+                             33  |   .0222549    .032239     0.69   0.490    -.0409663     .085476
+                             34  |  -.1772536   .0544448    -3.26   0.001    -.2840206   -.0704867
+                             35  |   .0240368    .032239     0.75   0.456    -.0391843    .0872579
+                             36  |  -.1399321    .032239    -4.34   0.000    -.2031532   -.0767109
+                             37  |  -.0475881    .032239    -1.48   0.140    -.1108092     .015633
+                             38  |  -.0184027    .032239    -0.57   0.568    -.0816239    .0448184
+                             39  |  -.0319136    .032239    -0.99   0.322    -.0951348    .0313075
+                             40  |  -.0655914    .032239    -2.03   0.042    -.1288125   -.0023703
+                             41  |   -.104131    .032239    -3.23   0.001    -.1673521   -.0409098
+                             42  |  -.0687988    .032239    -2.13   0.033    -.1320199   -.0055777
+                             43  |  -.0129686    .032239    -0.40   0.688    -.0761897    .0502525
+                             44  |  -.0084711    .032239    -0.26   0.793    -.0716922    .0547501
+                             45  |  -.0034722    .032239    -0.11   0.914    -.0666933     .059749
+                             47  |   .0423104    .032239     1.31   0.190    -.0209107    .1055316
+                             48  |   .0367024    .032239     1.14   0.255    -.0265188    .0999235
+                             49  |  -.0045942    .032239    -0.14   0.887    -.0678154    .0586269
+                             50  |  -.0430349    .032239    -1.33   0.182    -.1062561    .0201862
+                             51  |  -.6108325   .0437198   -13.97   0.000    -.6965675   -.5250974
+                             52  |   .0025129    .032239     0.08   0.938    -.0607082     .065734
+                             53  |  -.0123035    .032239    -0.38   0.703    -.0755247    .0509176
+                                 |
+                           _cons |   .1030831   .0299849     3.44   0.001     .0442822     .161884
+--------------------------------------------------------------------------------------------------
+
+. 
+. /*
+> gen state_delay = 0 if state_id==1
+> forvalues i = 2/48 {
+>     replace state_delay = _b[`i'.state_id] if state_id == `i'
+> }
+> */
+. 
+. 
+. /*
+> // need to merge in population data, make per capita, include population in lnsigma
+> // or instead, make alpha a function of population & week & state? prolly not
+> capture program drop reporting_delays
+> program reporting_delays
+>         args lnf detected time alpha lnsigma
+>         quietly replace `lnf' = ///
+>                 ln(normalden( $ML_y1,  `alpha' - `alpha'*exp(-(exp(`time') * $ML_y2 )), exp(`lnsigm
+> a'+`detected'*$ML_y2 )))
+> end
+> 
+> ml model lf reporting_delays ///
+>         (detected: total_deaths = ) ///
+>         (time: days_to_report = state_delay) ///
+>         (alpha: i.state_end_week) ///
+>         (lnsigma: )
+> ml maximize
+> 
+> display "k="exp(_b[#2:_cons])
+> 
+> gen delay_adj_total_deaths = total_deaths / (1-exp(-exp(_b[#2:_cons])*days_to_report))
+> 
+> 
+> 
+> 
+> egen min_realdeaths = max(total_deaths), by(state_end_week)
+> 
+> 
+> capture program drop reporting_delays
+> program reporting_delays
+>         args lnf detected time missed_realdeaths lnsigma delta
+>         quietly replace `lnf' = ///
+>                 ln(normalden( $ML_y1,  ($ML_y3 + exp(`missed_realdeaths')) - (1-1/exp(`delta'))*($M
+> L_y3 + exp(`missed_realdeaths'))*exp(-(exp(`time') * $ML_y2 )), exp(`lnsigma'+`detected'*$ML_y2 )))
+> end
+> 
+> ml model lf reporting_delays ///
+>         (detected: total_deaths = ) ///
+>         (time: days_to_report = ) ///
+>         (missed_realdeaths: min_realdeaths = i.end_week) ///
+>         (lnsigma: ) ///
+>         (delta: ) if end_week < date("20200510","YMD")
+> ml maximize
+> 
+> display "k="exp(_b[#2:_cons])
+> display "beta=limit*"1/exp(_b[#5:_cons])
+> display "alpha="(1-1/exp(_b[#5:_cons]))
+> 
+> gen delay_adj_total_deaths2 = total_deaths / (1-(1-1/exp(_b[#5:_cons]))*exp(-exp(_b[#2:_cons])*days
+> _to_report))
+> 
+> 
+> capture program drop reporting_delays
+> program reporting_delays
+>         args lnf time detected0 missed_realdeaths lnsigma
+>         quietly replace `lnf' = ///
+>                 ln(normalden( $ML_y1,  -(1/exp(`time')) * log( ($ML_y3 + exp(`missed_realdeaths') -
+>  $ML_y2 )/(($ML_y3 + exp(`missed_realdeaths'))*1/(1+exp(-`detected0'))) ), exp(`lnsigma')))
+> end
+> 
+> ml model lf reporting_delays ///
+>         (time: days_since_first_report = ) ///
+>         (detected0: total_deaths = ) ///
+>         (missed_realdeaths: min_realdeaths = i.end_week) ///
+>         (lnsigma: ) if end_week < date("20200501","YMD")
+> ml maximize
+> 
+> display "k="exp(_b[#1:_cons])
+> display "beta=limit*"(1-1/(1+exp(-_b[#2:_cons])))
+> display "alpha="(1/(1+exp(-_b[#2:_cons])))
+> 
+> gen delay_adj_total_deaths3 = total_deaths/(1-1/(1+exp(-_b[#2:_cons]))*exp(-exp(_b[#1:_cons])*days_
+> since_first_report))
+> 
+> twoway scatter est_real_total_deaths days_to_report
+> twoway scatter delay_adj_total_deaths days_to_report
+> twoway scatter delay_adj_total_deaths2 days_to_report
+> twoway scatter delay_adj_total_deaths3 days_to_report
+> 
+> reg est_real_total_deaths days_to_report i.end_week
+> reg delay_adj_total_deaths days_to_report i.end_week
+> reg delay_adj_total_deaths2 days_to_report i.end_week
+> reg delay_adj_total_deaths3 days_to_report i.end_week
+> 
+> corr est_real_total_deaths delay_adj_total_deaths delay_adj_total_deaths2 delay_adj_total_deaths3
+> */
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\favero\Documents\GitHub\covid-underreporting\data\..\logs\estimating_reporting_
+> delays_by_state.txt
+  log type:  text
+ closed on:  25 May 2020, 12:20:01
+-----------------------------------------------------------------------------------------------------

@@ -11,6 +11,11 @@ append using "..\data\past_reports\16 May 2020 cdc_deaths.dta"
 append using "..\data\past_reports\21 May 2020 cdc_deaths.dta"
 append using "..\data\past_reports\22 May 2020 cdc_deaths.dta"
 
+merge m:1 state using "..\data\population.dta"
+drop _merge
+replace fips = 0 if state == "United States"
+replace fips = 72 if state == "Puerto Rico"
+
 //drop if state == "United States" | state == "Connecticut" | state == "North Carolina" | state == "Puerto Rico" | state == "West Virginia"
 //drop if  state == "Connecticut" | state == "North Carolina" | state == "Puerto Rico" | state == "West Virginia"
 
@@ -56,11 +61,9 @@ xtset state_end_week ts
 gen growth_per_day = (log(f.total_deaths) - log(total_deaths))/(f.days_to_report - days_to_report)
 bys weeks_to_report: sum growth_per_day
 
-egen state_id = group(state)
-order state_id, after(state)
 gen loglog_days_to_report = log(log(days_to_report))
 
-reg growth_per_day c.loglog_days_to_report##b46.state_id
+reg growth_per_day c.loglog_days_to_report##b0.fips
 
 /*
 gen state_delay = 0 if state_id==1

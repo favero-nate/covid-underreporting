@@ -2,11 +2,11 @@
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\data\..\logs\pulldata.txt
   log type:  text
- opened on:  22 May 2020, 16:20:37
+ opened on:  24 May 2020, 21:35:08
 
 . 
 . import delimited "https://covidtracking.com/api/v1/states/daily.csv", stringcols(1)
-(27 vars, 4,329 obs)
+(27 vars, 4,497 obs)
 
 . rename date olddate
 
@@ -67,8 +67,8 @@ file ..\data\cdc_historical_deaths.dta saved
 (14 vars, 864 obs)
 
 . export delimited using "..\data\past_reports\unprocessed_files/$S_DATE cdc_deaths_raw", replace
-(note: file ..\data\past_reports\unprocessed_files/22 May 2020 cdc_deaths_raw.csv not found)
-file ..\data\past_reports\unprocessed_files/22 May 2020 cdc_deaths_raw.csv saved
+(note: file ..\data\past_reports\unprocessed_files/24 May 2020 cdc_deaths_raw.csv not found)
+file ..\data\past_reports\unprocessed_files/24 May 2020 cdc_deaths_raw.csv saved
 
 . gen date = date(substr(end_week,1,10), "YMD")
 
@@ -111,8 +111,8 @@ file ..\data\past_reports\unprocessed_files/22 May 2020 cdc_deaths_raw.csv saved
 file ..\data\cdc_deaths.dta saved
 
 . save "..\data\past_reports/$S_DATE cdc_deaths.dta", replace
-(note: file ..\data\past_reports/22 May 2020 cdc_deaths.dta not found)
-file ..\data\past_reports/22 May 2020 cdc_deaths.dta saved
+(note: file ..\data\past_reports/24 May 2020 cdc_deaths.dta not found)
+file ..\data\past_reports/24 May 2020 cdc_deaths.dta saved
 
 . 
 . insheet using "https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/national/totals/n
@@ -138,5 +138,5 @@ file ..\data\population.dta saved
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\data\..\logs\pulldata.txt
   log type:  text
- closed on:  22 May 2020, 16:20:50
+ closed on:  24 May 2020, 21:35:19
 -----------------------------------------------------------------------------------------------------

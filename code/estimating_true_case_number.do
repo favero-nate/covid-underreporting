@@ -1,6 +1,6 @@
 clear all
 capture log close
-log using "..\logs\analysis.txt", text replace
+log using "..\logs\estimating_true_case_number.txt", text replace
 
 use "..\data\weeklydata.dta"
 

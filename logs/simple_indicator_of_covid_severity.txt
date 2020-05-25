@@ -1,0 +1,316 @@
+-----------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\favero\Documents\GitHub\covid-underreporting\data\..\logs\simple_indicator_of_c
+> ovid_severity.txt
+  log type:  text
+ opened on:  25 May 2020, 17:28:57
+
+. 
+. use "..\data\weeklydata.dta"
+
+. 
+. 
+. *** Nationwide Analysis ***
+. 
+. //note: treats missing as 0, and a handful of states aren't yet reporting cases (or more aren't rep
+> orting negative test results) in early years
+. foreach var of varlist covid_deaths adj_covid_deaths adj_total_deaths expected_deaths adj_pneumon_i
+> nflu_or_covid expected_influ_pneu_deaths new_pos new_neg deathincrease {
+  2.         egen us_`var' = total(`var'), by(end_week) missing
+  3. }
+(18,179 missing values generated)
+(18,179 missing values generated)
+(18,179 missing values generated)
+(18,179 missing values generated)
+(18,179 missing values generated)
+(147 missing values generated)
+(18,081 missing values generated)
+(18,375 missing values generated)
+(18,032 missing values generated)
+
+. 
+. gen us_p_pos = us_new_pos/(us_new_pos+us_new_neg)*100
+(18,375 missing values generated)
+
+. gen us_p_posXnew_pos = us_p_pos*us_new_pos
+(18,375 missing values generated)
+
+. gen us_adj_excess_deaths = (us_adj_total_deaths-us_expected_deaths)
+(18,179 missing values generated)
+
+. gen us_adj_excess_respir_deaths = (us_adj_pneumon_influ_or_covid-us_expected_influ_pneu_deaths)
+(18,228 missing values generated)
+
+. 
+. egen us_tag = tag(end_week)
+
+. 
+. set scheme s2mono
+
+. format end_week %tdnn/dd
+
+. 
+. twoway (line us_adj_excess_respir_deaths end_week, yaxis(1)) (line us_p_posXnew_pos end_week, yaxis
+> (2)) (line us_new_pos end_week, yaxis(3)) if us_p_posXnew_pos != . & us_tag==1 & days_to_report > 1
+> 4 & days_to_report!=.
+
+. 
+. 
+. reg us_adj_covid_deaths us_new_pos l.us_new_pos if days_to_report > 14 & us_tag==1, cluster(fips) n
+> ocons
+
+Linear regression                               Number of obs     =         13
+                                                F(0, 0)           =          .
+                                                Prob > F          =          .
+                                                R-squared         =     0.9860
+                                                Root MSE          =     1047.4
+
+                                   (Std. Err. adjusted for 1 clusters in fips)
+------------------------------------------------------------------------------
+             |               Robust
+us_adj_cov~s |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+  us_new_pos |
+         --. |   .0288997          .        .       .            .           .
+         L1. |   .0416324          .        .       .            .           .
+------------------------------------------------------------------------------
+
+. predict us_naive_case_count
+(option xb assumed; fitted values)
+(18,130 missing values generated)
+
+. la var us_naive_case_count "us_naive_case_count"
+
+. 
+. reg us_adj_covid_deaths c.us_new_pos#c.us_p_pos c.l.us_new_pos#c.l.us_p_pos if days_to_report > 14 
+> & us_tag==1, cluster(fips) nocons
+
+Linear regression                               Number of obs     =          7
+                                                F(0, 0)           =          .
+                                                Prob > F          =          .
+                                                R-squared         =     0.9985
+                                                Root MSE          =     516.66
+
+                                                (Std. Err. adjusted for 1 clusters in fips)
+-------------------------------------------------------------------------------------------
+                          |               Robust
+      us_adj_covid_deaths |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+--------------------------+----------------------------------------------------------------
+  c.us_new_pos#c.us_p_pos |   .0011201          .        .       .            .           .
+                          |
+cL.us_new_pos#cL.us_p_pos |   .0027782          .        .       .            .           .
+-------------------------------------------------------------------------------------------
+
+. predict us_estimated_death_count
+(option xb assumed; fitted values)
+(18,424 missing values generated)
+
+. la var us_estimated_death_count "us_estimated_death_count"
+
+. 
+. twoway (line us_estimated_death_count end_week) (line us_adj_covid_deaths end_week) (line us_naive_
+> case_count end_week) if us_estimated_death_count != . & us_tag==1 & days_to_report > 14 & days_to_r
+> eport!=.
+
+. 
+. twoway (line us_estimated_death_count end_week) (line us_covid_deaths end_week) (line us_naive_case
+> _count end_week) if us_estimated_death_count != . & us_tag==1 & days_to_report > 14 & days_to_repor
+> t!=.
+
+. 
+. 
+. reg us_adj_excess_respir_deaths us_new_pos l.us_new_pos if days_to_report > 14 & us_tag==1, cluster
+> (fips) nocons
+
+Linear regression                               Number of obs     =         13
+                                                F(0, 0)           =          .
+                                                Prob > F          =          .
+                                                R-squared         =     0.9859
+                                                Root MSE          =     1121.9
+
+                                   (Std. Err. adjusted for 1 clusters in fips)
+------------------------------------------------------------------------------
+             |               Robust
+us_~r_deaths |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+  us_new_pos |
+         --. |   .0445317          .        .       .            .           .
+         L1. |   .0292634          .        .       .            .           .
+------------------------------------------------------------------------------
+
+. predict us_naive_case_count2
+(option xb assumed; fitted values)
+(18,130 missing values generated)
+
+. la var us_naive_case_count2 "us_naive_case_count2"
+
+. 
+. reg us_adj_excess_respir_deaths c.us_new_pos#c.us_p_pos c.l.us_new_pos#c.l.us_p_pos if days_to_repo
+> rt > 14 & us_tag==1, cluster(fips) nocons
+
+Linear regression                               Number of obs     =          7
+                                                F(0, 0)           =          .
+                                                Prob > F          =          .
+                                                R-squared         =     0.9983
+                                                Root MSE          =     572.41
+
+                                                (Std. Err. adjusted for 1 clusters in fips)
+-------------------------------------------------------------------------------------------
+                          |               Robust
+us_adj_excess_respir_de~s |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+--------------------------+----------------------------------------------------------------
+  c.us_new_pos#c.us_p_pos |   .0017402          .        .       .            .           .
+                          |
+cL.us_new_pos#cL.us_p_pos |   .0024041          .        .       .            .           .
+-------------------------------------------------------------------------------------------
+
+. predict us_estimated_death_count2
+(option xb assumed; fitted values)
+(18,424 missing values generated)
+
+. la var us_estimated_death_count2 "us_estimated_death_count2"
+
+. 
+. twoway (line us_estimated_death_count2 end_week) (line us_adj_excess_respir_deaths end_week) (line 
+> us_naive_case_count2 end_week) if us_estimated_death_count != . & us_tag==1 & days_to_report > 14 &
+>  days_to_report!=.
+
+. 
+. 
+. reg us_adj_excess_deaths us_new_pos l.us_new_pos if days_to_report > 14 & us_tag==1, cluster(fips) 
+> nocons
+
+Linear regression                               Number of obs     =         13
+                                                F(0, 0)           =          .
+                                                Prob > F          =          .
+                                                R-squared         =     0.9892
+                                                Root MSE          =     1336.6
+
+                                   (Std. Err. adjusted for 1 clusters in fips)
+------------------------------------------------------------------------------
+             |               Robust
+us_~s_deaths |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+  us_new_pos |
+         --. |   .0472267          .        .       .            .           .
+         L1. |   .0548097          .        .       .            .           .
+------------------------------------------------------------------------------
+
+. predict us_naive_case_count3
+(option xb assumed; fitted values)
+(18,130 missing values generated)
+
+. la var us_naive_case_count3 "us_naive_case_count3"
+
+. 
+. reg us_adj_excess_deaths c.us_new_pos#c.us_p_pos c.l.us_new_pos#c.l.us_p_pos if days_to_report > 14
+>  & us_tag==1, cluster(fips) nocons
+
+Linear regression                               Number of obs     =          7
+                                                F(0, 0)           =          .
+                                                Prob > F          =          .
+                                                R-squared         =     0.9928
+                                                Root MSE          =     1622.5
+
+                                                (Std. Err. adjusted for 1 clusters in fips)
+-------------------------------------------------------------------------------------------
+                          |               Robust
+     us_adj_excess_deaths |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+--------------------------+----------------------------------------------------------------
+  c.us_new_pos#c.us_p_pos |   .0018406          .        .       .            .           .
+                          |
+cL.us_new_pos#cL.us_p_pos |   .0037902          .        .       .            .           .
+-------------------------------------------------------------------------------------------
+
+. predict us_estimated_death_count3
+(option xb assumed; fitted values)
+(18,424 missing values generated)
+
+. la var us_estimated_death_count3 "us_estimated_death_count3"
+
+. 
+. twoway (line us_estimated_death_count3 end_week) (line us_adj_excess_deaths end_week) (line us_naiv
+> e_case_count3 end_week) if us_estimated_death_count != . & us_tag==1 & days_to_report > 14 & days_t
+> o_report!=.
+
+. 
+. 
+. *** State Analyses ***
+. 
+. reg adj_excess_respir_deaths_pc c.new_pos_pc c.l.new_pos_pc  if days_to_report > 14, nocons
+
+      Source |       SS           df       MS      Number of obs   =       348
+-------------+----------------------------------   F(2, 346)       =   1250.55
+       Model |  786039.128         2  393019.564   Prob > F        =    0.0000
+    Residual |  108739.808       346  314.276903   R-squared       =    0.8785
+-------------+----------------------------------   Adj R-squared   =    0.8778
+       Total |  894778.936       348  2571.20384   Root MSE        =    17.728
+
+------------------------------------------------------------------------------
+a~respir_d~c |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+  new_pos_pc |
+         --. |   .0271307   .0039327     6.90   0.000     .0193957    .0348656
+         L1. |   .0467727   .0043502    10.75   0.000     .0382165     .055329
+------------------------------------------------------------------------------
+
+. capture drop naive_case_count_pc
+
+. predict naive_case_count_pc
+(option xb assumed; fitted values)
+(18,419 missing values generated)
+
+. la var naive_case_count_pc "naive_case_count_pc"
+
+. 
+. reg adj_excess_respir_deaths_pc c.new_pos_pc#c.p_pos c.l.new_pos_pc#c.l.p_pos  if days_to_report > 
+> 14, nocons
+
+      Source |       SS           df       MS      Number of obs   =       308
+-------------+----------------------------------   F(2, 306)       =   1622.72
+       Model |  812256.544         2  406128.272   Prob > F        =    0.0000
+    Residual |   76584.542       306  250.276281   R-squared       =    0.9138
+-------------+----------------------------------   Adj R-squared   =    0.9133
+       Total |  888841.086       308  2885.84768   Root MSE        =     15.82
+
+----------------------------------------------------------------------------------------
+adj_excess_respir_de~c |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-----------------------+----------------------------------------------------------------
+  c.new_pos_pc#c.p_pos |   .0009111   .0000821    11.09   0.000     .0007495    .0010727
+                       |
+cL.new_pos_pc#cL.p_pos |   .0012617   .0000855    14.75   0.000     .0010934      .00143
+----------------------------------------------------------------------------------------
+
+. capture drop estimated_death_count_pc
+
+. predict estimated_death_count_pc
+(option xb assumed; fitted values)
+(18,464 missing values generated)
+
+. la var estimated_death_count_pc "estimated_death_count_pc"
+
+. 
+. // ten states w most covid cases_pc
+. twoway (line adj_excess_respir_deaths_pc end_week) (line estimated_death_count_pc end_week) (line n
+> aive_case_count_pc end_week) if estimated_death_count_pc != . & (fips==10 | fips==11 | fips==22 | f
+> ips==24 | fips==25 | fips==26 | fips==34 | fips==36 | fips==42 | fips==44) & days_to_report > 14 & 
+> days_to_report!=., by(state)
+
+. //drop Louisiana b/c reported number of negative cases drops half way through series
+. twoway (line adj_excess_respir_deaths_pc end_week) (line estimated_death_count_pc end_week) (line n
+> aive_case_count_pc end_week) if estimated_death_count_pc != . & (fips==10 | fips==11 | fips==24 | f
+> ips==25 | fips==26 | fips==34 | fips==36 | fips==42 | fips==44) & days_to_report > 14 & days_to_rep
+> ort!=., by(state)
+
+. 
+. 
+. 
+. 
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\favero\Documents\GitHub\covid-underreporting\data\..\logs\simple_indicator_of_c
+> ovid_severity.txt
+  log type:  text
+ closed on:  25 May 2020, 17:29:12
+-----------------------------------------------------------------------------------------------------

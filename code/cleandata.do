@@ -124,11 +124,15 @@ gen adj_covid_deaths = covid_deaths / (1-exp(-.09246997*days_to_report))
 gen adj_cumulative_covdeath = adj_covid_deaths
 replace adj_cumulative_covdeath = adj_cumulative_covdeath + l.adj_cumulative_covdeath if l.adj_cumulative_covdeath != .
 
+gen adj_total_deaths = total_deaths / (1-exp(-.09246997*days_to_report))
+gen adj_pneumon_influ_or_covid = pneumon_influ_or_covid / (1-exp(-.09246997*days_to_report))
 
 
 gen covdeath_pc = covid_deaths*1000000/population
 gen excess_deaths_pc = (total_deaths-adj_expected_deaths)*1000000/population
 gen excess_respir_deaths_pc = (pneumon_influ_or_covid-adj_expected_influ_pneu_deaths)*1000000/population
+gen adj_excess_deaths_pc = (adj_total_deaths-expected_deaths)*1000000/population
+gen adj_excess_respir_deaths_pc = (adj_pneumon_influ_or_covid-expected_influ_pneu_deaths)*1000000/population
 gen new_pos_pc = new_pos*1000000/population
 gen new_neg_pc = new_neg*1000000/population
 gen new_tests_pc = new_pos_pc + new_neg_pc
@@ -182,8 +186,8 @@ reg excess_respir_deaths_pc covdeath_pc [aweight=population] if days_to_report >
 reg excess_deaths_pc c.covdeath_pc##c.p_pos [aweight=population] if days_to_report > 14, cluster(fips)
 reg excess_respir_deaths_pc c.covdeath_pc##c.p_pos [aweight=population] if days_to_report > 14, cluster(fips)
 
-reg f.excess_deaths_pc c.new_pos_pc##c.p_pos [aweight=population] if days_to_report > 14, cluster(fips)
-reg f.excess_respir_deaths_pc c.new_pos_pc##c.p_pos [aweight=population] if days_to_report > 14, cluster(fips)
+reg f.adj_excess_deaths_pc c.new_pos_pc##c.p_pos [aweight=population] if days_to_report > 14, cluster(fips)
+reg f.adj_excess_respir_deaths_pc c.new_pos_pc##c.p_pos [aweight=population] if days_to_report > 14, cluster(fips)
 
 
 log close

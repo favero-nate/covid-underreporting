@@ -2,7 +2,7 @@
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\data\..\logs\cleandata.txt
   log type:  text
- opened on:  24 May 2020, 21:36:14
+ opened on:  24 May 2020, 21:51:14
 
 . 
 . use "..\data\population.dta" // start from this file because it has both fips codes and state names
@@ -446,6 +446,12 @@ epi_year#c.fluseason_sin_time |
 (405 real changes made)
 
 . 
+. gen adj_total_deaths = total_deaths / (1-exp(-.09246997*days_to_report))
+(18,179 missing values generated)
+
+. gen adj_pneumon_influ_or_covid = pneumon_influ_or_covid / (1-exp(-.09246997*days_to_report))
+(18,179 missing values generated)
+
 . 
 . 
 . gen covdeath_pc = covid_deaths*1000000/population
@@ -456,6 +462,13 @@ epi_year#c.fluseason_sin_time |
 
 . gen excess_respir_deaths_pc = (pneumon_influ_or_covid-adj_expected_influ_pneu_deaths)*1000000/popul
 > ation
+(18,228 missing values generated)
+
+. gen adj_excess_deaths_pc = (adj_total_deaths-expected_deaths)*1000000/population
+(18,179 missing values generated)
+
+. gen adj_excess_respir_deaths_pc = (adj_pneumon_influ_or_covid-expected_influ_pneu_deaths)*1000000/p
+> opulation
 (18,228 missing values generated)
 
 . gen new_pos_pc = new_pos*1000000/population
@@ -1045,50 +1058,50 @@ c.covdeath_pc#c.p_pos |   .0018343   .0006312     2.91   0.006     .0005652    .
 ---------------------------------------------------------------------------------------
 
 . 
-. reg f.excess_deaths_pc c.new_pos_pc##c.p_pos [aweight=population] if days_to_report > 14, cluster(f
-> ips)
+. reg f.adj_excess_deaths_pc c.new_pos_pc##c.p_pos [aweight=population] if days_to_report > 14, clust
+> er(fips)
 (sum of wgt is 2,254,525,234)
 
 Linear regression                               Number of obs     =        358
-                                                F(3, 48)          =     164.53
+                                                F(3, 48)          =     161.35
                                                 Prob > F          =     0.0000
-                                                R-squared         =     0.8592
-                                                Root MSE          =     29.075
-
-                                          (Std. Err. adjusted for 49 clusters in fips)
---------------------------------------------------------------------------------------
-                     |               Robust
-  F.excess_deaths_pc |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
----------------------+----------------------------------------------------------------
-          new_pos_pc |   .0280457   .0162529     1.73   0.091     -.004633    .0607244
-               p_pos |   .0987842   .1571677     0.63   0.533    -.2172226    .4147911
-                     |
-c.new_pos_pc#c.p_pos |   .0018074   .0005666     3.19   0.003     .0006681    .0029467
-                     |
-               _cons |   9.709887   3.541405     2.74   0.009     2.589415    16.83036
---------------------------------------------------------------------------------------
-
-. reg f.excess_respir_deaths_pc c.new_pos_pc##c.p_pos [aweight=population] if days_to_report > 14, cl
-> uster(fips)
-(sum of wgt is 2,254,525,234)
-
-Linear regression                               Number of obs     =        358
-                                                F(3, 48)          =     128.46
-                                                Prob > F          =     0.0000
-                                                R-squared         =     0.8940
-                                                Root MSE          =     19.153
+                                                R-squared         =     0.8617
+                                                Root MSE          =     30.652
 
                                           (Std. Err. adjusted for 49 clusters in fips)
 --------------------------------------------------------------------------------------
 F.                   |               Robust
-excess_respir_deat~c |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+adj_excess_deaths_pc |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 ---------------------+----------------------------------------------------------------
-          new_pos_pc |   .0212251   .0124661     1.70   0.095    -.0038396    .0462899
-               p_pos |    .129778    .091926     1.41   0.164    -.0550517    .3146078
+          new_pos_pc |   .0515292   .0151466     3.40   0.001     .0210749    .0819836
+               p_pos |   .1081135   .1591809     0.68   0.500    -.2119411    .4281682
                      |
-c.new_pos_pc#c.p_pos |   .0013966    .000439     3.18   0.003      .000514    .0022793
+c.new_pos_pc#c.p_pos |   .0014177   .0004791     2.96   0.005     .0004544    .0023811
                      |
-               _cons |   3.751271   2.552437     1.47   0.148    -1.380747     8.88329
+               _cons |   8.455453   3.626117     2.33   0.024     1.164656    15.74625
+--------------------------------------------------------------------------------------
+
+. reg f.adj_excess_respir_deaths_pc c.new_pos_pc##c.p_pos [aweight=population] if days_to_report > 14
+> , cluster(fips)
+(sum of wgt is 2,254,525,234)
+
+Linear regression                               Number of obs     =        358
+                                                F(3, 48)          =     127.07
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.9098
+                                                Root MSE          =     18.688
+
+                                          (Std. Err. adjusted for 49 clusters in fips)
+--------------------------------------------------------------------------------------
+F.                   |               Robust
+adj_excess_respir_~c |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+---------------------+----------------------------------------------------------------
+          new_pos_pc |   .0375305   .0114469     3.28   0.002      .014515    .0605461
+               p_pos |   .1542708   .0910791     1.69   0.097     -.028856    .3373976
+                     |
+c.new_pos_pc#c.p_pos |   .0011378   .0003714     3.06   0.004     .0003911    .0018846
+                     |
+               _cons |   1.934535   2.478933     0.78   0.439    -3.049693    6.918763
 --------------------------------------------------------------------------------------
 
 . 
@@ -1097,5 +1110,5 @@ c.new_pos_pc#c.p_pos |   .0013966    .000439     3.18   0.003      .000514    .0
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\data\..\logs\cleandata.txt
   log type:  text
- closed on:  24 May 2020, 21:36:30
+ closed on:  24 May 2020, 21:51:25
 -----------------------------------------------------------------------------------------------------

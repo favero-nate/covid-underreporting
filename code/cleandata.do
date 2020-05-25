@@ -19,7 +19,7 @@ drop _merge
 order date fips
 sort fips state date
 
-drop if fips > 56
+drop if fips > 56 & state != "United States"
 
 encode dataqualitygrade, gen(datagrade)
 order datagrade, after(dataqualitygrade)
@@ -42,6 +42,7 @@ foreach var of varlist death-pneumon_influ_or_covid numinfluenzadeaths-percentco
 }
 drop *_mis
 
+replace fips = 0 if state == "United States"
 xtset fips end_week, delta(7)
 
 gen new_pos = d.positive if d.positive>=0
@@ -150,44 +151,44 @@ gen excess_deaths = log_allcause-log_expected
 save "..\data\weeklydata.dta", replace
 
 
-reg excess_deaths_pc covdeath_pc [aweight=population] if days_to_report > 14, cluster(fips) nocons
+reg excess_deaths_pc covdeath_pc [aweight=population] if days_to_report > 14 & fips > 0, cluster(fips) nocons
 margins, dydx(covdeath_pc)
 
-twoway (scatter excess_deaths_pc covdeath_pc if days_to_report > 14, mcolor(%30) yline(0)) (function y=x, range(0 300))
+twoway (scatter excess_deaths_pc covdeath_pc if days_to_report > 14 & fips > 0, mcolor(%30) yline(0)) (function y=x, range(0 300))
 
-reg excess_deaths_pc covdeath_pc [aweight=population] if days_to_report > 14, cluster(fips)
-reg excess_deaths_pc c.covdeath_pc c.p_pos [aweight=population] if days_to_report > 14, cluster(fips)
-reg excess_deaths_pc c.covdeath_pc##c.p_pos [aweight=population] if days_to_report > 14, cluster(fips)
-reg excess_deaths_pc c.covdeath_pc c.new_pos_pc c.new_neg_pc [aweight=population] if days_to_report > 14, cluster(fips)
-reg excess_deaths_pc c.covdeath_pc##c.new_pos_pc c.covdeath_pc##c.new_neg_pc [aweight=population] if days_to_report > 14, cluster(fips)
-reg excess_deaths_pc c.covdeath_pc c.new_tests_pc [aweight=population] if days_to_report > 14, cluster(fips)
-reg excess_deaths_pc c.covdeath_pc##c.new_tests_pc [aweight=population] if days_to_report > 14, cluster(fips)
-reg excess_deaths_pc c.covdeath_pc##c.new_tests_pc c.covdeath_pc##c.p_pos [aweight=population] if days_to_report > 14, cluster(fips)
-reg excess_deaths_pc c.covdeath_pc##c.new_tests_pc##c.p_pos [aweight=population] if days_to_report > 14, cluster(fips)
+reg excess_deaths_pc covdeath_pc [aweight=population] if days_to_report > 14 & fips > 0, cluster(fips)
+reg excess_deaths_pc c.covdeath_pc c.p_pos [aweight=population] if days_to_report > 14 & fips > 0, cluster(fips)
+reg excess_deaths_pc c.covdeath_pc##c.p_pos [aweight=population] if days_to_report > 14 & fips > 0, cluster(fips)
+reg excess_deaths_pc c.covdeath_pc c.new_pos_pc c.new_neg_pc [aweight=population] if days_to_report > 14 & fips > 0, cluster(fips)
+reg excess_deaths_pc c.covdeath_pc##c.new_pos_pc c.covdeath_pc##c.new_neg_pc [aweight=population] if days_to_report > 14 & fips > 0, cluster(fips)
+reg excess_deaths_pc c.covdeath_pc c.new_tests_pc [aweight=population] if days_to_report > 14 & fips > 0, cluster(fips)
+reg excess_deaths_pc c.covdeath_pc##c.new_tests_pc [aweight=population] if days_to_report > 14 & fips > 0, cluster(fips)
+reg excess_deaths_pc c.covdeath_pc##c.new_tests_pc c.covdeath_pc##c.p_pos [aweight=population] if days_to_report > 14 & fips > 0, cluster(fips)
+reg excess_deaths_pc c.covdeath_pc##c.new_tests_pc##c.p_pos [aweight=population] if days_to_report > 14 & fips > 0, cluster(fips)
 
 gen covdeath_pcXp_pos = covdeath_pc * p_pos
-reghv excess_deaths_pc covdeath_pc p_pos covdeath_pcXp_pos if days_to_report > 14, var( new_tests_pc covdeath_pc population) twostage cluster(fips)
-reghv excess_deaths_pc covdeath_pc p_pos covdeath_pcXp_pos if days_to_report > 14, var( new_tests_pc covdeath_pc population) cluster(fips)
+reghv excess_deaths_pc covdeath_pc p_pos covdeath_pcXp_pos if days_to_report > 14 & fips > 0, var( new_tests_pc covdeath_pc population) twostage cluster(fips)
+reghv excess_deaths_pc covdeath_pc p_pos covdeath_pcXp_pos if days_to_report > 14 & fips > 0, var( new_tests_pc covdeath_pc population) cluster(fips)
 drop covdeath_pcXp_pos
 
 
 
-reg deathincrease_pc adj_covid_deaths_pc [aweight=population] if days_to_report > 7, cluster(fips)
-reg deathincrease_pc adj_covid_deaths_pc l.adj_covid_deaths_pc [aweight=population] if days_to_report > 7, cluster(fips)
-reg deathincrease_pc c.adj_covid_deaths_pc##c.p_pos [aweight=population] if days_to_report > 7, cluster(fips)
-reg deathincrease_pc c.adj_covid_deaths_pc##c.new_tests_pc [aweight=population] if days_to_report > 7, cluster(fips)
-reg deathincrease_pc c.adj_covid_deaths_pc##c.new_tests_pc c.l.adj_covid_deaths_pc##c.new_tests_pc [aweight=population] if days_to_report > 7, cluster(fips)
-reg deathincrease_pc c.excess_deaths_pc##c.new_tests_pc c.l.excess_deaths_pc##c.new_tests_pc [aweight=population] if days_to_report > 7, cluster(fips)
+reg deathincrease_pc adj_covid_deaths_pc [aweight=population] if days_to_report > 7 & fips > 0, cluster(fips)
+reg deathincrease_pc adj_covid_deaths_pc l.adj_covid_deaths_pc [aweight=population] if days_to_report > 7 & fips > 0, cluster(fips)
+reg deathincrease_pc c.adj_covid_deaths_pc##c.p_pos [aweight=population] if days_to_report > 7 & fips > 0, cluster(fips)
+reg deathincrease_pc c.adj_covid_deaths_pc##c.new_tests_pc [aweight=population] if days_to_report > 7 & fips > 0, cluster(fips)
+reg deathincrease_pc c.adj_covid_deaths_pc##c.new_tests_pc c.l.adj_covid_deaths_pc##c.new_tests_pc [aweight=population] if days_to_report > 7 & fips > 0, cluster(fips)
+reg deathincrease_pc c.excess_deaths_pc##c.new_tests_pc c.l.excess_deaths_pc##c.new_tests_pc [aweight=population] if days_to_report > 7 & fips > 0, cluster(fips)
 
 
-reg excess_deaths_pc covdeath_pc [aweight=population] if days_to_report > 14, cluster(fips)
-reg excess_respir_deaths_pc covdeath_pc [aweight=population] if days_to_report > 14, cluster(fips)
+reg excess_deaths_pc covdeath_pc [aweight=population] if days_to_report > 14 & fips > 0, cluster(fips)
+reg excess_respir_deaths_pc covdeath_pc [aweight=population] if days_to_report > 14 & fips > 0, cluster(fips)
 
-reg excess_deaths_pc c.covdeath_pc##c.p_pos [aweight=population] if days_to_report > 14, cluster(fips)
-reg excess_respir_deaths_pc c.covdeath_pc##c.p_pos [aweight=population] if days_to_report > 14, cluster(fips)
+reg excess_deaths_pc c.covdeath_pc##c.p_pos [aweight=population] if days_to_report > 14 & fips > 0, cluster(fips)
+reg excess_respir_deaths_pc c.covdeath_pc##c.p_pos [aweight=population] if days_to_report > 14 & fips > 0, cluster(fips)
 
-reg f.adj_excess_deaths_pc c.new_pos_pc##c.p_pos [aweight=population] if days_to_report > 14, cluster(fips)
-reg f.adj_excess_respir_deaths_pc c.new_pos_pc##c.p_pos [aweight=population] if days_to_report > 14, cluster(fips)
+reg f.adj_excess_deaths_pc c.new_pos_pc##c.p_pos [aweight=population] if days_to_report > 14 & fips > 0, cluster(fips)
+reg f.adj_excess_respir_deaths_pc c.new_pos_pc##c.p_pos [aweight=population] if days_to_report > 14 & fips > 0, cluster(fips)
 
 
 log close

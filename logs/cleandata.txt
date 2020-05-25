@@ -2,7 +2,7 @@
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\data\..\logs\cleandata.txt
   log type:  text
- opened on:  24 May 2020, 21:51:14
+ opened on:  25 May 2020, 12:42:55
 
 . 
 . use "..\data\population.dta" // start from this file because it has both fips codes and state names
@@ -71,8 +71,8 @@
 . sort fips state date
 
 . 
-. drop if fips > 56
-(382 observations deleted)
+. drop if fips > 56 & state != "United States"
+(366 observations deleted)
 
 . 
 . encode dataqualitygrade, gen(datagrade)
@@ -123,11 +123,11 @@
 (0 real changes made)
 (0 real changes made)
 (0 real changes made)
-(19,083 real changes made, 19,083 to missing)
-(19,083 real changes made, 19,083 to missing)
-(19,083 real changes made, 19,083 to missing)
-(19,083 real changes made, 19,083 to missing)
-(19,083 real changes made, 19,083 to missing)
+(19,099 real changes made, 19,099 to missing)
+(19,099 real changes made, 19,099 to missing)
+(19,099 real changes made, 19,099 to missing)
+(19,099 real changes made, 19,099 to missing)
+(19,099 real changes made, 19,099 to missing)
 (18,921 real changes made, 18,921 to missing)
 (18,921 real changes made, 18,921 to missing)
 (18,921 real changes made, 18,921 to missing)
@@ -135,28 +135,31 @@
 (18,921 real changes made, 18,921 to missing)
 (18,921 real changes made, 18,921 to missing)
 (18,921 real changes made, 18,921 to missing)
-(153 real changes made, 153 to missing)
-(153 real changes made, 153 to missing)
-(153 real changes made, 153 to missing)
-(153 real changes made, 153 to missing)
+(169 real changes made, 169 to missing)
+(169 real changes made, 169 to missing)
+(169 real changes made, 169 to missing)
+(169 real changes made, 169 to missing)
 
 . drop *_mis
 
 . 
+. replace fips = 0 if state == "United States"
+(16 real changes made)
+
 . xtset fips end_week, delta(7)
-       panel variable:  fips (strongly balanced)
+       panel variable:  fips (unbalanced)
         time variable:  end_week, 20130105 to 20200530
                 delta:  7 days
 
 . 
 . gen new_pos = d.positive if d.positive>=0
-(19,120 missing values generated)
+(19,136 missing values generated)
 
 . gen new_neg = d.negative if d.negative>=0
-(19,163 missing values generated)
+(19,179 missing values generated)
 
 . gen p_pos = new_pos/(new_pos+new_neg)*100
-(19,167 missing values generated)
+(19,183 missing values generated)
 
 . order new_pos-p_pos, after(negative)
 
@@ -201,30 +204,30 @@
 . 
 . gen pneumon_or_influ_fluview = numinfluenzadeaths + numpneumoniadeaths if end_week < date("20200201
 > ","YMD")
-(882 missing values generated)
+(898 missing values generated)
 
 . gen mmwrweek = substr(epi_week,-2,2)
-(147 missing values generated)
+(163 missing values generated)
 
 . 
 . //egen old_expected_influ_pneu_deaths = mean(pneumon_or_influ_fluview), by(fips mmwrweek)
 . 
 . // generate expected influenza/pneumonia deaths based on historical patterns
 .         gen epi_year = substr(epi_week,1,4)
-(147 missing values generated)
+(163 missing values generated)
 
 .         destring epi_year mmwrweek, replace
 epi_year: all characters numeric; replaced as int
-(147 missing values generated)
+(163 missing values generated)
 mmwrweek: all characters numeric; replaced as byte
-(147 missing values generated)
+(163 missing values generated)
 
 .         replace epi_year = epi_year + 1 if mmwrweek >= 40
 (4,508 real changes made)
 
 . 
 .         gen mmwrweek2 = mmwrweek - 39 if mmwrweek >= 40
-(14,455 missing values generated)
+(14,471 missing values generated)
 
 .         replace mmwrweek2 = l.mmwrweek2 + 1 if mmwrweek < 40
 (12,397 real changes made)
@@ -239,19 +242,19 @@ mmwrweek: all characters numeric; replaced as byte
 .         //gen halfcos_time = cos(pi_time/2)
 . 
 .         gen pneumon_or_influ_fluview_pc = pneumon_or_influ_fluview * 1000000 / population
-(882 missing values generated)
+(898 missing values generated)
 
 .         
 .         // most year-to-year variation in influenza severity seems to be from weeks 50 to 8; thus, 
 > create a sin spike for this period with a year-varying coefficient
 .         gen fluseason = 0 if mmwrweek != .
-(147 missing values generated)
+(163 missing values generated)
 
 .         replace fluseason = 1 if (mmwrweek >= 50 | mmwrweek <= 8) & mmwrweek != .
 (4,214 real changes made)
 
 .         gen fluseason_sin_time = sin(fluseason*_pi*(mmwrweek2-10)/12)
-(147 missing values generated)
+(163 missing values generated)
 
 .         
 .         reg pneumon_or_influ_fluview_pc i.fips i.epi_year i.mmwrweek i.epi_year#c.fluseason_sin_tim
@@ -396,10 +399,10 @@ epi_year#c.fluseason_sin_time |
 
 .         predict expected_influ_pneu_deaths_pc
 (option xb assumed; fitted values)
-(147 missing values generated)
+(163 missing values generated)
 
 .         gen expected_influ_pneu_deaths = expected_influ_pneu_deaths_pc * population / 1000000
-(147 missing values generated)
+(163 missing values generated)
 
 . 
 . //gen adj_expected_influ_pneu_deaths = expected_influ_pneu_deaths
@@ -411,7 +414,7 @@ epi_year#c.fluseason_sin_time |
 >  > 14 & days_to_report <= 21
 . gen adj_expected_influ_pneu_deaths = expected_influ_pneu_deaths * (1-exp(-.09246997*days_to_report)
 > )
-(18,228 missing values generated)
+(18,244 missing values generated)
 
 . order adj_expected_influ_pneu_deaths, after(expected_influ_pneu_deaths)
 
@@ -427,7 +430,7 @@ epi_year#c.fluseason_sin_time |
 
 . replace cumulative_covdeath = cumulative_covdeath + l.cumulative_covdeath if l.cumulative_covdeath 
 > != .
-(405 real changes made)
+(419 real changes made)
 
 . 
 . //gen adj_covid_deaths = covid_deaths
@@ -443,7 +446,7 @@ epi_year#c.fluseason_sin_time |
 
 . replace adj_cumulative_covdeath = adj_cumulative_covdeath + l.adj_cumulative_covdeath if l.adj_cumu
 > lative_covdeath != .
-(405 real changes made)
+(419 real changes made)
 
 . 
 . gen adj_total_deaths = total_deaths / (1-exp(-.09246997*days_to_report))
@@ -455,36 +458,36 @@ epi_year#c.fluseason_sin_time |
 . 
 . 
 . gen covdeath_pc = covid_deaths*1000000/population
-(18,179 missing values generated)
+(18,195 missing values generated)
 
 . gen excess_deaths_pc = (total_deaths-adj_expected_deaths)*1000000/population
-(18,179 missing values generated)
+(18,195 missing values generated)
 
 . gen excess_respir_deaths_pc = (pneumon_influ_or_covid-adj_expected_influ_pneu_deaths)*1000000/popul
 > ation
-(18,228 missing values generated)
+(18,244 missing values generated)
 
 . gen adj_excess_deaths_pc = (adj_total_deaths-expected_deaths)*1000000/population
-(18,179 missing values generated)
+(18,195 missing values generated)
 
 . gen adj_excess_respir_deaths_pc = (adj_pneumon_influ_or_covid-expected_influ_pneu_deaths)*1000000/p
 > opulation
-(18,228 missing values generated)
+(18,244 missing values generated)
 
 . gen new_pos_pc = new_pos*1000000/population
-(18,370 missing values generated)
+(18,386 missing values generated)
 
 . gen new_neg_pc = new_neg*1000000/population
-(18,410 missing values generated)
+(18,426 missing values generated)
 
 . gen new_tests_pc = new_pos_pc + new_neg_pc
-(18,410 missing values generated)
+(18,426 missing values generated)
 
 . gen deathincrease_pc = deathincrease*1000000/population
-(18,334 missing values generated)
+(18,350 missing values generated)
 
 . gen adj_covid_deaths_pc = adj_covid_deaths*1000000/population
-(18,179 missing values generated)
+(18,195 missing values generated)
 
 . 
 . /*
@@ -500,7 +503,8 @@ file ..\data\weeklydata.dta saved
 
 . 
 . 
-. reg excess_deaths_pc covdeath_pc [aweight=population] if days_to_report > 14, cluster(fips) nocons
+. reg excess_deaths_pc covdeath_pc [aweight=population] if days_to_report > 14 & fips > 0, cluster(fi
+> ps) nocons
 (sum of wgt is 4,398,606,128)
 
 Linear regression                               Number of obs     =        686
@@ -533,11 +537,12 @@ dy/dx w.r.t. : covdeath_pc
 ------------------------------------------------------------------------------
 
 . 
-. twoway (scatter excess_deaths_pc covdeath_pc if days_to_report > 14, mcolor(%30) yline(0)) (functio
-> n y=x, range(0 300))
+. twoway (scatter excess_deaths_pc covdeath_pc if days_to_report > 14 & fips > 0, mcolor(%30) yline(0
+> )) (function y=x, range(0 300))
 
 . 
-. reg excess_deaths_pc covdeath_pc [aweight=population] if days_to_report > 14, cluster(fips)
+. reg excess_deaths_pc covdeath_pc [aweight=population] if days_to_report > 14 & fips > 0, cluster(fi
+> ps)
 (sum of wgt is 4,398,606,128)
 
 Linear regression                               Number of obs     =        686
@@ -555,8 +560,8 @@ excess_dea~c |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
        _cons |   -.257895   2.324166    -0.11   0.912    -4.930945    4.415155
 ------------------------------------------------------------------------------
 
-. reg excess_deaths_pc c.covdeath_pc c.p_pos [aweight=population] if days_to_report > 14, cluster(fip
-> s)
+. reg excess_deaths_pc c.covdeath_pc c.p_pos [aweight=population] if days_to_report > 14 & fips > 0, 
+> cluster(fips)
 (sum of wgt is 2,254,525,234)
 
 Linear regression                               Number of obs     =        358
@@ -575,8 +580,8 @@ excess_dea~c |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
        _cons |   2.678421   2.179946     1.23   0.225    -1.704654    7.061495
 ------------------------------------------------------------------------------
 
-. reg excess_deaths_pc c.covdeath_pc##c.p_pos [aweight=population] if days_to_report > 14, cluster(fi
-> ps)
+. reg excess_deaths_pc c.covdeath_pc##c.p_pos [aweight=population] if days_to_report > 14 & fips > 0,
+>  cluster(fips)
 (sum of wgt is 2,254,525,234)
 
 Linear regression                               Number of obs     =        358
@@ -599,7 +604,7 @@ c.covdeath_pc#c.p_pos |   .0068517   .0024368     2.81   0.007     .0019523    .
 ---------------------------------------------------------------------------------------
 
 . reg excess_deaths_pc c.covdeath_pc c.new_pos_pc c.new_neg_pc [aweight=population] if days_to_report
->  > 14, cluster(fips)
+>  > 14 & fips > 0, cluster(fips)
 (sum of wgt is 2,254,525,234)
 
 Linear regression                               Number of obs     =        358
@@ -620,7 +625,7 @@ excess_dea~c |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 ------------------------------------------------------------------------------
 
 . reg excess_deaths_pc c.covdeath_pc##c.new_pos_pc c.covdeath_pc##c.new_neg_pc [aweight=population] i
-> f days_to_report > 14, cluster(fips)
+> f days_to_report > 14 & fips > 0, cluster(fips)
 (sum of wgt is 2,254,525,234)
 note: covdeath_pc omitted because of collinearity
 
@@ -648,8 +653,8 @@ c.covdeath_pc#c.new_neg_pc |  -.0000482   .0000104    -4.61   0.000    -.0000692
                      _cons |   1.700591   2.280298     0.75   0.459    -2.884255    6.285437
 --------------------------------------------------------------------------------------------
 
-. reg excess_deaths_pc c.covdeath_pc c.new_tests_pc [aweight=population] if days_to_report > 14, clus
-> ter(fips)
+. reg excess_deaths_pc c.covdeath_pc c.new_tests_pc [aweight=population] if days_to_report > 14 & fip
+> s > 0, cluster(fips)
 (sum of wgt is 2,254,525,234)
 
 Linear regression                               Number of obs     =        358
@@ -668,8 +673,8 @@ new_tests_pc |  -.0006172   .0006766    -0.91   0.366    -.0019776    .0007432
        _cons |   4.160939    2.18428     1.90   0.063    -.2308503    8.552728
 ------------------------------------------------------------------------------
 
-. reg excess_deaths_pc c.covdeath_pc##c.new_tests_pc [aweight=population] if days_to_report > 14, clu
-> ster(fips)
+. reg excess_deaths_pc c.covdeath_pc##c.new_tests_pc [aweight=population] if days_to_report > 14 & fi
+> ps > 0, cluster(fips)
 (sum of wgt is 2,254,525,234)
 
 Linear regression                               Number of obs     =        358
@@ -692,7 +697,7 @@ c.covdeath_pc#c.new_tests_pc |  -.0000275   .0000116    -2.37   0.022    -.00005
 ----------------------------------------------------------------------------------------------
 
 . reg excess_deaths_pc c.covdeath_pc##c.new_tests_pc c.covdeath_pc##c.p_pos [aweight=population] if d
-> ays_to_report > 14, cluster(fips)
+> ays_to_report > 14 & fips > 0, cluster(fips)
 (sum of wgt is 2,254,525,234)
 note: covdeath_pc omitted because of collinearity
 
@@ -721,7 +726,7 @@ c.covdeath_pc#c.new_tests_pc |   -.000017    .000011    -1.55   0.127    -.00003
 ----------------------------------------------------------------------------------------------
 
 . reg excess_deaths_pc c.covdeath_pc##c.new_tests_pc##c.p_pos [aweight=population] if days_to_report 
-> > 14, cluster(fips)
+> > 14 & fips > 0, cluster(fips)
 (sum of wgt is 2,254,525,234)
 
 Linear regression                               Number of obs     =        358
@@ -754,10 +759,10 @@ Linear regression                               Number of obs     =        358
 
 . 
 . gen covdeath_pcXp_pos = covdeath_pc * p_pos
-(18,507 missing values generated)
+(18,523 missing values generated)
 
-. reghv excess_deaths_pc covdeath_pc p_pos covdeath_pcXp_pos if days_to_report > 14, var( new_tests_p
-> c covdeath_pc population) twostage cluster(fips)
+. reghv excess_deaths_pc covdeath_pc p_pos covdeath_pcXp_pos if days_to_report > 14 & fips > 0, var( 
+> new_tests_pc covdeath_pc population) twostage cluster(fips)
 
 Multiplicative heteroscedastic regression             Number of obs  =     358
 Estimator: 2sls                                       Model chi2(6)  = 889.083
@@ -782,8 +787,8 @@ new_tests_pc |   .0002416   .0001564     1.54   0.122    -.0000649    .0005482
        _cons |   4.984872   .8902121     5.60   0.000     3.240088    6.729656
 ------------------------------------------------------------------------------
 
-. reghv excess_deaths_pc covdeath_pc p_pos covdeath_pcXp_pos if days_to_report > 14, var( new_tests_p
-> c covdeath_pc population) cluster(fips)
+. reghv excess_deaths_pc covdeath_pc p_pos covdeath_pcXp_pos if days_to_report > 14 & fips > 0, var( 
+> new_tests_pc covdeath_pc population) cluster(fips)
 
 iteration 1:  Log-likelihood =     -1498  |delta-b|     .6463 
 iteration 2:  Log-likelihood =     -1496  |delta-b|     .4181 
@@ -821,7 +826,8 @@ new_tests_pc |   .0002135   .0000575     3.71   0.000     .0001007    .0003262
 . 
 . 
 . 
-. reg deathincrease_pc adj_covid_deaths_pc [aweight=population] if days_to_report > 7, cluster(fips)
+. reg deathincrease_pc adj_covid_deaths_pc [aweight=population] if days_to_report > 7 & fips > 0, clu
+> ster(fips)
 (sum of wgt is 3,139,373,590)
 
 Linear regression                               Number of obs     =        481
@@ -840,7 +846,7 @@ adj_covid_deaths_pc |   .8199028   .0219499    37.35   0.000     .7757696     .8
 -------------------------------------------------------------------------------------
 
 . reg deathincrease_pc adj_covid_deaths_pc l.adj_covid_deaths_pc [aweight=population] if days_to_repo
-> rt > 7, cluster(fips)
+> rt > 7 & fips > 0, cluster(fips)
 (sum of wgt is 3,131,758,697)
 
 Linear regression                               Number of obs     =        480
@@ -861,8 +867,8 @@ adj_covid_deaths_pc |
               _cons |   2.024333   .4474086     4.52   0.000     1.124758    2.923909
 -------------------------------------------------------------------------------------
 
-. reg deathincrease_pc c.adj_covid_deaths_pc##c.p_pos [aweight=population] if days_to_report > 7, clu
-> ster(fips)
+. reg deathincrease_pc c.adj_covid_deaths_pc##c.p_pos [aweight=population] if days_to_report > 7 & fi
+> ps > 0, cluster(fips)
 (sum of wgt is 2,568,711,386)
 
 Linear regression                               Number of obs     =        407
@@ -885,7 +891,7 @@ c.adj_covid_deaths_pc#c.p_pos |  -.0065312   .0009077    -7.20   0.000    -.0083
 -----------------------------------------------------------------------------------------------
 
 . reg deathincrease_pc c.adj_covid_deaths_pc##c.new_tests_pc [aweight=population] if days_to_report >
->  7, cluster(fips)
+>  7 & fips > 0, cluster(fips)
 (sum of wgt is 2,568,711,386)
 
 Linear regression                               Number of obs     =        407
@@ -909,7 +915,7 @@ Linear regression                               Number of obs     =        407
 ----------------------------------------------------------------------------------------
 
 . reg deathincrease_pc c.adj_covid_deaths_pc##c.new_tests_pc c.l.adj_covid_deaths_pc##c.new_tests_pc 
-> [aweight=population] if days_to_report > 7, cluster(fips)
+> [aweight=population] if days_to_report > 7 & fips > 0, cluster(fips)
 (sum of wgt is 2,568,711,386)
 note: new_tests_pc omitted because of collinearity
 
@@ -942,7 +948,7 @@ Linear regression                               Number of obs     =        407
 -----------------------------------------------------------------------------------------
 
 . reg deathincrease_pc c.excess_deaths_pc##c.new_tests_pc c.l.excess_deaths_pc##c.new_tests_pc [aweig
-> ht=population] if days_to_report > 7, cluster(fips)
+> ht=population] if days_to_report > 7 & fips > 0, cluster(fips)
 (sum of wgt is 2,568,711,386)
 note: new_tests_pc omitted because of collinearity
 
@@ -974,7 +980,8 @@ cL.excess_deaths_pc#c.new_tests_pc |  -.0000396   .0000234    -1.69   0.097    -
 
 . 
 . 
-. reg excess_deaths_pc covdeath_pc [aweight=population] if days_to_report > 14, cluster(fips)
+. reg excess_deaths_pc covdeath_pc [aweight=population] if days_to_report > 14 & fips > 0, cluster(fi
+> ps)
 (sum of wgt is 4,398,606,128)
 
 Linear regression                               Number of obs     =        686
@@ -992,7 +999,8 @@ excess_dea~c |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
        _cons |   -.257895   2.324166    -0.11   0.912    -4.930945    4.415155
 ------------------------------------------------------------------------------
 
-. reg excess_respir_deaths_pc covdeath_pc [aweight=population] if days_to_report > 14, cluster(fips)
+. reg excess_respir_deaths_pc covdeath_pc [aweight=population] if days_to_report > 14 & fips > 0, clu
+> ster(fips)
 (sum of wgt is 4,398,606,128)
 
 Linear regression                               Number of obs     =        686
@@ -1011,8 +1019,8 @@ excess_res~c |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 ------------------------------------------------------------------------------
 
 . 
-. reg excess_deaths_pc c.covdeath_pc##c.p_pos [aweight=population] if days_to_report > 14, cluster(fi
-> ps)
+. reg excess_deaths_pc c.covdeath_pc##c.p_pos [aweight=population] if days_to_report > 14 & fips > 0,
+>  cluster(fips)
 (sum of wgt is 2,254,525,234)
 
 Linear regression                               Number of obs     =        358
@@ -1034,8 +1042,8 @@ c.covdeath_pc#c.p_pos |   .0068517   .0024368     2.81   0.007     .0019523    .
                 _cons |   6.073375   1.901709     3.19   0.002     2.249734    9.897017
 ---------------------------------------------------------------------------------------
 
-. reg excess_respir_deaths_pc c.covdeath_pc##c.p_pos [aweight=population] if days_to_report > 14, clu
-> ster(fips)
+. reg excess_respir_deaths_pc c.covdeath_pc##c.p_pos [aweight=population] if days_to_report > 14 & fi
+> ps > 0, cluster(fips)
 (sum of wgt is 2,254,525,234)
 
 Linear regression                               Number of obs     =        358
@@ -1058,8 +1066,8 @@ c.covdeath_pc#c.p_pos |   .0018343   .0006312     2.91   0.006     .0005652    .
 ---------------------------------------------------------------------------------------
 
 . 
-. reg f.adj_excess_deaths_pc c.new_pos_pc##c.p_pos [aweight=population] if days_to_report > 14, clust
-> er(fips)
+. reg f.adj_excess_deaths_pc c.new_pos_pc##c.p_pos [aweight=population] if days_to_report > 14 & fips
+>  > 0, cluster(fips)
 (sum of wgt is 2,254,525,234)
 
 Linear regression                               Number of obs     =        358
@@ -1082,7 +1090,7 @@ c.new_pos_pc#c.p_pos |   .0014177   .0004791     2.96   0.005     .0004544    .0
 --------------------------------------------------------------------------------------
 
 . reg f.adj_excess_respir_deaths_pc c.new_pos_pc##c.p_pos [aweight=population] if days_to_report > 14
-> , cluster(fips)
+>  & fips > 0, cluster(fips)
 (sum of wgt is 2,254,525,234)
 
 Linear regression                               Number of obs     =        358
@@ -1110,5 +1118,5 @@ c.new_pos_pc#c.p_pos |   .0011378   .0003714     3.06   0.004     .0003911    .0
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\data\..\logs\cleandata.txt
   log type:  text
- closed on:  24 May 2020, 21:51:25
+ closed on:  25 May 2020, 12:43:06
 -----------------------------------------------------------------------------------------------------

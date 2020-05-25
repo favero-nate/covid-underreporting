@@ -1,9 +1,9 @@
 -----------------------------------------------------------------------------------------------------
       name:  <unnamed>
-       log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\estimating_reporting_
+       log:  C:\Users\favero\Documents\GitHub\covid-underreporting\data\..\logs\estimating_reporting_
 > delays.txt
   log type:  text
- opened on:  22 May 2020, 09:08:57
+ opened on:  24 May 2020, 22:20:24
 
 . 
 . insheet using "..\data\past_reports\nationwide_historical_reports.csv"
@@ -351,47 +351,48 @@ rescale eq:    log likelihood = -41601.159
 Iteration 0:   log likelihood = -41601.159  (not concave)
 Iteration 1:   log likelihood = -34941.319  (not concave)
 Iteration 2:   log likelihood = -29583.991  (not concave)
-Iteration 3:   log likelihood = -27274.442  (not concave)
-Iteration 4:   log likelihood = -25591.513  (not concave)
-Iteration 5:   log likelihood = -24335.531  (not concave)
-Iteration 6:   log likelihood = -17124.071  (not concave)
-Iteration 7:   log likelihood =  -9487.784  (not concave)
-Iteration 8:   log likelihood = -7934.1517  (not concave)
-Iteration 9:   log likelihood =  -7418.027  (not concave)
-Iteration 10:  log likelihood = -6419.9719  (not concave)
-Iteration 11:  log likelihood = -6022.6835  (not concave)
-Iteration 12:  log likelihood = -6022.6831  (not concave)
-Iteration 13:  log likelihood = -5401.7144  (not concave)
-Iteration 14:  log likelihood = -5204.5657  (not concave)
-Iteration 15:  log likelihood = -4882.0364  (not concave)
-Iteration 16:  log likelihood = -4493.3058  (not concave)
-Iteration 17:  log likelihood = -4024.6014  (not concave)
-Iteration 18:  log likelihood = -3769.4962  (not concave)
-Iteration 19:  log likelihood = -3644.5868  (not concave)
-Iteration 20:  log likelihood =  -3590.599  (not concave)
-Iteration 21:  log likelihood = -3561.8144  (not concave)
-Iteration 22:  log likelihood = -3546.2217  (not concave)
-Iteration 23:  log likelihood = -3530.8383  (not concave)
-Iteration 24:  log likelihood = -3455.0519  (not concave)
-Iteration 25:  log likelihood = -3420.8099  (not concave)
-Iteration 26:  log likelihood = -3400.1206  (not concave)
-Iteration 27:  log likelihood = -3380.4791  (not concave)
-Iteration 28:  log likelihood = -3350.4546  (not concave)
-Iteration 29:  log likelihood = -3316.8273  (not concave)
-Iteration 30:  log likelihood =  -3277.829  (not concave)
-Iteration 31:  log likelihood = -3251.9119  (not concave)
-Iteration 32:  log likelihood = -3229.4506  (not concave)
-Iteration 33:  log likelihood = -3206.9292  (not concave)
-Iteration 34:  log likelihood = -3180.9943  (not concave)
-Iteration 35:  log likelihood = -3155.1204  (not concave)
-Iteration 36:  log likelihood = -3130.4262  (not concave)
-Iteration 37:  log likelihood = -3106.8676  (not concave)
-Iteration 38:  log likelihood = -3085.7617  (not concave)
-Iteration 39:  log likelihood = -3068.4062  
-Iteration 40:  log likelihood = -3035.8895  
-Iteration 41:  log likelihood = -3031.6334  
-Iteration 42:  log likelihood = -3031.5696  
-Iteration 43:  log likelihood = -3031.5695  
+Iteration 3:   log likelihood = -27274.447  (not concave)
+Iteration 4:   log likelihood = -25591.454  (not concave)
+Iteration 5:   log likelihood = -24335.489  (not concave)
+Iteration 6:   log likelihood = -17124.632  (not concave)
+Iteration 7:   log likelihood = -9493.1095  (not concave)
+Iteration 8:   log likelihood = -8097.0613  (not concave)
+Iteration 9:   log likelihood = -7896.6909  (not concave)
+Iteration 10:  log likelihood = -6875.6775  (not concave)
+Iteration 11:  log likelihood = -6619.4919  (not concave)
+Iteration 12:  log likelihood = -5418.4058  (not concave)
+Iteration 13:  log likelihood = -5272.7689  (not concave)
+Iteration 14:  log likelihood = -4761.9679  (not concave)
+Iteration 15:  log likelihood =  -4390.161  (not concave)
+Iteration 16:  log likelihood = -3998.7464  (not concave)
+Iteration 17:  log likelihood = -3719.7577  (not concave)
+Iteration 18:  log likelihood = -3630.9747  (not concave)
+Iteration 19:  log likelihood = -3580.3947  (not concave)
+Iteration 20:  log likelihood = -3553.3535  (not concave)
+Iteration 21:  log likelihood = -3532.3456  (not concave)
+Iteration 22:  log likelihood =  -3524.436  (not concave)
+Iteration 23:  log likelihood = -3516.4675  (not concave)
+Iteration 24:  log likelihood = -3501.4861  (not concave)
+Iteration 25:  log likelihood = -3488.5532  (not concave)
+Iteration 26:  log likelihood = -3475.9463  (not concave)
+Iteration 27:  log likelihood = -3465.1873  (not concave)
+Iteration 28:  log likelihood = -3454.8622  (not concave)
+Iteration 29:  log likelihood = -3444.7297  (not concave)
+Iteration 30:  log likelihood = -3433.8901  (not concave)
+Iteration 31:  log likelihood = -3414.8654  (not concave)
+Iteration 32:  log likelihood = -3388.7144  (not concave)
+Iteration 33:  log likelihood = -3347.4958  (not concave)
+Iteration 34:  log likelihood = -3328.6383  (not concave)
+Iteration 35:  log likelihood = -3310.6586  (not concave)
+Iteration 36:  log likelihood = -3285.1611  (not concave)
+Iteration 37:  log likelihood = -3251.4377  (not concave)
+Iteration 38:  log likelihood = -3229.4906  (not concave)
+Iteration 39:  log likelihood = -3205.8473  (not concave)
+Iteration 40:  log likelihood = -3072.3852  
+Iteration 41:  log likelihood = -3040.1045  
+Iteration 42:  log likelihood = -3031.6947  
+Iteration 43:  log likelihood = -3031.5697  
+Iteration 44:  log likelihood = -3031.5695  
 
                                                 Number of obs     =        362
                                                 Wald chi2(0)      =          .
@@ -401,38 +402,38 @@ Log likelihood = -3031.5695                     Prob > chi2       =          .
              |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
 detected     |
-       _cons |  -.0266042    .001588   -16.75   0.000    -.0297166   -.0234919
+       _cons |  -.0266043    .001588   -16.75   0.000    -.0297166   -.0234919
 -------------+----------------------------------------------------------------
 time         |
-       _cons |  -2.380871   .0220013  -108.22   0.000    -2.423993    -2.33775
+       _cons |  -2.380871   .0220013  -108.21   0.000    -2.423993    -2.33775
 -------------+----------------------------------------------------------------
 alpha        |
     end_week |
-      21953  |   454.3465   94.48015     4.81   0.000     269.1688    639.5241
-      21960  |  -292.9101   107.0258    -2.74   0.006    -502.6767   -83.14347
-      21967  |  -328.6612   123.3825    -2.66   0.008    -570.4864   -86.83603
-      21974  |  -148.9088   145.2917    -1.02   0.305    -433.6754    135.8577
-      21981  |  -388.3064   171.9005    -2.26   0.024    -725.2252    -51.3876
-      21988  |  -1813.021   207.2283    -8.75   0.000    -2219.181   -1406.861
-      21995  |  -1138.416   254.6779    -4.47   0.000    -1637.575    -639.256
-      22002  |     3092.6   322.5721     9.59   0.000      2460.37     3724.83
-      22009  |   12058.17    429.004    28.11   0.000     11217.34       12899
-      22016  |   19064.62   582.4706    32.73   0.000        17923    20206.25
-      22023  |    17187.1   770.9518    22.29   0.000     15676.07    18698.14
-      22030  |   12296.51    1056.29    11.64   0.000     10226.22     14366.8
-      22037  |   6962.122   1554.188     4.48   0.000     3915.969    10008.27
-      22044  |   2278.944   2820.844     0.81   0.419    -3249.808    7807.695
-      22051  |  -11517.33   11090.53    -1.04   0.299    -33254.36    10219.71
+      21953  |   454.3453   94.48004     4.81   0.000     269.1679    639.5228
+      21960  |  -292.9107   107.0257    -2.74   0.006    -502.6771   -83.14424
+      21967  |  -328.6614   123.3824    -2.66   0.008    -570.4864   -86.83643
+      21974  |  -148.9088   145.2916    -1.02   0.305    -433.6752    135.8576
+      21981  |  -388.3062   171.9004    -2.26   0.024    -725.2249   -51.38758
+      21988  |  -1813.021   207.2282    -8.75   0.000    -2219.181   -1406.861
+      21995  |  -1138.415   254.6778    -4.47   0.000    -1637.575   -639.2559
+      22002  |     3092.6   322.5721     9.59   0.000     2460.371     3724.83
+      22009  |   12058.17   429.0041    28.11   0.000     11217.34       12899
+      22016  |   19064.63   582.4709    32.73   0.000        17923    20206.25
+      22023  |   17187.11   770.9522    22.29   0.000     15676.07    18698.14
+      22030  |   12296.52   1056.291    11.64   0.000     10226.22    14366.81
+      22037  |   6962.127   1554.189     4.48   0.000     3915.972    10008.28
+      22044  |   2278.949   2820.845     0.81   0.419    -3249.807    7807.704
+      22051  |  -11517.32   11090.53    -1.04   0.299    -33254.36    10219.72
              |
-       _cons |   57277.68   62.33261   918.90   0.000     57155.51    57399.85
+       _cons |   57277.68   62.33254   918.90   0.000     57155.51    57399.85
 -------------+----------------------------------------------------------------
 lnsigma      |
-       _cons |   8.162161    .081044   100.71   0.000     8.003317    8.321004
+       _cons |   8.162161   .0810442   100.71   0.000     8.003318    8.321005
 ------------------------------------------------------------------------------
 
 . 
 . display "k="exp(_b[#2:_cons])
-k=.09246997
+k=.09246996
 
 . 
 . gen delay_adj_total_deaths = total_deaths / (1-exp(-exp(_b[#2:_cons])*days_to_report))
@@ -471,85 +472,105 @@ rescale eq:    log likelihood = -41617.888
 Iteration 0:   log likelihood = -41617.888  (not concave)
 Iteration 1:   log likelihood = -40835.702  (not concave)
 Iteration 2:   log likelihood = -40449.574  (not concave)
-Iteration 3:   log likelihood = -31675.157  (not concave)
-Iteration 4:   log likelihood = -27285.213  (not concave)
-Iteration 5:   log likelihood = -11673.211  (not concave)
-Iteration 6:   log likelihood = -11608.303  (not concave)
-Iteration 7:   log likelihood = -10024.883  (not concave)
-Iteration 8:   log likelihood = -9628.6636  (not concave)
-Iteration 9:   log likelihood = -8434.4967  (not concave)
-Iteration 10:  log likelihood = -6013.6592  (not concave)
-Iteration 11:  log likelihood =  -5001.698  (not concave)
-Iteration 12:  log likelihood = -4339.5605  (not concave)
-Iteration 13:  log likelihood = -3943.4891  (not concave)
-Iteration 14:  log likelihood = -3939.8282  (not concave)
-Iteration 15:  log likelihood = -3817.0903  (not concave)
-Iteration 16:  log likelihood = -3666.0857  (not concave)
-Iteration 17:  log likelihood = -3608.7516  
-Iteration 18:  log likelihood = -3449.2404  (not concave)
-Iteration 19:  log likelihood = -3240.6378  (not concave)
-Iteration 20:  log likelihood = -3174.5267  (not concave)
-Iteration 21:  log likelihood =  -3117.717  (not concave)
-Iteration 22:  log likelihood = -3080.9171  (not concave)
-Iteration 23:  log likelihood = -3054.2624  (not concave)
-Iteration 24:  log likelihood = -3026.5855  (not concave)
-Iteration 25:  log likelihood = -2995.6562  (not concave)
-Iteration 26:  log likelihood = -2977.4233  (not concave)
-Iteration 27:  log likelihood = -2934.6035  (not concave)
-Iteration 28:  log likelihood = -2930.0394  
-Iteration 29:  log likelihood = -2923.8843  
-Iteration 30:  log likelihood = -2923.4597  
-Iteration 31:  log likelihood = -2923.4479  
-Iteration 32:  log likelihood = -2923.4478  
+Iteration 3:   log likelihood = -31675.142  (not concave)
+Iteration 4:   log likelihood =  -27283.75  (not concave)
+Iteration 5:   log likelihood = -11681.899  (not concave)
+Iteration 6:   log likelihood = -11614.202  (not concave)
+Iteration 7:   log likelihood = -11590.134  (not concave)
+Iteration 8:   log likelihood = -7173.8618  (not concave)
+Iteration 9:   log likelihood = -7165.1886  (not concave)
+Iteration 10:  log likelihood =  -6949.456  (not concave)
+Iteration 11:  log likelihood = -5250.0865  (not concave)
+Iteration 12:  log likelihood = -4746.4603  (not concave)
+Iteration 13:  log likelihood = -4472.8264  (not concave)
+Iteration 14:  log likelihood = -4029.4551  (not concave)
+Iteration 15:  log likelihood = -3997.5625  (not concave)
+Iteration 16:  log likelihood = -3948.5896  (not concave)
+Iteration 17:  log likelihood = -3910.5292  (not concave)
+Iteration 18:  log likelihood = -3904.8183  (not concave)
+Iteration 19:  log likelihood = -3777.1583  (not concave)
+Iteration 20:  log likelihood = -3679.0196  (not concave)
+Iteration 21:  log likelihood = -3613.1575  (not concave)
+Iteration 22:  log likelihood = -3566.8625  (not concave)
+Iteration 23:  log likelihood = -3532.0753  (not concave)
+Iteration 24:  log likelihood = -3497.8526  (not concave)
+Iteration 25:  log likelihood = -3190.9642  (not concave)
+Iteration 26:  log likelihood = -3190.0567  (not concave)
+Iteration 27:  log likelihood = -3187.8063  (not concave)
+Iteration 28:  log likelihood = -3173.7788  (not concave)
+Iteration 29:  log likelihood = -3167.5235  (not concave)
+Iteration 30:  log likelihood = -3158.6859  (not concave)
+Iteration 31:  log likelihood = -3097.5592  (not concave)
+Iteration 32:  log likelihood = -3094.7977  (not concave)
+Iteration 33:  log likelihood =  -3092.772  (not concave)
+Iteration 34:  log likelihood = -3070.5631  (not concave)
+Iteration 35:  log likelihood = -3044.7815  (not concave)
+Iteration 36:  log likelihood = -3042.6613  (not concave)
+Iteration 37:  log likelihood = -3039.6748  (not concave)
+Iteration 38:  log likelihood = -3032.7848  (not concave)
+Iteration 39:  log likelihood = -3021.0958  (not concave)
+Iteration 40:  log likelihood = -3007.6095  
+Iteration 41:  log likelihood =  -2987.639  
+Iteration 42:  log likelihood = -2980.9064  (not concave)
+Iteration 43:  log likelihood = -2980.8914  
+Iteration 44:  log likelihood = -2980.1389  (not concave)
+Iteration 45:  log likelihood = -2980.1058  
+Iteration 46:  log likelihood = -2980.0609  
+Iteration 47:  log likelihood = -2980.0602  (not concave)
+Iteration 48:  log likelihood = -2978.4319  (backed up)
+Iteration 49:  log likelihood = -2977.8168  
+Iteration 50:  log likelihood = -2977.5879  
+Iteration 51:  log likelihood = -2977.5849  
+Iteration 52:  log likelihood = -2977.5849  
 
                                                 Number of obs     =        360
                                                 Wald chi2(0)      =          .
-Log likelihood = -2923.4478                     Prob > chi2       =          .
+Log likelihood = -2977.5849                     Prob > chi2       =          .
 
 -----------------------------------------------------------------------------------
                   |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
 ------------------+----------------------------------------------------------------
 detected          |
-            _cons |  -.0613224   .0011812   -51.92   0.000    -.0636375   -.0590073
+            _cons |  -.0497988   .0011753   -42.37   0.000    -.0521024   -.0474952
 ------------------+----------------------------------------------------------------
 time              |
-            _cons |  -3.128943   .0253466  -123.45   0.000    -3.178622   -3.079265
+            _cons |  -2.884713   .0149724  -192.67   0.000    -2.914058   -2.855367
 ------------------+----------------------------------------------------------------
 missed_realdeaths |
          end_week |
-           21953  |     .13494   .0464835     2.90   0.004      .043834    .2260461
-           21960  |   .5175169   .0497258    10.41   0.000     .4200561    .6149778
-           21967  |   .8774456   .0580504    15.12   0.000     .7636689    .9912224
-           21974  |   1.217538   .0678332    17.95   0.000     1.084588    1.350489
-           21981  |   1.584581   .0790961    20.03   0.000     1.429556    1.739607
-           21988  |   1.769486   .0939576    18.83   0.000     1.585333     1.95364
-           21995  |   2.159961   .1051157    20.55   0.000     1.953938    2.365984
-           22002  |   2.611068   .1132921    23.05   0.000     2.389019    2.833116
-           22009  |   3.053028   .1216216    25.10   0.000     2.814654    3.291402
-           22016  |   3.419707   .1344042    25.44   0.000      3.15628    3.683135
-           22023  |   3.609727   .1611733    22.40   0.000     3.293833    3.925621
-           22030  |   3.611147   .2262962    15.96   0.000     3.167614    4.054679
-           22037  |   3.249922   .4830839     6.73   0.000     2.303094    4.196749
-           22044  |   3.245969   .8634325     3.76   0.000     1.553672    4.938266
+           21953  |  -104.9219          .        .       .            .           .
+           21960  |   .8063505   .5616827     1.44   0.151    -.2945273    1.907228
+           21967  |  -189.1723          .        .       .            .           .
+           21974  |   2.259427   .4955493     4.56   0.000     1.288168    3.230686
+           21981  |   2.914458   .4963114     5.87   0.000     1.941705     3.88721
+           21988  |   3.169998   .5031083     6.30   0.000     2.183924    4.156073
+           21995  |   3.762521   .5043756     7.46   0.000     2.773963    4.751079
+           22002  |   4.361142   .5054386     8.63   0.000     3.370501    5.351784
+           22009  |   4.885683   .5063787     9.65   0.000     3.893199    5.878167
+           22016  |   5.333181   .5086641    10.48   0.000     4.336217    6.330144
+           22023  |   5.625307    .514044    10.94   0.000       4.6178    6.632815
+           22030  |   5.767365   .5257164    10.97   0.000     4.736979     6.79775
+           22037  |     5.7799   .5640376    10.25   0.000     4.674407    6.885394
+           22044  |    6.00382   .6249334     9.61   0.000     4.778973    7.228667
                   |
-            _cons |   5.633833   .0921525    61.14   0.000     5.453218    5.814449
+            _cons |   3.694614   .5061779     7.30   0.000     2.702523    4.686704
 ------------------+----------------------------------------------------------------
 lnsigma           |
-            _cons |   9.497541   .0654905   145.02   0.000     9.369182      9.6259
+            _cons |   9.122542   .0652712   139.76   0.000     8.994612    9.250471
 ------------------+----------------------------------------------------------------
 delta             |
-            _cons |   .7305998   .0549997    13.28   0.000     .6228024    .8383972
+            _cons |   1.252401   .0785704    15.94   0.000     1.098405    1.406396
 -----------------------------------------------------------------------------------
 
 . 
 . display "k="exp(_b[#2:_cons])
-k=.04376401
+k=.05587083
 
 . display "beta=limit*"1/exp(_b[#5:_cons])
-beta=limit*.48162003
+beta=limit*.28581781
 
 . display "alpha="(1-1/exp(_b[#5:_cons]))
-alpha=.51837997
+alpha=.71418219
 
 . 
 . gen delay_adj_total_deaths2 = total_deaths / (1-(1-1/exp(_b[#5:_cons]))*exp(-exp(_b[#2:_cons])*days
@@ -586,15 +607,15 @@ Iteration 1:   log likelihood = -1423.1561  (not concave)
 numerical derivatives are approximate
 nearby values are missing
 Iteration 2:   log likelihood = -1371.1928  (not concave)
-Iteration 3:   log likelihood = -1239.0134  (not concave)
-Iteration 4:   log likelihood = -1157.6915  (not concave)
-Iteration 5:   log likelihood =  -1153.937  (not concave)
-Iteration 6:   log likelihood = -1142.0736  (not concave)
-Iteration 7:   log likelihood = -1107.8662  
-Iteration 8:   log likelihood = -1063.9663  
-Iteration 9:   log likelihood = -997.68215  
-Iteration 10:  log likelihood = -967.09237  
-Iteration 11:  log likelihood = -963.18222  
+Iteration 3:   log likelihood = -1239.2757  (not concave)
+Iteration 4:   log likelihood = -1159.3083  (not concave)
+Iteration 5:   log likelihood = -1152.0821  (not concave)
+Iteration 6:   log likelihood = -1108.5092  
+Iteration 7:   log likelihood = -1073.2632  
+Iteration 8:   log likelihood = -1071.4836  (not concave)
+Iteration 9:   log likelihood = -984.09428  
+Iteration 10:  log likelihood = -964.69073  
+Iteration 11:  log likelihood =  -963.1652  
 Iteration 12:  log likelihood = -963.16481  
 Iteration 13:  log likelihood = -963.16481  
 
@@ -613,7 +634,7 @@ detected0         |
 ------------------+----------------------------------------------------------------
 missed_realdeaths |
          end_week |
-           21953  |   .2007813   .1122681     1.79   0.074    -.0192601    .4208228
+           21953  |   .2007814   .1122681     1.79   0.074    -.0192601    .4208229
            21960  |   .6115332   .1107715     5.52   0.000     .3944251    .8286414
            21967  |   1.038998   .1106025     9.39   0.000     .8222207    1.255774
            21974  |   1.440616   .1117236    12.89   0.000     1.221641     1.65959
@@ -694,68 +715,68 @@ days_to_report |  -28.74899   19.70085    -1.46   0.145    -67.49789    9.999903
 
       Source |       SS           df       MS      Number of obs   =       362
 -------------+----------------------------------   F(16, 345)      =     47.04
-       Model |  1.4642e+10        16   915128686   Prob > F        =    0.0000
-    Residual |  6.7111e+09       345    19452565   R-squared       =    0.6857
+       Model |  1.4642e+10        16   915129156   Prob > F        =    0.0000
+    Residual |  6.7111e+09       345  19452567.4   R-squared       =    0.6857
 -------------+----------------------------------   Adj R-squared   =    0.6711
-       Total |  2.1353e+10       361  59150121.6   Root MSE        =    4410.5
+       Total |  2.1353e+10       361  59150144.7   Root MSE        =    4410.5
 
 --------------------------------------------------------------------------------
 delay_adj_to~s |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 ---------------+----------------------------------------------------------------
-days_to_report |   32.39641   17.85646     1.81   0.071    -2.724828    67.51764
+days_to_report |   32.39634   17.85647     1.81   0.071    -2.724897    67.51758
                |
       end_week |
-        21953  |   658.6695   1164.981     0.57   0.572    -1632.689    2950.028
-        21960  |  -4.575823   1184.927    -0.00   0.997    -2335.166    2326.014
-        21967  |    133.049   1217.444     0.11   0.913    -2261.498    2527.596
-        21974  |    471.139   1261.561     0.37   0.709    -2010.181    2952.459
-        21981  |   659.5798   1316.112     0.50   0.617    -1929.034    3248.194
-        21988  |  -214.0745    1379.86    -0.16   0.877    -2928.071    2499.922
-        21995  |   1339.815   1451.593     0.92   0.357    -1515.272    4194.901
-        22002  |   6790.258    1530.19     4.44   0.000     3780.583    9799.933
+        21953  |   658.6689   1164.981     0.57   0.572     -1632.69    2950.028
+        21960  |  -4.576894   1184.927    -0.00   0.997    -2335.167    2326.013
+        21967  |   133.0474   1217.444     0.11   0.913      -2261.5    2527.595
+        21974  |   471.1373   1261.561     0.37   0.709    -2010.182    2952.457
+        21981  |   659.5779   1316.112     0.50   0.617    -1929.036    3248.192
+        21988  |  -214.0762    1379.86    -0.16   0.877    -2928.073    2499.921
+        21995  |   1339.813   1451.593     0.92   0.357    -1515.273      4194.9
+        22002  |   6790.257    1530.19     4.44   0.000     3780.582    9799.932
         22009  |   15351.51   1612.153     9.52   0.000     12180.62    18522.39
         22016  |   20435.12   1695.077    12.06   0.000     17101.14    23769.11
         22023  |    15776.7   1796.113     8.78   0.000     12243.99    19309.41
         22030  |   13467.86    1933.71     6.96   0.000     9664.518    17271.21
-        22037  |   4247.811   2063.643     2.06   0.040     188.9056    8306.717
-        22044  |   3383.757   2423.868     1.40   0.164    -1383.662    8151.176
-        22051  |  -9119.154    3540.95    -2.58   0.010    -16083.72   -2154.588
+        22037  |   4247.813   2063.643     2.06   0.040     188.9072    8306.719
+        22044  |   3383.759   2423.869     1.40   0.164     -1383.66    8151.178
+        22051  |  -9119.154    3540.95    -2.58   0.010    -16083.72   -2154.587
                |
-         _cons |   54241.94   1716.008    31.61   0.000     50866.79     57617.1
+         _cons |   54241.95   1716.008    31.61   0.000     50866.79     57617.1
 --------------------------------------------------------------------------------
 
 . reg delay_adj_total_deaths2 days_to_report i.end_week
 
       Source |       SS           df       MS      Number of obs   =       362
--------------+----------------------------------   F(16, 345)      =     11.46
-       Model |  1.6338e+10        16  1.0211e+09   Prob > F        =    0.0000
-    Residual |  3.0729e+10       345  89070544.3   R-squared       =    0.3471
--------------+----------------------------------   Adj R-squared   =    0.3168
-       Total |  4.7067e+10       361   130380130   Root MSE        =    9437.7
+-------------+----------------------------------   F(16, 345)      =     15.44
+       Model |  1.7276e+10        16  1.0797e+09   Prob > F        =    0.0000
+    Residual |  2.4126e+10       345  69930090.1   R-squared       =    0.4173
+-------------+----------------------------------   Adj R-squared   =    0.3902
+       Total |  4.1402e+10       361   114686188   Root MSE        =    8362.4
 
 --------------------------------------------------------------------------------
 delay_adj_to~2 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 ---------------+----------------------------------------------------------------
-days_to_report |   189.1498   38.20974     4.95   0.000     113.9964    264.3031
+days_to_report |   101.5325   33.85627     3.00   0.003     34.94187    168.1232
                |
       end_week |
-        21953  |   2047.953   2492.857     0.82   0.412    -2855.157    6951.063
-        21960  |   2825.771   2535.538     1.11   0.266    -2161.287     7812.83
-        21967  |   4517.295    2605.12     1.73   0.084    -606.6211    9641.211
-        21974  |   6511.851   2699.523     2.41   0.016     1202.257    11821.44
-        21981  |   8412.488   2816.252     2.99   0.003     2873.303    13951.67
-        21988  |   9089.907   2952.661     3.08   0.002     3282.424    14897.39
-        21995  |   11810.32   3106.158     3.80   0.000     5700.931    17919.71
-        22002  |   16713.29   3274.341     5.10   0.000     10273.11    23153.48
-        22009  |   20991.21   3449.728     6.08   0.000     14206.07    27776.36
-        22016  |   25452.72    3627.17     7.02   0.000     18318.57    32586.87
-        22023  |   21697.82    3843.37     5.65   0.000     14138.43     29257.2
-        22030  |    20572.5   4137.805     4.97   0.000        12434       28711
-        22037  |   3861.038   4415.839     0.87   0.383    -4824.317    12546.39
-        22044  |  -3948.867   5186.658    -0.76   0.447    -14150.32    6252.585
-        22051  |  -24917.71   7577.019    -3.29   0.001    -39820.68   -10014.75
+        21953  |   1339.896    2208.83     0.61   0.545    -3004.572    5684.365
+        21960  |   1416.314   2246.648     0.63   0.529    -3002.538    5835.165
+        21967  |   2404.188   2308.302     1.04   0.298    -2135.928    6944.305
+        21974  |   3722.783    2391.95     1.56   0.121     -981.856    8427.422
+        21981  |   5030.532   2495.379     2.02   0.045     122.4611    9938.604
+        21988  |    5314.25   2616.246     2.03   0.043       168.45    10460.05
+        21995  |   8026.024   2752.254     2.92   0.004     2612.714    13439.33
+        22002  |   13780.43   2901.275     4.75   0.000     8074.013    19486.84
+        22009  |    19438.4   3056.679     6.36   0.000     13426.33    25450.47
+        22016  |   24383.58   3213.904     7.59   0.000     18062.27    30704.89
+        22023  |   20341.76   3405.471     5.97   0.000     13643.67    27039.86
+        22030  |   19959.74   3666.359     5.44   0.000     12748.51    27170.97
+        22037  |   4384.825   3912.715     1.12   0.263    -3310.954     12080.6
+        22044  |  -1837.637    4595.71    -0.40   0.690    -10876.77      7201.5
+        22051  |  -24597.23   6713.723    -3.66   0.000    -37802.21   -11392.25
                |
-         _cons |   41844.68    3671.96    11.40   0.000     34622.43    49066.92
+         _cons |   48839.88   3253.591    15.01   0.000     42440.51    55239.25
 --------------------------------------------------------------------------------
 
 . reg delay_adj_total_deaths3 days_to_report i.end_week
@@ -763,20 +784,20 @@ days_to_report |   189.1498   38.20974     4.95   0.000     113.9964    264.3031
       Source |       SS           df       MS      Number of obs   =       362
 -------------+----------------------------------   F(16, 345)      =     12.67
        Model |  1.6785e+10        16  1.0490e+09   Prob > F        =    0.0000
-    Residual |  2.8558e+10       345  82777409.9   R-squared       =    0.3702
+    Residual |  2.8558e+10       345  82777409.6   R-squared       =    0.3702
 -------------+----------------------------------   Adj R-squared   =    0.3410
        Total |  4.5343e+10       361   125603733   Root MSE        =    9098.2
 
 --------------------------------------------------------------------------------
 delay_adj_to~3 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 ---------------+----------------------------------------------------------------
-days_to_report |   143.6513   36.83519     3.90   0.000     71.20152    216.1012
+days_to_report |   143.6513   36.83519     3.90   0.000     71.20153    216.1012
                |
       end_week |
         21953  |   1702.752   2403.179     0.71   0.479    -3023.975    6429.479
         21960  |    2144.64   2444.325     0.88   0.381    -2663.015    6952.295
         21967  |     3510.2   2511.404     1.40   0.163    -1429.389     8449.79
-        21974  |   5206.024   2602.411     2.00   0.046     87.43551    10324.61
+        21974  |   5206.024   2602.411     2.00   0.046     87.43555    10324.61
         21981  |   6864.997   2714.941     2.53   0.012     1525.077    12204.92
         21988  |    7409.13   2846.443     2.60   0.010     1810.564     13007.7
         21995  |    10203.7   2994.418     3.41   0.001      4314.09    16093.32
@@ -800,15 +821,15 @@ days_to_report |   143.6513   36.83519     3.90   0.000     71.20152    216.1012
 -------------+------------------------------------
 est_real_t~s |   1.0000
 delay_adj_~s |   0.9183   1.0000
-delay_adj_~2 |   0.4107   0.6474   1.0000
-delay_adj_~3 |   0.5164   0.7385   0.9887   1.0000
+delay_adj_~2 |   0.6242   0.8249   1.0000
+delay_adj_~3 |   0.5164   0.7385   0.9872   1.0000
 
 
 . 
 . log close
       name:  <unnamed>
-       log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\estimating_reporting_
+       log:  C:\Users\favero\Documents\GitHub\covid-underreporting\data\..\logs\estimating_reporting_
 > delays.txt
   log type:  text
- closed on:  22 May 2020, 09:09:09
+ closed on:  24 May 2020, 22:20:32
 -----------------------------------------------------------------------------------------------------

@@ -3,7 +3,7 @@
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\data\..\logs\simple_indicator_of_c
 > ovid_severity.txt
   log type:  text
- opened on:  25 May 2020, 17:28:57
+ opened on:  26 May 2020, 14:34:27
 
 . 
 . use "..\data\weeklydata.dta"
@@ -18,11 +18,11 @@
 > nflu_or_covid expected_influ_pneu_deaths new_pos new_neg deathincrease {
   2.         egen us_`var' = total(`var'), by(end_week) missing
   3. }
-(18,179 missing values generated)
-(18,179 missing values generated)
-(18,179 missing values generated)
-(18,179 missing values generated)
-(18,179 missing values generated)
+(18,130 missing values generated)
+(18,130 missing values generated)
+(18,130 missing values generated)
+(18,130 missing values generated)
+(18,130 missing values generated)
 (147 missing values generated)
 (18,081 missing values generated)
 (18,375 missing values generated)
@@ -36,7 +36,7 @@
 (18,375 missing values generated)
 
 . gen us_adj_excess_deaths = (us_adj_total_deaths-us_expected_deaths)
-(18,179 missing values generated)
+(18,130 missing values generated)
 
 . gen us_adj_excess_respir_deaths = (us_adj_pneumon_influ_or_covid-us_expected_influ_pneu_deaths)
 (18,228 missing values generated)
@@ -59,11 +59,11 @@
 . reg us_adj_covid_deaths us_new_pos l.us_new_pos if days_to_report > 14 & us_tag==1, cluster(fips) n
 > ocons
 
-Linear regression                               Number of obs     =         13
+Linear regression                               Number of obs     =         14
                                                 F(0, 0)           =          .
                                                 Prob > F          =          .
-                                                R-squared         =     0.9860
-                                                Root MSE          =     1047.4
+                                                R-squared         =     0.9755
+                                                Root MSE          =     1376.3
 
                                    (Std. Err. adjusted for 1 clusters in fips)
 ------------------------------------------------------------------------------
@@ -71,8 +71,8 @@ Linear regression                               Number of obs     =         13
 us_adj_cov~s |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
   us_new_pos |
-         --. |   .0288997          .        .       .            .           .
-         L1. |   .0416324          .        .       .            .           .
+         --. |   .0364415          .        .       .            .           .
+         L1. |   .0296624          .        .       .            .           .
 ------------------------------------------------------------------------------
 
 . predict us_naive_case_count
@@ -85,20 +85,20 @@ us_adj_cov~s |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 . reg us_adj_covid_deaths c.us_new_pos#c.us_p_pos c.l.us_new_pos#c.l.us_p_pos if days_to_report > 14 
 > & us_tag==1, cluster(fips) nocons
 
-Linear regression                               Number of obs     =          7
+Linear regression                               Number of obs     =          8
                                                 F(0, 0)           =          .
                                                 Prob > F          =          .
-                                                R-squared         =     0.9985
-                                                Root MSE          =     516.66
+                                                R-squared         =     0.9975
+                                                Root MSE          =      623.2
 
                                                 (Std. Err. adjusted for 1 clusters in fips)
 -------------------------------------------------------------------------------------------
                           |               Robust
       us_adj_covid_deaths |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 --------------------------+----------------------------------------------------------------
-  c.us_new_pos#c.us_p_pos |   .0011201          .        .       .            .           .
+  c.us_new_pos#c.us_p_pos |   .0011049          .        .       .            .           .
                           |
-cL.us_new_pos#cL.us_p_pos |   .0027782          .        .       .            .           .
+cL.us_new_pos#cL.us_p_pos |   .0027933          .        .       .            .           .
 -------------------------------------------------------------------------------------------
 
 . predict us_estimated_death_count
@@ -122,11 +122,11 @@ cL.us_new_pos#cL.us_p_pos |   .0027782          .        .       .            . 
 . reg us_adj_excess_respir_deaths us_new_pos l.us_new_pos if days_to_report > 14 & us_tag==1, cluster
 > (fips) nocons
 
-Linear regression                               Number of obs     =         13
+Linear regression                               Number of obs     =         14
                                                 F(0, 0)           =          .
                                                 Prob > F          =          .
-                                                R-squared         =     0.9859
-                                                Root MSE          =     1121.9
+                                                R-squared         =     0.9733
+                                                Root MSE          =     1514.5
 
                                    (Std. Err. adjusted for 1 clusters in fips)
 ------------------------------------------------------------------------------
@@ -134,8 +134,8 @@ Linear regression                               Number of obs     =         13
 us_~r_deaths |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
   us_new_pos |
-         --. |   .0445317          .        .       .            .           .
-         L1. |   .0292634          .        .       .            .           .
+         --. |   .0529445          .        .       .            .           .
+         L1. |   .0154915          .        .       .            .           .
 ------------------------------------------------------------------------------
 
 . predict us_naive_case_count2
@@ -148,20 +148,20 @@ us_~r_deaths |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 . reg us_adj_excess_respir_deaths c.us_new_pos#c.us_p_pos c.l.us_new_pos#c.l.us_p_pos if days_to_repo
 > rt > 14 & us_tag==1, cluster(fips) nocons
 
-Linear regression                               Number of obs     =          7
+Linear regression                               Number of obs     =          8
                                                 F(0, 0)           =          .
                                                 Prob > F          =          .
-                                                R-squared         =     0.9983
-                                                Root MSE          =     572.41
+                                                R-squared         =     0.9982
+                                                Root MSE          =      550.7
 
                                                 (Std. Err. adjusted for 1 clusters in fips)
 -------------------------------------------------------------------------------------------
                           |               Robust
 us_adj_excess_respir_de~s |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 --------------------------+----------------------------------------------------------------
-  c.us_new_pos#c.us_p_pos |   .0017402          .        .       .            .           .
+  c.us_new_pos#c.us_p_pos |   .0017516          .        .       .            .           .
                           |
-cL.us_new_pos#cL.us_p_pos |   .0024041          .        .       .            .           .
+cL.us_new_pos#cL.us_p_pos |   .0023596          .        .       .            .           .
 -------------------------------------------------------------------------------------------
 
 . predict us_estimated_death_count2
@@ -180,11 +180,11 @@ cL.us_new_pos#cL.us_p_pos |   .0024041          .        .       .            . 
 . reg us_adj_excess_deaths us_new_pos l.us_new_pos if days_to_report > 14 & us_tag==1, cluster(fips) 
 > nocons
 
-Linear regression                               Number of obs     =         13
+Linear regression                               Number of obs     =         14
                                                 F(0, 0)           =          .
                                                 Prob > F          =          .
-                                                R-squared         =     0.9892
-                                                Root MSE          =     1336.6
+                                                R-squared         =     0.9590
+                                                Root MSE          =     2401.7
 
                                    (Std. Err. adjusted for 1 clusters in fips)
 ------------------------------------------------------------------------------
@@ -192,8 +192,8 @@ Linear regression                               Number of obs     =         13
 us_~s_deaths |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
   us_new_pos |
-         --. |   .0472267          .        .       .            .           .
-         L1. |   .0548097          .        .       .            .           .
+         --. |     .07938          .        .       .            .           .
+         L1. |    .006425          .        .       .            .           .
 ------------------------------------------------------------------------------
 
 . predict us_naive_case_count3
@@ -206,20 +206,20 @@ us_~s_deaths |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 . reg us_adj_excess_deaths c.us_new_pos#c.us_p_pos c.l.us_new_pos#c.l.us_p_pos if days_to_report > 14
 >  & us_tag==1, cluster(fips) nocons
 
-Linear regression                               Number of obs     =          7
+Linear regression                               Number of obs     =          8
                                                 F(0, 0)           =          .
                                                 Prob > F          =          .
-                                                R-squared         =     0.9928
-                                                Root MSE          =     1622.5
+                                                R-squared         =     0.9993
+                                                Root MSE          =     430.79
 
                                                 (Std. Err. adjusted for 1 clusters in fips)
 -------------------------------------------------------------------------------------------
                           |               Robust
      us_adj_excess_deaths |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 --------------------------+----------------------------------------------------------------
-  c.us_new_pos#c.us_p_pos |   .0018406          .        .       .            .           .
+  c.us_new_pos#c.us_p_pos |   .0027724          .        .       .            .           .
                           |
-cL.us_new_pos#cL.us_p_pos |   .0037902          .        .       .            .           .
+cL.us_new_pos#cL.us_p_pos |   .0024773          .        .       .            .           .
 -------------------------------------------------------------------------------------------
 
 . predict us_estimated_death_count3
@@ -239,19 +239,19 @@ cL.us_new_pos#cL.us_p_pos |   .0037902          .        .       .            . 
 . 
 . reg adj_excess_respir_deaths_pc c.new_pos_pc c.l.new_pos_pc  if days_to_report > 14, nocons
 
-      Source |       SS           df       MS      Number of obs   =       348
--------------+----------------------------------   F(2, 346)       =   1250.55
-       Model |  786039.128         2  393019.564   Prob > F        =    0.0000
-    Residual |  108739.808       346  314.276903   R-squared       =    0.8785
--------------+----------------------------------   Adj R-squared   =    0.8778
-       Total |  894778.936       348  2571.20384   Root MSE        =    17.728
+      Source |       SS           df       MS      Number of obs   =       397
+-------------+----------------------------------   F(2, 395)       =   1015.17
+       Model |  787888.371         2  393944.185   Prob > F        =    0.0000
+    Residual |  153282.785       395  388.057685   R-squared       =    0.8371
+-------------+----------------------------------   Adj R-squared   =    0.8363
+       Total |  941171.156       397   2370.7082   Root MSE        =    19.699
 
 ------------------------------------------------------------------------------
 a~respir_d~c |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
   new_pos_pc |
-         --. |   .0271307   .0039327     6.90   0.000     .0193957    .0348656
-         L1. |   .0467727   .0043502    10.75   0.000     .0382165     .055329
+         --. |   .0290218   .0041795     6.94   0.000      .020805    .0372386
+         L1. |   .0382591   .0044949     8.51   0.000     .0294222     .047096
 ------------------------------------------------------------------------------
 
 . capture drop naive_case_count_pc
@@ -266,26 +266,26 @@ a~respir_d~c |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 . reg adj_excess_respir_deaths_pc c.new_pos_pc#c.p_pos c.l.new_pos_pc#c.l.p_pos  if days_to_report > 
 > 14, nocons
 
-      Source |       SS           df       MS      Number of obs   =       308
--------------+----------------------------------   F(2, 306)       =   1622.72
-       Model |  812256.544         2  406128.272   Prob > F        =    0.0000
-    Residual |   76584.542       306  250.276281   R-squared       =    0.9138
--------------+----------------------------------   Adj R-squared   =    0.9133
-       Total |  888841.086       308  2885.84768   Root MSE        =     15.82
+      Source |       SS           df       MS      Number of obs   =       357
+-------------+----------------------------------   F(2, 355)       =   1346.45
+       Model |   826100.03         2  413050.015   Prob > F        =    0.0000
+    Residual |  108903.356       355  306.770018   R-squared       =    0.8835
+-------------+----------------------------------   Adj R-squared   =    0.8829
+       Total |  935003.386       357   2619.0571   Root MSE        =    17.515
 
 ----------------------------------------------------------------------------------------
 adj_excess_respir_de~c |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 -----------------------+----------------------------------------------------------------
-  c.new_pos_pc#c.p_pos |   .0009111   .0000821    11.09   0.000     .0007495    .0010727
+  c.new_pos_pc#c.p_pos |   .0009347   .0000887    10.54   0.000     .0007602    .0011092
                        |
-cL.new_pos_pc#cL.p_pos |   .0012617   .0000855    14.75   0.000     .0010934      .00143
+cL.new_pos_pc#cL.p_pos |   .0011834   .0000906    13.06   0.000     .0010052    .0013616
 ----------------------------------------------------------------------------------------
 
 . capture drop estimated_death_count_pc
 
 . predict estimated_death_count_pc
 (option xb assumed; fitted values)
-(18,464 missing values generated)
+(18,461 missing values generated)
 
 . la var estimated_death_count_pc "estimated_death_count_pc"
 
@@ -312,5 +312,5 @@ cL.new_pos_pc#cL.p_pos |   .0012617   .0000855    14.75   0.000     .0010934    
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\data\..\logs\simple_indicator_of_c
 > ovid_severity.txt
   log type:  text
- closed on:  25 May 2020, 17:29:12
+ closed on:  26 May 2020, 14:34:46
 -----------------------------------------------------------------------------------------------------

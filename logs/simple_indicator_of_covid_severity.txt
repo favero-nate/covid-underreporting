@@ -3,7 +3,7 @@
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\data\..\logs\simple_indicator_of_c
 > ovid_severity.txt
   log type:  text
- opened on:  26 May 2020, 14:34:27
+ opened on:  27 May 2020, 15:54:32
 
 . 
 . use "..\data\weeklydata.dta"
@@ -50,10 +50,55 @@
 . format end_week %tdnn/dd
 
 . 
+. la var adj_excess_respir_deaths_pc "No. of estimated excess respiratory deaths"
+
+. la var us_adj_excess_respir_deaths "No. of estimated excess respiratory deaths"
+
+. la var us_covid_deaths "COVID-19 deaths - unadjusted for reporting delay"
+
+. la var us_adj_covid_deaths "COVID-19 deaths - adjusted for reporting delay"
+
+. //la var us_adj_excess_respir_deaths "Excess respiratory deaths"
+. la var us_new_pos "No. of new cases"
+
+. la var us_p_posXnew_pos "No. of new cases X percent positive"
+
+. 
 . twoway (line us_adj_excess_respir_deaths end_week, yaxis(1)) (line us_p_posXnew_pos end_week, yaxis
 > (2)) (line us_new_pos end_week, yaxis(3)) if us_p_posXnew_pos != . & us_tag==1 & days_to_report > 1
 > 4 & days_to_report!=.
 
+. 
+. ** figure 1 **
+. twoway (line us_adj_excess_respir_deaths end_week, yaxis(1)) (line us_new_pos end_week, yaxis(3)) i
+> f us_p_posXnew_pos != . & us_tag==1 & days_to_report > 14 & days_to_report!=., tlabel(14mar2020(7)9
+> may2020) xtitle("") title("Deaths & cases") legend(order(1 "Deaths{sup:b}" 2 "New cases or detectio
+> n-adjusted cases{sup:c}")) name(figure1a, replace)
+
+. twoway (line us_adj_excess_respir_deaths end_week, yaxis(1)) (line us_p_posXnew_pos end_week, yaxis
+> (2)) if us_p_posXnew_pos != . & us_tag==1 & days_to_report > 14 & days_to_report!=., tlabel(14mar20
+> 20(7)9may2020) xtitle("") title("Deaths & detection-adjusted cases") legend(off) name(figure1b, rep
+> lace)
+
+. grc1leg figure1a figure1b, legendfrom(figure1a) xsize(7) // xsize doesn't work with this command, s
+> o have to do it manually
+
+. 
+. // (potential replacement for figure 2)
+. twoway (line us_covid_deaths end_week, yaxis(1)) (line us_p_posXnew_pos end_week, yaxis(2)) (line u
+> s_adj_covid_deaths end_week, yaxis(1)) if us_p_posXnew_pos != . & us_tag==1 & days_to_report > 14 &
+>  days_to_report!=., tlabel(14mar2020(14)9may2020) xtitle("") ytitle("COVID-19 deaths") legend(order
+> (1 "Deaths - unadjusted for reporting delays" 2 "Deaths - adjusted for reporting delays" 3 "Detecti
+> on-adjusted cases") col(1)) name(figure2a, replace)
+
+. //twoway (line us_adj_covid_deaths end_week, yaxis(1)) (line us_p_posXnew_pos end_week, yaxis(2)) i
+> f us_p_posXnew_pos != . & us_tag==1 & days_to_report > 14 & days_to_report!=., tlabel(14mar2020(14)
+> 9may2020) xtitle("") legend(off) name(figure2b, replace)
+. //twoway (line us_adj_excess_deaths end_week, yaxis(1)) (line us_p_posXnew_pos end_week, yaxis(2)) 
+> if us_p_posXnew_pos != . & us_tag==1 & days_to_report > 14 & days_to_report!=., tlabel(14mar2020(14
+> )9may2020) tmtick(##2) name(figure2c, replace)
+. //grc1leg figure2a figure2b, legendfrom(figure2a) xsize(7.5) // xsize doesn't work with this comman
+> d, so have to do it manually
 . 
 . 
 . reg us_adj_covid_deaths us_new_pos l.us_new_pos if days_to_report > 14 & us_tag==1, cluster(fips) n
@@ -237,21 +282,24 @@ cL.us_new_pos#cL.us_p_pos |   .0024773          .        .       .            . 
 . 
 . *** State Analyses ***
 . 
-. reg adj_excess_respir_deaths_pc c.new_pos_pc c.l.new_pos_pc  if days_to_report > 14, nocons
+. reg adj_excess_respir_deaths_pc c.new_pos_pc c.l.new_pos_pc  if days_to_report > 14 & days_to_repor
+> t <= 66
 
-      Source |       SS           df       MS      Number of obs   =       397
--------------+----------------------------------   F(2, 395)       =   1015.17
-       Model |  787888.371         2  393944.185   Prob > F        =    0.0000
-    Residual |  153282.785       395  388.057685   R-squared       =    0.8371
--------------+----------------------------------   Adj R-squared   =    0.8363
-       Total |  941171.156       397   2370.7082   Root MSE        =    19.699
+      Source |       SS           df       MS      Number of obs   =       391
+-------------+----------------------------------   F(2, 388)       =    765.27
+       Model |  5814.81145         2  2907.40572   Prob > F        =    0.0000
+    Residual |  1474.07704       388  3.79916763   R-squared       =    0.7978
+-------------+----------------------------------   Adj R-squared   =    0.7967
+       Total |  7288.88849       390  18.6894577   Root MSE        =    1.9491
 
 ------------------------------------------------------------------------------
 a~respir_d~c |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
   new_pos_pc |
-         --. |   .0290218   .0041795     6.94   0.000      .020805    .0372386
-         L1. |   .0382591   .0044949     8.51   0.000     .0294222     .047096
+         --. |   .0345254   .0043672     7.91   0.000      .025939    .0431117
+         L1. |    .036817   .0044633     8.25   0.000     .0280418    .0455923
+             |
+       _cons |  -.4900342   .1248606    -3.92   0.000    -.7355223   -.2445462
 ------------------------------------------------------------------------------
 
 . capture drop naive_case_count_pc
@@ -260,25 +308,27 @@ a~respir_d~c |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 (option xb assumed; fitted values)
 (18,419 missing values generated)
 
-. la var naive_case_count_pc "naive_case_count_pc"
+. la var naive_case_count_pc "Prediction from naïve case count (new cases)"
 
 . 
 . reg adj_excess_respir_deaths_pc c.new_pos_pc#c.p_pos c.l.new_pos_pc#c.l.p_pos  if days_to_report > 
-> 14, nocons
+> 14 & days_to_report <= 66
 
       Source |       SS           df       MS      Number of obs   =       357
--------------+----------------------------------   F(2, 355)       =   1346.45
-       Model |   826100.03         2  413050.015   Prob > F        =    0.0000
-    Residual |  108903.356       355  306.770018   R-squared       =    0.8835
--------------+----------------------------------   Adj R-squared   =    0.8829
-       Total |  935003.386       357   2619.0571   Root MSE        =    17.515
+-------------+----------------------------------   F(2, 354)       =   1141.98
+       Model |  6189.01582         2  3094.50791   Prob > F        =    0.0000
+    Residual |   959.26312       354  2.70978282   R-squared       =    0.8658
+-------------+----------------------------------   Adj R-squared   =    0.8650
+       Total |  7148.27894       356  20.0794352   Root MSE        =    1.6461
 
 ----------------------------------------------------------------------------------------
 adj_excess_respir_de~c |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 -----------------------+----------------------------------------------------------------
-  c.new_pos_pc#c.p_pos |   .0009347   .0000887    10.54   0.000     .0007602    .0011092
+  c.new_pos_pc#c.p_pos |    .000835   .0000846     9.87   0.000     .0006686    .0010014
                        |
-cL.new_pos_pc#cL.p_pos |   .0011834   .0000906    13.06   0.000     .0010052    .0013616
+cL.new_pos_pc#cL.p_pos |   .0011666   .0000852    13.69   0.000      .000999    .0013342
+                       |
+                 _cons |   .6608104   .0954896     6.92   0.000     .4730121    .8486087
 ----------------------------------------------------------------------------------------
 
 . capture drop estimated_death_count_pc
@@ -287,20 +337,46 @@ cL.new_pos_pc#cL.p_pos |   .0011834   .0000906    13.06   0.000     .0010052    
 (option xb assumed; fitted values)
 (18,461 missing values generated)
 
-. la var estimated_death_count_pc "estimated_death_count_pc"
+. la var estimated_death_count_pc "Prediction from detection-adjusted cases (new cases X percent posi
+> tive)"
 
 . 
 . // ten states w most covid cases_pc
-. twoway (line adj_excess_respir_deaths_pc end_week) (line estimated_death_count_pc end_week) (line n
-> aive_case_count_pc end_week) if estimated_death_count_pc != . & (fips==10 | fips==11 | fips==22 | f
-> ips==24 | fips==25 | fips==26 | fips==34 | fips==36 | fips==42 | fips==44) & days_to_report > 14 & 
-> days_to_report!=., by(state)
+. tab state if covdeath_pc > 5 & covdeath_pc!=.
 
-. //drop Louisiana b/c reported number of negative cases drops half way through series
-. twoway (line adj_excess_respir_deaths_pc end_week) (line estimated_death_count_pc end_week) (line n
-> aive_case_count_pc end_week) if estimated_death_count_pc != . & (fips==10 | fips==11 | fips==24 | f
+     (firstnm) state |      Freq.     Percent        Cum.
+---------------------+-----------------------------------
+            Delaware |          2        4.76        4.76
+District of Columbia |          3        7.14       11.90
+           Louisiana |          4        9.52       21.43
+            Maryland |          3        7.14       28.57
+       Massachusetts |          6       14.29       42.86
+            Michigan |          4        9.52       52.38
+          New Jersey |          6       14.29       66.67
+            New York |          7       16.67       83.33
+        Pennsylvania |          4        9.52       92.86
+        Rhode Island |          3        7.14      100.00
+---------------------+-----------------------------------
+               Total |         42      100.00
+
+. 
+. ** Figure 2 **
+. twoway (line adj_excess_respir_deaths_pc end_week) (line naive_case_count_pc end_week) (line estima
+> ted_death_count_pc end_week) if estimated_death_count_pc != . & (fips==10 | fips==11 | fips==22 | f
+> ips==24 | fips==25 | fips==26 | fips==34 | fips==36 | fips==42 | fips==44) & days_to_report > 14 & 
+> days_to_report!=., by(state, note("") row(2)) ytitle("Deaths per 100,000 population") xtitle("") tl
+> abel(21mar2020(14)9may2020) tmtick(##2) legend(col(1) order(1 "Deaths{sup:a}" 2 "Prediction from na
+> ïve case count (new cases){sup:b}" 3 "Prediction from detection-adjusted cases (new cases X percent
+>  positive){sup:c}")) xsize(7)
+
+. 
+. //not used: drop Louisiana b/c reported number of negative cases is missing for part of series (not
+>  obvious on graphs)
+. twoway (line adj_excess_respir_deaths_pc end_week) (line naive_case_count_pc end_week) (line estima
+> ted_death_count_pc end_week) if estimated_death_count_pc != . & (fips==10 | fips==22 | fips==24 | f
 > ips==25 | fips==26 | fips==34 | fips==36 | fips==42 | fips==44) & days_to_report > 14 & days_to_rep
-> ort!=., by(state)
+> ort!=., by(state, note("")) ytitle("Deaths per 100,000 population") xtitle("") ylabel(0(20)40) ymti
+> ck(##2) tlabel(21mar2020(14)9may2020) tmtick(##2) legend(col(1))
 
 . 
 . 
@@ -312,5 +388,5 @@ cL.new_pos_pc#cL.p_pos |   .0011834   .0000906    13.06   0.000     .0010052    
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\data\..\logs\simple_indicator_of_c
 > ovid_severity.txt
   log type:  text
- closed on:  26 May 2020, 14:34:46
+ closed on:  27 May 2020, 15:54:48
 -----------------------------------------------------------------------------------------------------

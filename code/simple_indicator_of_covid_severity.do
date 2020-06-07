@@ -92,7 +92,7 @@ predict estimated_death_count_pc
 la var estimated_death_count_pc "Prediction from detection-adjusted cases (new cases X percent positive)"
 
 // ten states w most covid cases_pc
-tab state if covdeath_pc > 5 & covdeath_pc!=.
+tab state if covid_deaths_pc > 5 & covid_deaths_pc!=.
 
 ** Figure 2 **
 twoway (line adj_excess_respir_deaths_pc end_week) (line naive_case_count_pc end_week) (line estimated_death_count_pc end_week) if estimated_death_count_pc != . & (fips==10 | fips==11 | fips==22 | fips==24 | fips==25 | fips==26 | fips==34 | fips==36 | fips==42 | fips==44) & days_to_report > 14 & days_to_report!=., by(state, note("") row(2)) ytitle("Deaths per 100,000 population") xtitle("") tlabel(21mar2020(14)9may2020) tmtick(##2) legend(col(1) order(1 "Deaths{sup:a}" 2 "Prediction from naïve case count (new cases){sup:b}" 3 "Prediction from detection-adjusted cases (new cases X percent positive){sup:c}")) xsize(7)

@@ -10,6 +10,10 @@ rename pneumon_influ_and_covid pneumon_influ_or_covid
 append using "..\data\past_reports\16 May 2020 cdc_deaths.dta"
 append using "..\data\past_reports\21 May 2020 cdc_deaths.dta"
 append using "..\data\past_reports\22 May 2020 cdc_deaths.dta"
+append using "..\data\past_reports\26 May 2020 cdc_deaths.dta"
+append using "..\data\past_reports\27 May 2020 cdc_deaths.dta"
+append using "..\data\past_reports\28 May 2020 cdc_deaths.dta"
+append using "..\data\past_reports\29 May 2020 cdc_deaths.dta"
 
 merge m:1 state using "..\data\population.dta"
 drop _merge

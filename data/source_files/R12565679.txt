@@ -1,0 +1,103 @@
+--------------------------------------------------------------------------------
+Codebook for Social Explorer report ID: R12565679
+--------------------------------------------------------------------------------
+
+Contents
+    - Table Summary
+    - Data Dictionary
+    - Citation and Use
+
+
+--------------------------------------------------------------------------------
+Table Summary
+--------------------------------------------------------------------------------
+ 
+Survey:           Population Estimates 2018
+Dataset:          Social Explorer Tables
+Tables:
+
+      1. Age (Detailed Version)
+         Universe:  
+         Name:      T5
+         Variables:
+            T005_001:   Total Population:
+            T005_002:      Under 5 Years
+            T005_003:      5 to 9 Years
+            T005_004:      10 to 14 Years
+            T005_005:      15 to 19 Years
+            T005_006:      20 to 24 Years
+            T005_007:      25 to 29 Years
+            T005_008:      30 to 34 Years
+            T005_009:      35 to 39 Years
+            T005_010:      40 to 44 Years
+            T005_011:      45 to 49 Years
+            T005_012:      50 to 54 Years
+            T005_013:      55 to 59 Years
+            T005_014:      60 to 64 Years
+            T005_015:      65 to 69 Years
+            T005_016:      70 to 74 Years
+            T005_017:      75 to 79 Years
+            T005_018:      80 to 84 Years
+            T005_019:      85 Years and Older
+
+
+
+
+
+ 
+ 
+ 
+--------------------------------------------------------------------------------
+Data Dictionary
+--------------------------------------------------------------------------------
+ 
+Variables 
+      FIPS:           FIPS
+      NAME:           Name of Area
+      QNAME:          Qualifying Name
+      NATION:         Nation
+      STATE:          State
+      COUNTY:         County
+      T005_001:       Total Population 
+
+      T005_002:       Total Population: Under 5 Years
+      T005_003:       Total Population: 5 to 9 Years
+      T005_004:       Total Population: 10 to 14 Years
+      T005_005:       Total Population: 15 to 19 Years
+      T005_006:       Total Population: 20 to 24 Years
+      T005_007:       Total Population: 25 to 29 Years
+      T005_008:       Total Population: 30 to 34 Years
+      T005_009:       Total Population: 35 to 39 Years
+      T005_010:       Total Population: 40 to 44 Years
+      T005_011:       Total Population: 45 to 49 Years
+      T005_012:       Total Population: 50 to 54 Years
+      T005_013:       Total Population: 55 to 59 Years
+      T005_014:       Total Population: 60 to 64 Years
+      T005_015:       Total Population: 65 to 69 Years
+      T005_016:       Total Population: 70 to 74 Years
+      T005_017:       Total Population: 75 to 79 Years
+      T005_018:       Total Population: 80 to 84 Years
+      T005_019:       Total Population: 85 Years and Older
+
+
+
+
+--------------------------------------------------------------------------------
+Citation and Use of Data
+--------------------------------------------------------------------------------
+ 
+All persons are granted a limited license to use this documentation and the
+accompanying data, subject to the following conditions:
+
+* Publications and research reports employing the data
+  must cite it appropriately. The citation should include the following:
+
+	  www.socialexplorer.com
+	  New York City, NY: Social Explorer 2020
+
+
+* Citations should also include the URL for this report:
+
+    http://www.socialexplorer.com/pub/reportdata/HtmlResults.aspx?reportid=R12565679
+
+If you have any questions contact info@socialexplorer.com

@@ -2,11 +2,11 @@
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\pulldata.txt
   log type:  text
- opened on:  29 May 2020, 18:43:13
+ opened on:   5 Jun 2020, 15:31:19
 
 . 
 . import delimited "https://covidtracking.com/api/v1/states/daily.csv", stringcols(1)
-(27 vars, 4,777 obs)
+(35 vars, 5,113 obs)
 
 . rename date olddate
 
@@ -64,11 +64,11 @@ file ..\data\cdc_historical_deaths.dta saved
 
 . 
 . insheet using "https://data.cdc.gov/resource/r8kw-7aab.csv", clear
-(14 vars, 918 obs)
+(14 vars, 972 obs)
 
 . export delimited using "..\data\past_reports\unprocessed_files/$S_DATE cdc_deaths_raw", replace
-(note: file ..\data\past_reports\unprocessed_files/29 May 2020 cdc_deaths_raw.csv not found)
-file ..\data\past_reports\unprocessed_files/29 May 2020 cdc_deaths_raw.csv saved
+(note: file ..\data\past_reports\unprocessed_files/ 5 Jun 2020 cdc_deaths_raw.csv not found)
+file ..\data\past_reports\unprocessed_files/ 5 Jun 2020 cdc_deaths_raw.csv saved
 
 . gen date = date(substr(end_week,1,10), "YMD")
 
@@ -81,14 +81,14 @@ file ..\data\past_reports\unprocessed_files/29 May 2020 cdc_deaths_raw.csv saved
 . order date report_date
 
 . gen expected_deaths = total_deaths / percent_of_expected_deaths
-(10 missing values generated)
+(7 missing values generated)
 
 . order expected_deaths, after(total_deaths)
 
 . drop start_week group indicator percent_of_expected_deaths footnote
 
 . replace state = "New York" if state == "New York City"
-(17 real changes made)
+(18 real changes made)
 
 . rename pneumonia_influenza_or_covid pneumon_influ_or_covid
 
@@ -96,13 +96,13 @@ file ..\data\past_reports\unprocessed_files/29 May 2020 cdc_deaths_raw.csv saved
 . foreach var of varlist covid_deaths-pneumon_influ_or_covid {
   2.         replace `var' = 5 if `var' == .
   3. }
-(151 real changes made)
-(6 real changes made)
-(10 real changes made)
-(89 real changes made)
-(183 real changes made)
-(458 real changes made)
-(67 real changes made)
+(164 real changes made)
+(5 real changes made)
+(7 real changes made)
+(93 real changes made)
+(202 real changes made)
+(468 real changes made)
+(71 real changes made)
 
 . collapse (sum) covid_deaths-pneumon_influ_or_covid (first) report_date, by(state date)
 
@@ -111,8 +111,8 @@ file ..\data\past_reports\unprocessed_files/29 May 2020 cdc_deaths_raw.csv saved
 file ..\data\cdc_deaths.dta saved
 
 . save "..\data\past_reports/$S_DATE cdc_deaths.dta", replace
-(note: file ..\data\past_reports/29 May 2020 cdc_deaths.dta not found)
-file ..\data\past_reports/29 May 2020 cdc_deaths.dta saved
+(note: file ..\data\past_reports/ 5 Jun 2020 cdc_deaths.dta not found)
+file ..\data\past_reports/ 5 Jun 2020 cdc_deaths.dta saved
 
 . 
 . insheet using "https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/national/totals/n
@@ -138,5 +138,5 @@ file ..\data\population.dta saved
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\pulldata.txt
   log type:  text
- closed on:  29 May 2020, 18:43:27
+ closed on:   5 Jun 2020, 15:31:31
 -----------------------------------------------------------------------------------------------------

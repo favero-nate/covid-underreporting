@@ -1,9 +1,9 @@
 -----------------------------------------------------------------------------------------------------
       name:  <unnamed>
-       log:  C:\Users\favero\Documents\GitHub\covid-underreporting\data\..\logs\simple_indicator_of_c
+       log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\simple_indicator_of_c
 > ovid_severity.txt
   log type:  text
- opened on:  27 May 2020, 15:54:32
+ opened on:  29 May 2020, 22:52:27
 
 . 
 . use "..\data\weeklydata.dta"
@@ -69,7 +69,10 @@
 > 4 & days_to_report!=.
 
 . 
-. ** figure 1 **
+end of do-file
+
+. do "C:\Users\favero\AppData\Local\Temp\STD6020_000000.tmp"
+
 . twoway (line us_adj_excess_respir_deaths end_week, yaxis(1)) (line us_new_pos end_week, yaxis(3)) i
 > f us_p_posXnew_pos != . & us_tag==1 & days_to_report > 14 & days_to_report!=., tlabel(14mar2020(7)9
 > may2020) xtitle("") title("Deaths & cases") legend(order(1 "Deaths{sup:b}" 2 "New cases or detectio
@@ -84,31 +87,37 @@
 > o have to do it manually
 
 . 
-. // (potential replacement for figure 2)
+end of do-file
+
+. do "C:\Users\favero\AppData\Local\Temp\STD6020_000000.tmp"
+
 . twoway (line us_covid_deaths end_week, yaxis(1)) (line us_p_posXnew_pos end_week, yaxis(2)) (line u
 > s_adj_covid_deaths end_week, yaxis(1)) if us_p_posXnew_pos != . & us_tag==1 & days_to_report > 14 &
 >  days_to_report!=., tlabel(14mar2020(14)9may2020) xtitle("") ytitle("COVID-19 deaths") legend(order
 > (1 "Deaths - unadjusted for reporting delays" 2 "Deaths - adjusted for reporting delays" 3 "Detecti
 > on-adjusted cases") col(1)) name(figure2a, replace)
 
-. //twoway (line us_adj_covid_deaths end_week, yaxis(1)) (line us_p_posXnew_pos end_week, yaxis(2)) i
-> f us_p_posXnew_pos != . & us_tag==1 & days_to_report > 14 & days_to_report!=., tlabel(14mar2020(14)
-> 9may2020) xtitle("") legend(off) name(figure2b, replace)
-. //twoway (line us_adj_excess_deaths end_week, yaxis(1)) (line us_p_posXnew_pos end_week, yaxis(2)) 
-> if us_p_posXnew_pos != . & us_tag==1 & days_to_report > 14 & days_to_report!=., tlabel(14mar2020(14
-> )9may2020) tmtick(##2) name(figure2c, replace)
-. //grc1leg figure2a figure2b, legendfrom(figure2a) xsize(7.5) // xsize doesn't work with this comman
-> d, so have to do it manually
+. twoway (line us_adj_covid_deaths end_week, yaxis(1)) (line us_p_posXnew_pos end_week, yaxis(2)) if 
+> us_p_posXnew_pos != . & us_tag==1 & days_to_report > 14 & days_to_report!=., tlabel(14mar2020(14)9m
+> ay2020) xtitle("") legend(off) name(figure2b, replace)
+
+. twoway (line us_adj_excess_deaths end_week, yaxis(1)) (line us_p_posXnew_pos end_week, yaxis(2)) if
+>  us_p_posXnew_pos != . & us_tag==1 & days_to_report > 14 & days_to_report!=., tlabel(14mar2020(14)9
+> may2020) tmtick(##2) name(figure2c, replace)
+
 . 
-. 
+end of do-file
+
+. do "C:\Users\favero\AppData\Local\Temp\STD6020_000000.tmp"
+
 . reg us_adj_covid_deaths us_new_pos l.us_new_pos if days_to_report > 14 & us_tag==1, cluster(fips) n
 > ocons
 
 Linear regression                               Number of obs     =         14
                                                 F(0, 0)           =          .
                                                 Prob > F          =          .
-                                                R-squared         =     0.9755
-                                                Root MSE          =     1376.3
+                                                R-squared         =     0.9846
+                                                Root MSE          =     1123.2
 
                                    (Std. Err. adjusted for 1 clusters in fips)
 ------------------------------------------------------------------------------
@@ -116,8 +125,8 @@ Linear regression                               Number of obs     =         14
 us_adj_cov~s |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
   us_new_pos |
-         --. |   .0364415          .        .       .            .           .
-         L1. |   .0296624          .        .       .            .           .
+         --. |   .0331251          .        .       .            .           .
+         L1. |   .0355771          .        .       .            .           .
 ------------------------------------------------------------------------------
 
 . predict us_naive_case_count
@@ -133,17 +142,17 @@ us_adj_cov~s |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 Linear regression                               Number of obs     =          8
                                                 F(0, 0)           =          .
                                                 Prob > F          =          .
-                                                R-squared         =     0.9975
-                                                Root MSE          =      623.2
+                                                R-squared         =     0.9918
+                                                Root MSE          =     1159.2
 
                                                 (Std. Err. adjusted for 1 clusters in fips)
 -------------------------------------------------------------------------------------------
                           |               Robust
       us_adj_covid_deaths |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 --------------------------+----------------------------------------------------------------
-  c.us_new_pos#c.us_p_pos |   .0011049          .        .       .            .           .
+  c.us_new_pos#c.us_p_pos |   .0009603          .        .       .            .           .
                           |
-cL.us_new_pos#cL.us_p_pos |   .0027933          .        .       .            .           .
+cL.us_new_pos#cL.us_p_pos |   .0030395          .        .       .            .           .
 -------------------------------------------------------------------------------------------
 
 . predict us_estimated_death_count
@@ -158,20 +167,36 @@ cL.us_new_pos#cL.us_p_pos |   .0027933          .        .       .            . 
 > eport!=.
 
 . 
+end of do-file
+
+. do "C:\Users\favero\AppData\Local\Temp\STD6020_000000.tmp"
+
 . twoway (line us_estimated_death_count end_week) (line us_covid_deaths end_week) (line us_naive_case
 > _count end_week) if us_estimated_death_count != . & us_tag==1 & days_to_report > 14 & days_to_repor
 > t!=.
 
 . 
+end of do-file
+
+. do "C:\Users\favero\AppData\Local\Temp\STD6020_000000.tmp"
+
+. twoway (line us_estimated_death_count end_week) (line us_adj_covid_deaths end_week) (line us_naive_
+> case_count end_week) if us_estimated_death_count != . & us_tag==1 & days_to_report > 14 & days_to_r
+> eport!=.
+
 . 
+end of do-file
+
+. do "C:\Users\favero\AppData\Local\Temp\STD6020_000000.tmp"
+
 . reg us_adj_excess_respir_deaths us_new_pos l.us_new_pos if days_to_report > 14 & us_tag==1, cluster
 > (fips) nocons
 
 Linear regression                               Number of obs     =         14
                                                 F(0, 0)           =          .
                                                 Prob > F          =          .
-                                                R-squared         =     0.9733
-                                                Root MSE          =     1514.5
+                                                R-squared         =     0.9840
+                                                Root MSE          =     1209.9
 
                                    (Std. Err. adjusted for 1 clusters in fips)
 ------------------------------------------------------------------------------
@@ -179,8 +204,8 @@ Linear regression                               Number of obs     =         14
 us_~r_deaths |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
   us_new_pos |
-         --. |   .0529445          .        .       .            .           .
-         L1. |   .0154915          .        .       .            .           .
+         --. |    .049107          .        .       .            .           .
+         L1. |   .0223634          .        .       .            .           .
 ------------------------------------------------------------------------------
 
 . predict us_naive_case_count2
@@ -196,17 +221,17 @@ us_~r_deaths |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 Linear regression                               Number of obs     =          8
                                                 F(0, 0)           =          .
                                                 Prob > F          =          .
-                                                R-squared         =     0.9982
-                                                Root MSE          =      550.7
+                                                R-squared         =     0.9924
+                                                Root MSE          =     1181.8
 
                                                 (Std. Err. adjusted for 1 clusters in fips)
 -------------------------------------------------------------------------------------------
                           |               Robust
 us_adj_excess_respir_de~s |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 --------------------------+----------------------------------------------------------------
-  c.us_new_pos#c.us_p_pos |   .0017516          .        .       .            .           .
+  c.us_new_pos#c.us_p_pos |   .0015863          .        .       .            .           .
                           |
-cL.us_new_pos#cL.us_p_pos |   .0023596          .        .       .            .           .
+cL.us_new_pos#cL.us_p_pos |   .0026428          .        .       .            .           .
 -------------------------------------------------------------------------------------------
 
 . predict us_estimated_death_count2
@@ -221,6 +246,10 @@ cL.us_new_pos#cL.us_p_pos |   .0023596          .        .       .            . 
 >  days_to_report!=.
 
 . 
+end of do-file
+
+. do "C:\Users\favero\AppData\Local\Temp\STD6020_000000.tmp"
+
 . 
 . reg us_adj_excess_deaths us_new_pos l.us_new_pos if days_to_report > 14 & us_tag==1, cluster(fips) 
 > nocons
@@ -228,8 +257,8 @@ cL.us_new_pos#cL.us_p_pos |   .0023596          .        .       .            . 
 Linear regression                               Number of obs     =         14
                                                 F(0, 0)           =          .
                                                 Prob > F          =          .
-                                                R-squared         =     0.9590
-                                                Root MSE          =     2401.7
+                                                R-squared         =     0.9839
+                                                Root MSE          =       1613
 
                                    (Std. Err. adjusted for 1 clusters in fips)
 ------------------------------------------------------------------------------
@@ -237,8 +266,8 @@ Linear regression                               Number of obs     =         14
 us_~s_deaths |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
   us_new_pos |
-         --. |     .07938          .        .       .            .           .
-         L1. |    .006425          .        .       .            .           .
+         --. |   .0685136          .        .       .            .           .
+         L1. |   .0261566          .        .       .            .           .
 ------------------------------------------------------------------------------
 
 . predict us_naive_case_count3
@@ -254,17 +283,17 @@ us_~s_deaths |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 Linear regression                               Number of obs     =          8
                                                 F(0, 0)           =          .
                                                 Prob > F          =          .
-                                                R-squared         =     0.9993
-                                                Root MSE          =     430.79
+                                                R-squared         =     0.9841
+                                                Root MSE          =     2265.4
 
                                                 (Std. Err. adjusted for 1 clusters in fips)
 -------------------------------------------------------------------------------------------
                           |               Robust
      us_adj_excess_deaths |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 --------------------------+----------------------------------------------------------------
-  c.us_new_pos#c.us_p_pos |   .0027724          .        .       .            .           .
+  c.us_new_pos#c.us_p_pos |   .0022998          .        .       .            .           .
                           |
-cL.us_new_pos#cL.us_p_pos |   .0024773          .        .       .            .           .
+cL.us_new_pos#cL.us_p_pos |   .0032888          .        .       .            .           .
 -------------------------------------------------------------------------------------------
 
 . predict us_estimated_death_count3
@@ -279,27 +308,28 @@ cL.us_new_pos#cL.us_p_pos |   .0024773          .        .       .            . 
 > o_report!=.
 
 . 
-. 
-. *** State Analyses ***
-. 
+end of do-file
+
+. do "C:\Users\favero\AppData\Local\Temp\STD6020_000000.tmp"
+
 . reg adj_excess_respir_deaths_pc c.new_pos_pc c.l.new_pos_pc  if days_to_report > 14 & days_to_repor
 > t <= 66
 
-      Source |       SS           df       MS      Number of obs   =       391
--------------+----------------------------------   F(2, 388)       =    765.27
-       Model |  5814.81145         2  2907.40572   Prob > F        =    0.0000
-    Residual |  1474.07704       388  3.79916763   R-squared       =    0.7978
--------------+----------------------------------   Adj R-squared   =    0.7967
-       Total |  7288.88849       390  18.6894577   Root MSE        =    1.9491
+      Source |       SS           df       MS      Number of obs   =       343
+-------------+----------------------------------   F(2, 340)       =    901.86
+       Model |  6255.61959         2  3127.80979   Prob > F        =    0.0000
+    Residual |  1179.17703       340  3.46816773   R-squared       =    0.8414
+-------------+----------------------------------   Adj R-squared   =    0.8405
+       Total |  7434.79661       342  21.7391714   Root MSE        =    1.8623
 
 ------------------------------------------------------------------------------
 a~respir_d~c |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 -------------+----------------------------------------------------------------
   new_pos_pc |
-         --. |   .0345254   .0043672     7.91   0.000      .025939    .0431117
-         L1. |    .036817   .0044633     8.25   0.000     .0280418    .0455923
+         --. |   .0336179   .0042154     7.97   0.000     .0253263    .0419095
+         L1. |   .0429318   .0042897    10.01   0.000     .0344941    .0513695
              |
-       _cons |  -.4900342   .1248606    -3.92   0.000    -.7355223   -.2445462
+       _cons |  -.6444533   .1315141    -4.90   0.000    -.9031371   -.3857695
 ------------------------------------------------------------------------------
 
 . capture drop naive_case_count_pc
@@ -314,21 +344,21 @@ a~respir_d~c |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 . reg adj_excess_respir_deaths_pc c.new_pos_pc#c.p_pos c.l.new_pos_pc#c.l.p_pos  if days_to_report > 
 > 14 & days_to_report <= 66
 
-      Source |       SS           df       MS      Number of obs   =       357
--------------+----------------------------------   F(2, 354)       =   1141.98
-       Model |  6189.01582         2  3094.50791   Prob > F        =    0.0000
-    Residual |   959.26312       354  2.70978282   R-squared       =    0.8658
--------------+----------------------------------   Adj R-squared   =    0.8650
-       Total |  7148.27894       356  20.0794352   Root MSE        =    1.6461
+      Source |       SS           df       MS      Number of obs   =       325
+-------------+----------------------------------   F(2, 322)       =   1304.20
+       Model |   6539.9042         2   3269.9521   Prob > F        =    0.0000
+    Residual |   807.33502       322  2.50725162   R-squared       =    0.8901
+-------------+----------------------------------   Adj R-squared   =    0.8894
+       Total |  7347.23922       324  22.6766643   Root MSE        =    1.5834
 
 ----------------------------------------------------------------------------------------
 adj_excess_respir_de~c |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
 -----------------------+----------------------------------------------------------------
-  c.new_pos_pc#c.p_pos |    .000835   .0000846     9.87   0.000     .0006686    .0010014
+  c.new_pos_pc#c.p_pos |    .000769   .0000816     9.43   0.000     .0006085    .0009295
                        |
-cL.new_pos_pc#cL.p_pos |   .0011666   .0000852    13.69   0.000      .000999    .0013342
+cL.new_pos_pc#cL.p_pos |   .0013047   .0000821    15.89   0.000     .0011431    .0014662
                        |
-                 _cons |   .6608104   .0954896     6.92   0.000     .4730121    .8486087
+                 _cons |   .7786583   .0970894     8.02   0.000     .5876487    .9696679
 ----------------------------------------------------------------------------------------
 
 . capture drop estimated_death_count_pc
@@ -346,18 +376,19 @@ cL.new_pos_pc#cL.p_pos |   .0011666   .0000852    13.69   0.000      .000999    
 
      (firstnm) state |      Freq.     Percent        Cum.
 ---------------------+-----------------------------------
-            Delaware |          2        4.76        4.76
-District of Columbia |          3        7.14       11.90
-           Louisiana |          4        9.52       21.43
-            Maryland |          3        7.14       28.57
-       Massachusetts |          6       14.29       42.86
-            Michigan |          4        9.52       52.38
-          New Jersey |          6       14.29       66.67
-            New York |          7       16.67       83.33
-        Pennsylvania |          4        9.52       92.86
-        Rhode Island |          3        7.14      100.00
+            Delaware |          2        4.17        4.17
+District of Columbia |          4        8.33       12.50
+            Illinois |          2        4.17       16.67
+           Louisiana |          4        8.33       25.00
+            Maryland |          3        6.25       31.25
+       Massachusetts |          6       12.50       43.75
+            Michigan |          4        8.33       52.08
+          New Jersey |          7       14.58       66.67
+            New York |          8       16.67       83.33
+        Pennsylvania |          4        8.33       91.67
+        Rhode Island |          4        8.33      100.00
 ---------------------+-----------------------------------
-               Total |         42      100.00
+               Total |         48      100.00
 
 . 
 . ** Figure 2 **
@@ -370,23 +401,186 @@ District of Columbia |          3        7.14       11.90
 >  positive){sup:c}")) xsize(7)
 
 . 
-. //not used: drop Louisiana b/c reported number of negative cases is missing for part of series (not
->  obvious on graphs)
+end of do-file
+
+. do "C:\Users\favero\AppData\Local\Temp\STD6020_000000.tmp"
+
 . twoway (line adj_excess_respir_deaths_pc end_week) (line naive_case_count_pc end_week) (line estima
-> ted_death_count_pc end_week) if estimated_death_count_pc != . & (fips==10 | fips==22 | fips==24 | f
-> ips==25 | fips==26 | fips==34 | fips==36 | fips==42 | fips==44) & days_to_report > 14 & days_to_rep
-> ort!=., by(state, note("")) ytitle("Deaths per 100,000 population") xtitle("") ylabel(0(20)40) ymti
-> ck(##2) tlabel(21mar2020(14)9may2020) tmtick(##2) legend(col(1))
+> ted_death_count_pc end_week) if estimated_death_count_pc != . & (fips<=10 & fips!=34 & fips!=36) & 
+> days_to_report > 14 & days_to_report!=., by(state, note("") row(2)) ytitle("Deaths per 100,000 popu
+> lation") xtitle("") tlabel(21mar2020(14)9may2020) tmtick(##2) legend(col(1) order(1 "Deaths{sup:a}"
+>  2 "Prediction from naïve case count (new cases){sup:b}" 3 "Prediction from detection-adjusted case
+> s (new cases X percent positive){sup:c}")) xsize(7)
 
 . 
+end of do-file
+
+. do "C:\Users\favero\AppData\Local\Temp\STD6020_000000.tmp"
+
+. twoway (line adj_excess_respir_deaths_pc end_week) (line naive_case_count_pc end_week) (line estima
+> ted_death_count_pc end_week) if estimated_death_count_pc != . & (fips>10 & fips<=20 & fips!=34 & fi
+> ps!=36) & days_to_report > 14 & days_to_report!=., by(state, note("") row(2)) ytitle("Deaths per 10
+> 0,000 population") xtitle("") tlabel(21mar2020(14)9may2020) tmtick(##2) legend(col(1) order(1 "Deat
+> hs{sup:a}" 2 "Prediction from naïve case count (new cases){sup:b}" 3 "Prediction from detection-adj
+> usted cases (new cases X percent positive){sup:c}")) xsize(7)
+
 . 
+end of do-file
+
+. do "C:\Users\favero\AppData\Local\Temp\STD6020_000000.tmp"
+
+. twoway (line adj_excess_respir_deaths_pc end_week) (line naive_case_count_pc end_week) (line estima
+> ted_death_count_pc end_week) if estimated_death_count_pc != . & (fips>20 & fips<=30 & fips!=34 & fi
+> ps!=36) & days_to_report > 14 & days_to_report!=., by(state, note("") row(2)) ytitle("Deaths per 10
+> 0,000 population") xtitle("") tlabel(21mar2020(14)9may2020) tmtick(##2) legend(col(1) order(1 "Deat
+> hs{sup:a}" 2 "Prediction from naïve case count (new cases){sup:b}" 3 "Prediction from detection-adj
+> usted cases (new cases X percent positive){sup:c}")) xsize(7)
+
 . 
+end of do-file
+
+. do "C:\Users\favero\AppData\Local\Temp\STD6020_000000.tmp"
+
+. twoway (line adj_excess_respir_deaths_pc end_week) (line naive_case_count_pc end_week) (line estima
+> ted_death_count_pc end_week) if estimated_death_count_pc != . & (fips<=10 & fips!=34 & fips!=36) & 
+> days_to_report > 14 & days_to_report!=., by(state, note("") row(2)) ytitle("Deaths per 100,000 popu
+> lation") xtitle("") tlabel(21mar2020(14)9may2020) tmtick(##2) legend(col(1) order(1 "Deaths{sup:a}"
+>  2 "Prediction from naïve case count (new cases){sup:b}" 3 "Prediction from detection-adjusted case
+> s (new cases X percent positive){sup:c}")) xsize(7)
+
 . 
+end of do-file
+
+. do "C:\Users\favero\AppData\Local\Temp\STD6020_000000.tmp"
+
+. twoway (line adj_excess_respir_deaths_pc end_week) (line naive_case_count_pc end_week) (line estima
+> ted_death_count_pc end_week) if estimated_death_count_pc != . & (fips>20 & fips<=30 & fips!=34 & fi
+> ps!=36) & days_to_report > 14 & days_to_report!=., by(state, note("") row(2)) ytitle("Deaths per 10
+> 0,000 population") xtitle("") tlabel(21mar2020(14)9may2020) tmtick(##2) legend(col(1) order(1 "Deat
+> hs{sup:a}" 2 "Prediction from naïve case count (new cases){sup:b}" 3 "Prediction from detection-adj
+> usted cases (new cases X percent positive){sup:c}")) xsize(7)
+
 . 
-. log close
-      name:  <unnamed>
-       log:  C:\Users\favero\Documents\GitHub\covid-underreporting\data\..\logs\simple_indicator_of_c
-> ovid_severity.txt
-  log type:  text
- closed on:  27 May 2020, 15:54:48
------------------------------------------------------------------------------------------------------
+end of do-file
+
+. do "C:\Users\favero\AppData\Local\Temp\STD6020_000000.tmp"
+
+. twoway (line adj_excess_respir_deaths_pc end_week) (line naive_case_count_pc end_week) (line estima
+> ted_death_count_pc end_week) if estimated_death_count_pc != . & (fips>30 & fips<=40 & fips!=34 & fi
+> ps!=36) & days_to_report > 14 & days_to_report!=., by(state, note("") row(2)) ytitle("Deaths per 10
+> 0,000 population") xtitle("") tlabel(21mar2020(14)9may2020) tmtick(##2) legend(col(1) order(1 "Deat
+> hs{sup:a}" 2 "Prediction from naïve case count (new cases){sup:b}" 3 "Prediction from detection-adj
+> usted cases (new cases X percent positive){sup:c}")) xsize(7)
+
+. 
+end of do-file
+
+. do "C:\Users\favero\AppData\Local\Temp\STD6020_000000.tmp"
+
+. twoway (line adj_excess_respir_deaths_pc end_week) (line naive_case_count_pc end_week) (line estima
+> ted_death_count_pc end_week) if estimated_death_count_pc != . & (fips>40  & fips!=34 & fips!=36) & 
+> days_to_report > 14 & days_to_report!=., by(state, note("") row(2)) ytitle("Deaths per 100,000 popu
+> lation") xtitle("") tlabel(21mar2020(14)9may2020) tmtick(##2) legend(col(1) order(1 "Deaths{sup:a}"
+>  2 "Prediction from naïve case count (new cases){sup:b}" 3 "Prediction from detection-adjusted case
+> s (new cases X percent positive){sup:c}")) xsize(7)
+
+. 
+end of do-file
+
+. do "C:\Users\favero\AppData\Local\Temp\STD6020_000000.tmp"
+
+. twoway (line adj_excess_respir_deaths_pc end_week) (line naive_case_count_pc end_week) (line estima
+> ted_death_count_pc end_week) if estimated_death_count_pc != . & (fips<=10 & fips!=34 & fips!=36) & 
+>  days_to_report!=., by(state, note("") row(2)) ytitle("Deaths per 100,000 population") xtitle("") t
+> label(21mar2020(14)9may2020) tmtick(##2) legend(col(1) order(1 "Deaths{sup:a}" 2 "Prediction from n
+> aïve case count (new cases){sup:b}" 3 "Prediction from detection-adjusted cases (new cases X percen
+> t positive){sup:c}")) xsize(7)
+
+. 
+end of do-file
+
+. do "C:\Users\favero\AppData\Local\Temp\STD6020_000000.tmp"
+
+. twoway (line adj_excess_respir_deaths_pc end_week) (line naive_case_count_pc end_week) (line estima
+> ted_death_count_pc end_week) if estimated_death_count_pc != . & (fips>10 & fips<=20 & fips!=34 & fi
+> ps!=36) &  days_to_report!=., by(state, note("") row(2)) ytitle("Deaths per 100,000 population") xt
+> itle("") tlabel(21mar2020(14)9may2020) tmtick(##2) legend(col(1) order(1 "Deaths{sup:a}" 2 "Predict
+> ion from naïve case count (new cases){sup:b}" 3 "Prediction from detection-adjusted cases (new case
+> s X percent positive){sup:c}")) xsize(7)
+
+. 
+end of do-file
+
+. do "C:\Users\favero\AppData\Local\Temp\STD6020_000000.tmp"
+
+. twoway (line adj_excess_respir_deaths_pc end_week) (line naive_case_count_pc end_week) (line estima
+> ted_death_count_pc end_week) if estimated_death_count_pc != . & (fips<=10 & fips!=34 & fips!=36) & 
+>  days_to_report!=., by(state, note("") row(2)) ytitle("Deaths per 100,000 population") xtitle("") t
+> label(21mar2020(14)9may2020) tmtick(##2) legend(col(1) order(1 "Deaths{sup:a}" 2 "Prediction from n
+> aïve case count (new cases){sup:b}" 3 "Prediction from detection-adjusted cases (new cases X percen
+> t positive){sup:c}")) xsize(7)
+
+. 
+end of do-file
+
+. do "C:\Users\favero\AppData\Local\Temp\STD6020_000000.tmp"
+
+. twoway (line adj_excess_respir_deaths_pc end_week) (line naive_case_count_pc end_week) (line estima
+> ted_death_count_pc end_week) if estimated_death_count_pc != . & (fips>10 & fips<=20 & fips!=34 & fi
+> ps!=36) &  days_to_report!=., by(state, note("") row(2)) ytitle("Deaths per 100,000 population") xt
+> itle("") tlabel(21mar2020(14)9may2020) tmtick(##2) legend(col(1) order(1 "Deaths{sup:a}" 2 "Predict
+> ion from naïve case count (new cases){sup:b}" 3 "Prediction from detection-adjusted cases (new case
+> s X percent positive){sup:c}")) xsize(7)
+
+. 
+end of do-file
+
+. do "C:\Users\favero\AppData\Local\Temp\STD6020_000000.tmp"
+
+. twoway (line adj_excess_respir_deaths_pc end_week) (line naive_case_count_pc end_week) (line estima
+> ted_death_count_pc end_week) if estimated_death_count_pc != . & (fips<=10 & fips!=34 & fips!=36) & 
+>  days_to_report!=., by(state, note("") row(2)) ytitle("Deaths per 100,000 population") xtitle("") t
+> label(21mar2020(14)9may2020) tmtick(##2) legend(col(1) order(1 "Deaths{sup:a}" 2 "Prediction from n
+> aïve case count (new cases){sup:b}" 3 "Prediction from detection-adjusted cases (new cases X percen
+> t positive){sup:c}")) xsize(7)
+
+. 
+end of do-file
+
+. do "C:\Users\favero\AppData\Local\Temp\STD6020_000000.tmp"
+
+. twoway (line adj_excess_respir_deaths_pc end_week) (line naive_case_count_pc end_week) (line estima
+> ted_death_count_pc end_week) if estimated_death_count_pc != . & (fips>20 & fips<=30 & fips!=34 & fi
+> ps!=36) &  days_to_report!=., by(state, note("") row(2)) ytitle("Deaths per 100,000 population") xt
+> itle("") tlabel(21mar2020(14)9may2020) tmtick(##2) legend(col(1) order(1 "Deaths{sup:a}" 2 "Predict
+> ion from naïve case count (new cases){sup:b}" 3 "Prediction from detection-adjusted cases (new case
+> s X percent positive){sup:c}")) xsize(7)
+
+. 
+end of do-file
+
+. do "C:\Users\favero\AppData\Local\Temp\STD6020_000000.tmp"
+
+. twoway (line adj_excess_respir_deaths_pc end_week) (line naive_case_count_pc end_week) (line estima
+> ted_death_count_pc end_week) if estimated_death_count_pc != . & (fips>30 & fips<=40 & fips!=34 & fi
+> ps!=36) &  days_to_report!=., by(state, note("") row(2)) ytitle("Deaths per 100,000 population") xt
+> itle("") tlabel(21mar2020(14)9may2020) tmtick(##2) legend(col(1) order(1 "Deaths{sup:a}" 2 "Predict
+> ion from naïve case count (new cases){sup:b}" 3 "Prediction from detection-adjusted cases (new case
+> s X percent positive){sup:c}")) xsize(7)
+
+. 
+end of do-file
+
+. do "C:\Users\favero\AppData\Local\Temp\STD6020_000000.tmp"
+
+. twoway (line adj_excess_respir_deaths_pc end_week) (line naive_case_count_pc end_week) (line estima
+> ted_death_count_pc end_week) if estimated_death_count_pc != . & (fips>40  & fips!=34 & fips!=36) & 
+>  days_to_report!=., by(state, note("") row(2)) ytitle("Deaths per 100,000 population") xtitle("") t
+> label(21mar2020(14)9may2020) tmtick(##2) legend(col(1) order(1 "Deaths{sup:a}" 2 "Prediction from n
+> aïve case count (new cases){sup:b}" 3 "Prediction from detection-adjusted cases (new cases X percen
+> t positive){sup:c}")) xsize(7)
+
+. 
+end of do-file
+
+. exit, clear

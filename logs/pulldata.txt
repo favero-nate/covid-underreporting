@@ -2,11 +2,11 @@
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\pulldata.txt
   log type:  text
- opened on:   5 Jun 2020, 15:31:19
+ opened on:  10 Jun 2020, 10:13:06
 
 . 
 . import delimited "https://covidtracking.com/api/v1/states/daily.csv", stringcols(1)
-(35 vars, 5,113 obs)
+(35 vars, 5,393 obs)
 
 . rename date olddate
 
@@ -63,12 +63,24 @@ percentcomplete: characters space > < % removed; replaced as double
 file ..\data\cdc_historical_deaths.dta saved
 
 . 
-. insheet using "https://data.cdc.gov/resource/r8kw-7aab.csv", clear
-(14 vars, 972 obs)
+. insheet using "https://data.cdc.gov/resource/r8kw-7aab.csv?%24offset=1000", clear
+(14 vars, 26 obs)
 
-. export delimited using "..\data\past_reports\unprocessed_files/$S_DATE cdc_deaths_raw", replace
-(note: file ..\data\past_reports\unprocessed_files/ 5 Jun 2020 cdc_deaths_raw.csv not found)
-file ..\data\past_reports\unprocessed_files/ 5 Jun 2020 cdc_deaths_raw.csv saved
+. export delimited using "..\data\past_reports\unprocessed_files/$S_DATE cdc_deaths_raw2", replace
+(note: file ..\data\past_reports\unprocessed_files/10 Jun 2020 cdc_deaths_raw2.csv not found)
+file ..\data\past_reports\unprocessed_files/10 Jun 2020 cdc_deaths_raw2.csv saved
+
+. save "..\data\cdc_deaths.dta", replace
+file ..\data\cdc_deaths.dta saved
+
+. insheet using "https://data.cdc.gov/resource/r8kw-7aab.csv?%24offset=0", clear
+(14 vars, 1,000 obs)
+
+. export delimited using "..\data\past_reports\unprocessed_files/$S_DATE cdc_deaths_raw1", replace
+(note: file ..\data\past_reports\unprocessed_files/10 Jun 2020 cdc_deaths_raw1.csv not found)
+file ..\data\past_reports\unprocessed_files/10 Jun 2020 cdc_deaths_raw1.csv saved
+
+. append using "..\data\cdc_deaths.dta"
 
 . gen date = date(substr(end_week,1,10), "YMD")
 
@@ -81,14 +93,14 @@ file ..\data\past_reports\unprocessed_files/ 5 Jun 2020 cdc_deaths_raw.csv saved
 . order date report_date
 
 . gen expected_deaths = total_deaths / percent_of_expected_deaths
-(7 missing values generated)
+(10 missing values generated)
 
 . order expected_deaths, after(total_deaths)
 
 . drop start_week group indicator percent_of_expected_deaths footnote
 
 . replace state = "New York" if state == "New York City"
-(18 real changes made)
+(19 real changes made)
 
 . rename pneumonia_influenza_or_covid pneumon_influ_or_covid
 
@@ -96,13 +108,13 @@ file ..\data\past_reports\unprocessed_files/ 5 Jun 2020 cdc_deaths_raw.csv saved
 . foreach var of varlist covid_deaths-pneumon_influ_or_covid {
   2.         replace `var' = 5 if `var' == .
   3. }
-(164 real changes made)
-(5 real changes made)
-(7 real changes made)
-(93 real changes made)
-(202 real changes made)
-(468 real changes made)
-(71 real changes made)
+(174 real changes made)
+(4 real changes made)
+(10 real changes made)
+(111 real changes made)
+(221 real changes made)
+(473 real changes made)
+(84 real changes made)
 
 . collapse (sum) covid_deaths-pneumon_influ_or_covid (first) report_date, by(state date)
 
@@ -111,25 +123,86 @@ file ..\data\past_reports\unprocessed_files/ 5 Jun 2020 cdc_deaths_raw.csv saved
 file ..\data\cdc_deaths.dta saved
 
 . save "..\data\past_reports/$S_DATE cdc_deaths.dta", replace
-(note: file ..\data\past_reports/ 5 Jun 2020 cdc_deaths.dta not found)
-file ..\data\past_reports/ 5 Jun 2020 cdc_deaths.dta saved
+(note: file ..\data\past_reports/10 Jun 2020 cdc_deaths.dta not found)
+file ..\data\past_reports/10 Jun 2020 cdc_deaths.dta saved
 
 . 
-. insheet using "https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/national/totals/n
-> st-est2019-alldata.csv", clear
-(151 vars, 57 obs)
+. insheet using "..\data\source_files\R12565679_SL040.txt", clear
+(25 vars, 52 obs)
 
-. rename state fips
+. rename geo_fips fips
 
-. rename name state
+. rename geo_name state
 
-. rename popestimate2019 population
+. rename se_* *
+
+. rename t005_001 population
+
+. gen pop_0to9 = t005_002 + t005_003
+
+. gen pop_10to19 = t005_004 + t005_005
+
+. gen pop_20to29 = t005_006 + t005_007
+
+. gen pop_30to39 = t005_008 + t005_009
+
+. gen pop_40to49 = t005_010 + t005_011
+
+. gen pop_50to59 = t005_012 + t005_013
+
+. gen pop_60to69 = t005_014 + t005_015
+
+. gen pop_70to79 = t005_016 + t005_017
+
+. gen pop_80plus = t005_018 + t005_019
 
 . keep if fips > 0 & fips < 60
-(6 observations deleted)
+(1 observation deleted)
 
-. keep fips state population
+. foreach var of varlist pop* {
+  2.         egen `var'_us = total(`var')
+  3. }
 
+. keep fips state pop*
+
+. gen tmp = 1
+
+. save "..\data\population.dta", replace
+file ..\data\population.dta saved
+
+. 
+. insheet using "..\data\source_files\verity_ifr_estimates.csv", clear
+(9 vars, 1 obs)
+
+. gen tmp = 1
+
+. merge 1:m tmp using "..\data\population.dta"
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                             0
+    matched                                51  (_merge==3)
+    -----------------------------------------
+
+. drop _merge tmp
+
+. 
+. foreach var of varlist _* {
+  2.         gen deaths`var'_us = `var' * pop`var'_us
+  3. }
+
+. egen deaths_us = rowtotal(deaths_*_us)
+
+. foreach var of varlist _* {
+  2.         gen weighted_pop`var' = (pop`var' * deaths`var'_us * population_us) / (deaths_us * pop`v
+> ar'_us)
+  3. }
+
+. egen risk_standardized_population = rowtotal(weighted_pop*)
+
+. keep fips state population risk_standardized_population
+
+. 
 . save "..\data\population.dta", replace
 file ..\data\population.dta saved
 
@@ -138,5 +211,5 @@ file ..\data\population.dta saved
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\pulldata.txt
   log type:  text
- closed on:   5 Jun 2020, 15:31:31
+ closed on:  10 Jun 2020, 10:13:17
 -----------------------------------------------------------------------------------------------------

@@ -25,8 +25,12 @@ replace state = "New York" if state == "New York City"
 collapse (sum) numinfluenzadeaths-percentcomplete (first) season epi_week, by(state date)
 save "..\data\cdc_historical_deaths.dta", replace
 
-insheet using "https://data.cdc.gov/resource/r8kw-7aab.csv", clear
-export delimited using "..\data\past_reports\unprocessed_files/$S_DATE cdc_deaths_raw", replace
+insheet using "https://data.cdc.gov/resource/r8kw-7aab.csv?%24offset=1000", clear
+export delimited using "..\data\past_reports\unprocessed_files/$S_DATE cdc_deaths_raw2", replace
+save "..\data\cdc_deaths.dta", replace
+insheet using "https://data.cdc.gov/resource/r8kw-7aab.csv?%24offset=0", clear
+export delimited using "..\data\past_reports\unprocessed_files/$S_DATE cdc_deaths_raw1", replace
+append using "..\data\cdc_deaths.dta"
 gen date = date(substr(end_week,1,10), "YMD")
 format date %tdCCYYNNDD
 gen report_date = date(substr(data_as_of,1,10), "YMD")
@@ -46,12 +50,43 @@ collapse (sum) covid_deaths-pneumon_influ_or_covid (first) report_date, by(state
 save "..\data\cdc_deaths.dta", replace
 save "..\data\past_reports/$S_DATE cdc_deaths.dta", replace
 
-insheet using "https://www2.census.gov/programs-surveys/popest/datasets/2010-2019/national/totals/nst-est2019-alldata.csv", clear
-rename state fips
-rename name state
-rename popestimate2019 population
+insheet using "..\data\source_files\R12565679_SL040.txt", clear
+rename geo_fips fips
+rename geo_name state
+rename se_* *
+rename t005_001 population
+gen pop_0to9 = t005_002 + t005_003
+gen pop_10to19 = t005_004 + t005_005
+gen pop_20to29 = t005_006 + t005_007
+gen pop_30to39 = t005_008 + t005_009
+gen pop_40to49 = t005_010 + t005_011
+gen pop_50to59 = t005_012 + t005_013
+gen pop_60to69 = t005_014 + t005_015
+gen pop_70to79 = t005_016 + t005_017
+gen pop_80plus = t005_018 + t005_019
 keep if fips > 0 & fips < 60
-keep fips state population
+foreach var of varlist pop* {
+	egen `var'_us = total(`var')
+}
+keep fips state pop*
+gen tmp = 1
+save "..\data\population.dta", replace
+
+insheet using "..\data\source_files\verity_ifr_estimates.csv", clear
+gen tmp = 1
+merge 1:m tmp using "..\data\population.dta"
+drop _merge tmp
+
+foreach var of varlist _* {
+	gen deaths`var'_us = `var' * pop`var'_us
+}
+egen deaths_us = rowtotal(deaths_*_us)
+foreach var of varlist _* {
+	gen weighted_pop`var' = (pop`var' * deaths`var'_us * population_us) / (deaths_us * pop`var'_us)
+}
+egen risk_standardized_population = rowtotal(weighted_pop*)
+keep fips state population risk_standardized_population
+
 save "..\data\population.dta", replace
 
 log close

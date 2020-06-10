@@ -5,9 +5,9 @@ log using "..\logs\cleandata.txt", text replace
 use "..\data\population.dta" // start from this file because it has both fips codes and state names
 
 merge 1:m fips using "..\data\covidtracking.dta", keep(2 3)
-drop _merge population // merge population back in later because want it merged to all observations, even those missing from the current dataset
+drop _merge population risk_standardized_population // merge population back in later because want it merged to all observations, even those missing from the current dataset
 
-merge 1:1 state date using "..\data\cdc_deaths.dta"
+merge 1:1 state date using "..\data\past_reports\ 6 Jun 2020 cdc_deaths.dta"
 drop _merge
 
 merge 1:1 state date using "..\data\cdc_historical_deaths.dta"
@@ -19,22 +19,30 @@ drop _merge
 order date fips
 sort fips state date
 
+// adjust expected deaths for reporting lag: https://www.cdc.gov/nchs/data/vsrr/report001.pdf
+// maybe also somehow adjust for how the individual state was doing relative to expectations pre-covid
+gen end_week = date + mod(6 - dow(date), 7)
+format end_week %tdCCYYNNDD
+order end_week, after(date)
+gen days_to_report = report_date - end_week
+merge m:1 state days_to_report using "..\data\delay_multipliers.dta", keep(1 3)
+drop _merge
+
 drop if fips > 56
+
+drop if fips == 9 | fips == 37 // Connecticut and North Carolina's data look highly problematic, so dropping them
 
 encode dataqualitygrade, gen(datagrade)
 order datagrade, after(dataqualitygrade)
 drop dataqualitygrade
-
-gen end_week = date + mod(6 - dow(date), 7)
-format end_week %tdCCYYNNDD
-order end_week, after(date)
 
 drop hash datechecked // new variables added to more recent versions of covidtracking's data that interfere with following code:
 foreach var of varlist positive-datagrade death-pneumon_influ_or_covid numinfluenzadeaths-percentcomplete {
 	gen `var'_mis = (`var'==.)
 }
 gen dayscollapsed = 1
-collapse (firstnm) state report_date epi_week (lastnm) positive-datagrade population death-posneg (sum) deathincrease-pneumon_influ_or_covid numinfluenzadeaths-percentcomplete *_mis dayscollapsed, by(end_week fips)
+sort fips state date
+collapse (firstnm) state report_date epi_week (lastnm) positive-datagrade population risk_standardized_population delay_multiplier days_to_report death-posneg (sum) deathincrease-pneumon_influ_or_covid numinfluenzadeaths-percentcomplete *_mis dayscollapsed, by(end_week fips)
 foreach var of varlist positive-datagrade {
 	replace `var' = . if `var'_mis > 0
 }
@@ -50,12 +58,6 @@ gen new_neg = d.negative if d.negative>=0
 gen p_pos = new_pos/(new_pos+new_neg)*100
 order new_pos-p_pos, after(negative)
 
-// adjust expected deaths for reporting lag: https://www.cdc.gov/nchs/data/vsrr/report001.pdf
-// maybe also somehow adjust for how the individual state was doing relative to expectations pre-covid
-gen days_to_report = report_date - end_week
-
-drop if fips == 9 | fips == 37 // Connecticut and North Carolina's data look highly problematic, so dropping them
-
 /*
 gen allcause_minus_posscovid = total_deaths - pneumon_influ_or_covid
 gen allcause_minus_posscovid_pc  = allcause_minus_posscovid*100000/population
@@ -70,7 +72,7 @@ replace adj_allcause_minus_posscovid_pc = allcause_minus_posscovid_pc * 212 / 19
 //replace adj_expected_deaths = expected_deaths * 93 / 212 if days_to_report <= 7 & days_to_report != .
 //replace adj_expected_deaths = expected_deaths * 159 / 212 if days_to_report > 7 & days_to_report <= 14
 //replace adj_expected_deaths = expected_deaths * 192 / 212 if days_to_report > 14 & days_to_report <= 21
-gen adj_expected_deaths = expected_deaths * (1-exp(-.09246997*days_to_report))
+gen adj_expected_deaths = expected_deaths / delay_multiplier
 order adj_expected_deaths, after(expected_deaths)
 
 gen pneumon_or_influ_fluview = numinfluenzadeaths + numpneumoniadeaths if end_week < date("20200201","YMD")
@@ -112,7 +114,7 @@ gen mmwrweek = substr(epi_week,-2,2)
 //replace adj_expected_influ_pneu_deaths = expected_influ_pneu_deaths * 93 / 212 if days_to_report <= 7 & days_to_report != .
 //replace adj_expected_influ_pneu_deaths = expected_influ_pneu_deaths * 159 / 212 if days_to_report > 7 & days_to_report <= 14
 //replace adj_expected_influ_pneu_deaths = expected_influ_pneu_deaths * 192 / 212 if days_to_report > 14 & days_to_report <= 21
-gen adj_expected_influ_pneu_deaths = expected_influ_pneu_deaths * (1-exp(-.09246997*days_to_report))
+gen adj_expected_influ_pneu_deaths = expected_influ_pneu_deaths / delay_multiplier
 order adj_expected_influ_pneu_deaths, after(expected_influ_pneu_deaths)
 
 replace covid_deaths = 5 if covid_deaths == . & total_deaths != . //rough imputation for where data is supressed for 1-9 deaths
@@ -126,25 +128,25 @@ replace cumulative_covid_death = cumulative_covid_death + l.cumulative_covid_dea
 //replace adj_covid_deaths = covid_deaths * 212 / 159 if days_to_report > 7 & days_to_report <= 14
 //replace adj_covid_deaths = covid_deaths * 212 / 192 if days_to_report > 14 & days_to_report <= 21
 
-gen adj_covid_deaths = covid_deaths / (1-exp(-.09246997*days_to_report))
+gen adj_covid_deaths = covid_deaths * delay_multiplier
 gen adj_cumulative_covid_death = adj_covid_deaths
 replace adj_cumulative_covid_death = adj_cumulative_covid_death + l.adj_cumulative_covid_death if l.adj_cumulative_covid_death != .
 
-gen adj_total_deaths = total_deaths / (1-exp(-.09246997*days_to_report))
-gen adj_pneumon_influ_or_covid = pneumon_influ_or_covid / (1-exp(-.09246997*days_to_report))
+gen adj_total_deaths = total_deaths * delay_multiplier
+gen adj_pneumon_influ_or_covid = pneumon_influ_or_covid * delay_multiplier
 
 
-gen covid_deaths_pc = covid_deaths*100000/population
+gen covid_deaths_pc = covid_deaths*100000/risk_standardized_population
 gen excess_deaths_pc = (total_deaths-adj_expected_deaths)*100000/population
-gen excess_respir_deaths_pc = (pneumon_influ_or_covid-adj_expected_influ_pneu_deaths)*100000/population
+gen excess_respir_deaths_pc = (pneumon_influ_or_covid-adj_expected_influ_pneu_deaths)*100000/risk_standardized_population
+gen adj_covid_deaths_pc = adj_covid_deaths*100000/risk_standardized_population
 gen adj_excess_deaths_pc = (adj_total_deaths-expected_deaths)*100000/population
 gen adj_excess_deaths_fluview_pc = (adj_total_deaths-expected_allcause_deaths)*100000/population
-gen adj_excess_respir_deaths_pc = (adj_pneumon_influ_or_covid-expected_influ_pneu_deaths)*100000/population
+gen adj_excess_respir_deaths_pc = (adj_pneumon_influ_or_covid-expected_influ_pneu_deaths)*100000/risk_standardized_population
 gen new_pos_pc = new_pos*100000/population
 gen new_neg_pc = new_neg*100000/population
 gen new_tests_pc = new_pos_pc + new_neg_pc
-gen deathincrease_pc = deathincrease*100000/population
-gen adj_covid_deaths_pc = adj_covid_deaths*100000/population
+gen deathincrease_pc = deathincrease*100000/risk_standardized_population
 
 /*
 gen log_covid_death = log(covid_deaths)

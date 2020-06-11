@@ -19,8 +19,8 @@ drop _merge
 order date fips
 sort fips state date
 
-// adjust expected deaths for reporting lag: https://www.cdc.gov/nchs/data/vsrr/report001.pdf
-// maybe also somehow adjust for how the individual state was doing relative to expectations pre-covid
+// bring in delay multipliers, which adjust expected deaths for reporting lag: https://www.cdc.gov/nchs/data/vsrr/report001.pdf
+// note: excess deaths do not adjust for how the individual state was doing relative to expectations pre-covid this year
 gen end_week = date + mod(6 - dow(date), 7)
 format end_week %tdCCYYNNDD
 order end_week, after(date)
@@ -59,64 +59,51 @@ gen new_neg = d.negative if d.negative>=0
 gen p_pos = new_pos/(new_pos+new_neg)*100
 order new_pos-p_pos, after(negative)
 
-/*
-gen allcause_minus_posscovid = total_deaths - pneumon_influ_or_covid
-gen allcause_minus_posscovid_pc  = allcause_minus_posscovid*100000/population
-bys days_to_report: sum allcause_minus_posscovid_pc
-gen adj_allcause_minus_posscovid_pc = allcause_minus_posscovid_pc
-replace adj_allcause_minus_posscovid_pc = allcause_minus_posscovid_pc * 212 / 93 if days_to_report <= 7 & days_to_report != .
-replace adj_allcause_minus_posscovid_pc = allcause_minus_posscovid_pc * 212 / 159 if days_to_report > 7 & days_to_report <= 14
-replace adj_allcause_minus_posscovid_pc = allcause_minus_posscovid_pc * 212 / 192 if days_to_report > 14 & days_to_report <= 21
-*/
+// dropping CDC expected death data because it appears to have errors
+drop expected_deaths
 
-//gen adj_expected_deaths = expected_deaths
-//replace adj_expected_deaths = expected_deaths * 93 / 212 if days_to_report <= 7 & days_to_report != .
-//replace adj_expected_deaths = expected_deaths * 159 / 212 if days_to_report > 7 & days_to_report <= 14
-//replace adj_expected_deaths = expected_deaths * 192 / 212 if days_to_report > 14 & days_to_report <= 21
-gen adj_expected_deaths = expected_deaths / delay_multiplier
-order adj_expected_deaths, after(expected_deaths)
-
-gen pneumon_or_influ_fluview = numinfluenzadeaths + numpneumoniadeaths if end_week < date("20200201","YMD")
-gen mmwrweek = substr(epi_week,-2,2)
-
-//egen old_expected_influ_pneu_deaths = mean(pneumon_or_influ_fluview), by(fips mmwrweek)
 
 // generate expected influenza/pneumonia deaths based on historical patterns
-	gen epi_year = substr(epi_week,1,4)
-	destring epi_year mmwrweek, replace
-	replace epi_year = epi_year + 1 if mmwrweek >= 40
-
+	gen pneumon_or_influ_fluview = numinfluenzadeaths + numpneumoniadeaths if end_week < date("20200201","YMD")
+	gen mmwrweek = substr(epi_week,-2,2)
+	gen year = year(end_week)
+	destring mmwrweek, replace
+	replace mmwrweek = l.mmwrweek + 1 if mmwrweek == . & year == 2020
+	
+	// use 2017-2019 data to calculate for each state the weekly average number of all-cause deaths and influenza/pneumonia deaths
+	replace pneumon_or_influ_fluview = .  if year == 2020 | year < 2016
+	rename totaldeaths allcause_fluview
+	replace allcause_fluview = .  if year == 2020 | year < 2016
+	
+	egen expected_influ_pneu_deaths = mean(pneumon_or_influ_fluview), by(state mmwrweek)
+	egen expected_deaths = mean(allcause_fluview), by(state mmwrweek)
+	
+	// Not currently using this method: most year-to-year variation in influenza severity seems to be from weeks 50 to 8; thus, create a sin spike for this period with a year-varying coefficient
+	/*
+	gen flu_year = year + 1 if mmwrweek >= 40
 	gen mmwrweek2 = mmwrweek - 39 if mmwrweek >= 40
 	replace mmwrweek2 = l.mmwrweek2 + 1 if mmwrweek < 40
 	replace mmwrweek2 = mmwrweek + 13 if mmwrweek2 == .
-	//gen pi_time = 2*_pi*mmwrweek2/52.1775
-	//gen sin_time = sin(pi_time)
-	//gen cos_time = cos(pi_time)
-	//gen halfsin_time = sin(pi_time/2)
-	//gen halfcos_time = cos(pi_time/2)
-
-	gen pneumon_or_influ_fluview_pc = pneumon_or_influ_fluview * 100000 / population if end_week < date("20200201","YMD")
-	gen allcause_fluview_pc = totaldeaths * 100000 / population if end_week < date("20200201","YMD")
-	
-	// most year-to-year variation in influenza severity seems to be from weeks 50 to 8; thus, create a sin spike for this period with a year-varying coefficient
 	gen fluseason = 0 if mmwrweek != .
 	replace fluseason = 1 if (mmwrweek >= 50 | mmwrweek <= 8) & mmwrweek != .
 	gen fluseason_sin_time = sin(fluseason*_pi*(mmwrweek2-10)/12)
 	
-	reg pneumon_or_influ_fluview_pc i.fips i.epi_year i.mmwrweek i.epi_year#c.fluseason_sin_time [aweight=population]
+	gen pneumon_or_influ_fluview_pc = pneumon_or_influ_fluview * 100000 / population if end_week < date("20200201","YMD")
+	gen allcause_fluview_pc = totaldeaths * 100000 / population if end_week < date("20200201","YMD")
+
+	reg pneumon_or_influ_fluview_pc i.fips i.flu_year i.mmwrweek i.flu_year#c.fluseason_sin_time [aweight=population]
 	predict expected_influ_pneu_deaths_pc
 	gen expected_influ_pneu_deaths = expected_influ_pneu_deaths_pc * population / 100000
 	
-	reg allcause_fluview_pc i.fips i.epi_year i.mmwrweek i.epi_year#c.fluseason_sin_time [aweight=population]
+	reg allcause_fluview_pc i.fips i.flu_year i.mmwrweek i.flu_year#c.fluseason_sin_time [aweight=population]
 	predict expected_allcause_deaths_pc
 	gen expected_allcause_deaths = expected_allcause_deaths_pc * population / 100000
+	*/
 
-//gen adj_expected_influ_pneu_deaths = expected_influ_pneu_deaths
-//replace adj_expected_influ_pneu_deaths = expected_influ_pneu_deaths * 93 / 212 if days_to_report <= 7 & days_to_report != .
-//replace adj_expected_influ_pneu_deaths = expected_influ_pneu_deaths * 159 / 212 if days_to_report > 7 & days_to_report <= 14
-//replace adj_expected_influ_pneu_deaths = expected_influ_pneu_deaths * 192 / 212 if days_to_report > 14 & days_to_report <= 21
 gen adj_expected_influ_pneu_deaths = expected_influ_pneu_deaths / delay_multiplier
 order adj_expected_influ_pneu_deaths, after(expected_influ_pneu_deaths)
+gen adj_expected_deaths = expected_deaths / delay_multiplier
+order adj_expected_deaths, after(expected_deaths)
 
 replace covid_deaths = 5 if covid_deaths == . & total_deaths != . //rough imputation for where data is supressed for 1-9 deaths
 
@@ -124,10 +111,6 @@ replace covid_deaths = 5 if covid_deaths == . & total_deaths != . //rough imputa
 gen cumulative_covid_death = covid_deaths
 replace cumulative_covid_death = cumulative_covid_death + l.cumulative_covid_death if l.cumulative_covid_death != .
 
-//gen adj_covid_deaths = covid_deaths
-//replace adj_covid_deaths = covid_deaths * 212 / 93 if days_to_report <= 7 & days_to_report != .
-//replace adj_covid_deaths = covid_deaths * 212 / 159 if days_to_report > 7 & days_to_report <= 14
-//replace adj_covid_deaths = covid_deaths * 212 / 192 if days_to_report > 14 & days_to_report <= 21
 
 gen adj_covid_deaths = covid_deaths * delay_multiplier
 gen adj_cumulative_covid_death = adj_covid_deaths
@@ -142,7 +125,6 @@ gen excess_deaths_pc = (total_deaths-adj_expected_deaths)*100000/population
 gen excess_respir_deaths_pc = (pneumon_influ_or_covid-adj_expected_influ_pneu_deaths)*100000/risk_standardized_population
 gen adj_covid_deaths_pc = adj_covid_deaths*100000/risk_standardized_population
 gen adj_excess_deaths_pc = (adj_total_deaths-expected_deaths)*100000/population
-gen adj_excess_deaths_fluview_pc = (adj_total_deaths-expected_allcause_deaths)*100000/population
 gen adj_excess_respir_deaths_pc = (adj_pneumon_influ_or_covid-expected_influ_pneu_deaths)*100000/risk_standardized_population
 gen new_pos_pc = new_pos*100000/population
 gen new_neg_pc = new_neg*100000/population
@@ -168,29 +150,12 @@ twoway (scatter excess_deaths_pc covid_deaths_pc if days_to_report > 14, mcolor(
 reg excess_deaths_pc covid_deaths_pc [aweight=population] if days_to_report > 14, cluster(fips)
 reg excess_deaths_pc c.covid_deaths_pc c.p_pos [aweight=population] if days_to_report > 14, cluster(fips)
 reg excess_deaths_pc c.covid_deaths_pc##c.p_pos [aweight=population] if days_to_report > 14, cluster(fips)
-reg excess_deaths_pc c.covid_deaths_pc c.new_pos_pc c.new_neg_pc [aweight=population] if days_to_report > 14, cluster(fips)
-reg excess_deaths_pc c.covid_deaths_pc##c.new_pos_pc c.covid_deaths_pc##c.new_neg_pc [aweight=population] if days_to_report > 14, cluster(fips)
-reg excess_deaths_pc c.covid_deaths_pc c.new_tests_pc [aweight=population] if days_to_report > 14, cluster(fips)
-reg excess_deaths_pc c.covid_deaths_pc##c.new_tests_pc [aweight=population] if days_to_report > 14, cluster(fips)
-reg excess_deaths_pc c.covid_deaths_pc##c.new_tests_pc c.covid_deaths_pc##c.p_pos [aweight=population] if days_to_report > 14, cluster(fips)
-reg excess_deaths_pc c.covid_deaths_pc##c.new_tests_pc##c.p_pos [aweight=population] if days_to_report > 14, cluster(fips)
-
-gen covid_deaths_pcXp_pos = covid_deaths_pc * p_pos
-reghv excess_deaths_pc covid_deaths_pc p_pos covid_deaths_pcXp_pos if days_to_report > 14, var( new_tests_pc covid_deaths_pc population) twostage cluster(fips)
-reghv excess_deaths_pc covid_deaths_pc p_pos covid_deaths_pcXp_pos if days_to_report > 14, var( new_tests_pc covid_deaths_pc population) cluster(fips)
-drop covid_deaths_pcXp_pos
-
-
 
 reg deathincrease_pc adj_covid_deaths_pc [aweight=population] if days_to_report > 7, cluster(fips)
 reg deathincrease_pc adj_covid_deaths_pc l.adj_covid_deaths_pc [aweight=population] if days_to_report > 7, cluster(fips)
 reg deathincrease_pc c.adj_covid_deaths_pc##c.p_pos [aweight=population] if days_to_report > 7, cluster(fips)
-reg deathincrease_pc c.adj_covid_deaths_pc##c.new_tests_pc [aweight=population] if days_to_report > 7, cluster(fips)
-reg deathincrease_pc c.adj_covid_deaths_pc##c.new_tests_pc c.l.adj_covid_deaths_pc##c.new_tests_pc [aweight=population] if days_to_report > 7, cluster(fips)
-reg deathincrease_pc c.excess_deaths_pc##c.new_tests_pc c.l.excess_deaths_pc##c.new_tests_pc [aweight=population] if days_to_report > 7, cluster(fips)
 
 
-reg excess_deaths_pc covid_deaths_pc [aweight=population] if days_to_report > 14, cluster(fips)
 reg excess_respir_deaths_pc covid_deaths_pc [aweight=population] if days_to_report > 14, cluster(fips)
 
 reg excess_deaths_pc c.covid_deaths_pc##c.p_pos [aweight=population] if days_to_report > 14, cluster(fips)

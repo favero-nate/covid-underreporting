@@ -2,7 +2,7 @@
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\pulldata.txt
   log type:  text
- opened on:  10 Jun 2020, 10:13:06
+ opened on:  10 Jun 2020, 15:19:25
 
 . 
 . import delimited "https://covidtracking.com/api/v1/states/daily.csv", stringcols(1)
@@ -23,15 +23,15 @@ file ..\data\covidtracking.dta saved
 
 . 
 . insheet using "..\data\source_files\State_Custom_Data.csv", clear
-(10 vars, 19,968 obs)
+(10 vars, 20,124 obs)
 
 . gen week_str = string(week,"%02.0f")
 
 . gen yr = substr(season,3,2) if week > 39
-(15,184 missing values generated)
+(15,340 missing values generated)
 
 . replace yr = substr(season,-2,2) if week <= 39
-(15,184 real changes made)
+(15,340 real changes made)
 
 . gen epi_week = "20"+yr+"w"+week_str
 
@@ -41,11 +41,11 @@ file ..\data\covidtracking.dta saved
 
 . destring numinfluenzadeaths-percentcomplete, replace ignore("Insufficient Data" "," ">" "<" "%")
 numinfluenzadeaths: characters I n s u f i c e t space D a removed; replaced as int
-(25 missing values generated)
+(22 missing values generated)
 numpneumoniadeaths: characters I n s u f i c e t space D a , removed; replaced as int
-(25 missing values generated)
+(22 missing values generated)
 totaldeaths: characters I n s u f i c e t space D a , removed; replaced as int
-(25 missing values generated)
+(22 missing values generated)
 percentcomplete: characters space > < % removed; replaced as double
 
 . drop percentpi week_str area agegroup yr weekstartingdate
@@ -55,7 +55,7 @@ percentcomplete: characters space > < % removed; replaced as double
 . rename subarea state
 
 . replace state = "New York" if state == "New York City"
-(384 real changes made)
+(387 real changes made)
 
 . collapse (sum) numinfluenzadeaths-percentcomplete (first) season epi_week, by(state date)
 
@@ -123,7 +123,6 @@ file ..\data\past_reports\unprocessed_files/10 Jun 2020 cdc_deaths_raw1.csv save
 file ..\data\cdc_deaths.dta saved
 
 . save "..\data\past_reports/$S_DATE cdc_deaths.dta", replace
-(note: file ..\data\past_reports/10 Jun 2020 cdc_deaths.dta not found)
 file ..\data\past_reports/10 Jun 2020 cdc_deaths.dta saved
 
 . 
@@ -211,5 +210,5 @@ file ..\data\population.dta saved
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\pulldata.txt
   log type:  text
- closed on:  10 Jun 2020, 10:13:17
+ closed on:  10 Jun 2020, 15:19:37
 -----------------------------------------------------------------------------------------------------

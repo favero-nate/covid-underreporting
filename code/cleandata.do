@@ -27,6 +27,7 @@ order end_week, after(date)
 gen days_to_report = report_date - end_week
 merge m:1 state days_to_report using "..\data\delay_multipliers.dta", keep(1 3)
 drop _merge
+replace delay_multiplier = 1 if days_to_report >= 118 & delay_multiplier == . & days_to_report != .
 
 drop if fips > 56
 
@@ -94,7 +95,7 @@ gen mmwrweek = substr(epi_week,-2,2)
 	//gen halfsin_time = sin(pi_time/2)
 	//gen halfcos_time = cos(pi_time/2)
 
-	gen pneumon_or_influ_fluview_pc = pneumon_or_influ_fluview * 100000 / population
+	gen pneumon_or_influ_fluview_pc = pneumon_or_influ_fluview * 100000 / population if end_week < date("20200201","YMD")
 	gen allcause_fluview_pc = totaldeaths * 100000 / population if end_week < date("20200201","YMD")
 	
 	// most year-to-year variation in influenza severity seems to be from weeks 50 to 8; thus, create a sin spike for this period with a year-varying coefficient

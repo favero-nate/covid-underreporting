@@ -31,7 +31,7 @@ replace delay_multiplier = 1 if days_to_report >= 118 & delay_multiplier == . & 
 
 drop if fips > 56
 
-drop if fips == 9 | fips == 37 // Connecticut and North Carolina's data look highly problematic, so dropping them
+//drop if fips == 9 | fips == 37 // Connecticut and North Carolina's provisional death data look highly problematic, so they are not included in analyses using death counts; however, they are kept in the dataset for analysis of hospitalizations
 
 encode dataqualitygrade, gen(datagrade)
 order datagrade, after(dataqualitygrade)

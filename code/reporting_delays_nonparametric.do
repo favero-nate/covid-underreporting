@@ -25,7 +25,7 @@ foreach var of varlist covid_deaths total_deaths pneumon_influ_or_covid {
 	replace avg_inc_`var' = 1 if avg_inc_`var' < 1
 }
 
-bys state days_to_report: sum newreport_* increase_* avg_inc_*
+bys days_to_report: sum newreport_* increase_* avg_inc_*
 
 keep if days_to_report > 6 & days_to_report < 118
 keep state state_id days_to_report avg_inc_*

@@ -6,6 +6,7 @@ use "..\data\past_reports\16 May 2020 cdc_deaths.dta"
 append using "..\data\past_reports\23 May 2020 cdc_deaths.dta"
 append using "..\data\past_reports\30 May 2020 cdc_deaths.dta"
 append using "..\data\past_reports\ 6 Jun 2020 cdc_deaths.dta"
+append using "..\data\past_reports\12 Jun 2020 cdc_deaths.dta"
 
 rename date end_week
 drop if state == "Connecticut" | state == "North Carolina" | state == "Puerto Rico"

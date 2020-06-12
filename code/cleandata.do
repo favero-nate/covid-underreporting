@@ -7,7 +7,7 @@ use "..\data\population.dta" // start from this file because it has both fips co
 merge 1:m fips using "..\data\covidtracking.dta", keep(2 3)
 drop _merge population risk_standardized_population // merge population back in later because want it merged to all observations, even those missing from the current dataset
 
-merge 1:1 state date using "..\data\past_reports\ 6 Jun 2020 cdc_deaths.dta"
+merge 1:1 state date using "..\data\past_reports\12 Jun 2020 cdc_deaths.dta"
 drop _merge
 
 merge 1:1 state date using "..\data\cdc_historical_deaths.dta"

@@ -27,6 +27,7 @@ predict naive_case_count_pc
 la var naive_case_count_pc "Prediction from naïve case count (new cases)"
 
 reg adj_covid_deaths_pc c.l_new_pos_pc c.l_new_pos_pc#c.l_p_pos, cluster(fips) nocons
+tab end_week if e(sample)==1
 margins, dydx(l_new_pos_pc) at(l_p_pos=(5 15 25 35 45))
 capture drop estimated_death_count_pc
 predict estimated_death_count_pc
@@ -45,6 +46,7 @@ margins, dydx(l_new_pos_pc)
 
 reg adj_excess_respir_deaths_pc c.l_new_pos_pc c.l_new_pos_pc#c.l_p_pos, cluster(fips) nocons
 margins, dydx(l_new_pos_pc) at(l_p_pos=(5 15 25 35 45))
+tab end_week if e(sample)==1
 
 // excess all-cause deaths
 
@@ -53,6 +55,7 @@ margins, dydx(l_new_pos_pc)
 
 reg adj_excess_deaths_pc c.l_new_pos_pc c.l_new_pos_pc#c.l_p_pos, cluster(fips) nocons
 margins, dydx(l_new_pos_pc) at(l_p_pos=(5 15 25 35 45))
+tab end_week if e(sample)==1
 
 // covid hospitalizations
 restore

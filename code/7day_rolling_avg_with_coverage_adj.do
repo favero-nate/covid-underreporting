@@ -56,8 +56,7 @@ export delimited using "`dropbox'/covid_trendlines", replace
 drop if population==.
 
 format date %tdnn/dd
-la var adj_case_count_pc_7d "Estimated severity (relative to population size)"
-    //twoway (line adj_case_count_pc_7d date) (scatter adj_case_count_pc_7d date if problematic_data==1) if state_id==2, by(state, note("")) title("Relative prevalence of newly confirmed cases," "adjusted for testing volume (7-day rolling average)") xtitle("") ylabel(0 50 100) note("Data sources: covidtracking.com, US Census Bureau (Social Explorer)") legend(order(2 "Inconsistent data reports"))
+la var adj_case_count_pc_7d "Estimated prevalence (relative to population size)"
 	
 gen cound_7d_available = (adj_case_count_pc_7d!=.)
 replace adj_case_count_pc_7d = 0 if problematic_data == 1 & adj_case_count_pc_7d == .
@@ -70,11 +69,11 @@ forvalues i = 1/51 {
     local state : label state_id `i'
 	quietly sum problematic_data if state_id==`i'
 	if r(mean) == 0 {
-		twoway (line adj_case_count_pc_7d date) if state_id==`i' & cound_7d_available==1, by(state, note("Estimates by covidtrendlines.com; data from covidtracking.com (CC BY-NC-4.0)")) title("Relative prevalence of newly confirmed cases, adjusted for" "testing volume (lags 2-4 weeks behind initial infections)") xtitle("") ylabel(0 50 100)
+		twoway (line adj_case_count_pc_7d date) if state_id==`i' & cound_7d_available==1, title("`state'") subtitle("Prevalence of newly confirmed COVID-19 cases, adjusted for" "testing volume (lags 2-4 weeks behind initial infections)") note("Estimates by covidtrendlines.com; data from covidtracking.com (CC BY-NC-4.0)") xtitle("") ylabel(0 50 100)
 		graph export "`dropbox'/`state'_`c_date'.png", replace width(1500)
 	}
 	else {
-		twoway (line adj_case_count_pc_7d date if cound_7d_available==1) (scatter adj_case_count_pc_7d date if problematic_data==1) if state_id==`i', by(state, note("Estimates by covidtrendlines.com; data from covidtracking.com (CC BY-NC-4.0)")) title("Relative prevalence of newly confirmed cases, adjusted for" "testing volume (lags 2-4 weeks behind initial infections)") xtitle("") ylabel(0 50 100) legend(order(2 "Inconsistent/suspect data reports"))
+		twoway (line adj_case_count_pc_7d date if cound_7d_available==1) (scatter adj_case_count_pc_7d date if problematic_data==1) if state_id==`i', title("`state'") subtitle("Prevalence of newly confirmed COVID-19 cases, adjusted for" "testing volume (lags 2-4 weeks behind initial infections)") note("Estimates by covidtrendlines.com; data from covidtracking.com (CC BY-NC-4.0)") xtitle("") ylabel(0 50 100) legend(order(2 "Inconsistent or unusual data reported"))
 		graph export "`dropbox'/`state'_`c_date'.png", replace width(1500)
 	}
 }

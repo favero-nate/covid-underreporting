@@ -1,0 +1,240 @@
+-----------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\7day_rolling_avg_with
+> _coverage_adj.txt
+  log type:  text
+ opened on:  14 Jun 2020, 01:07:26
+
+. 
+. use "..\data\population.dta"
+
+. 
+. merge 1:m fips using "..\data\covidtracking.dta", keep(2 3)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                           445
+        from master                         0  (_merge==1)
+        from using                        445  (_merge==2)
+
+    matched                             5,116  (_merge==3)
+    -----------------------------------------
+
+. 
+. order date fips
+
+. sort fips state date
+
+. 
+. xtset fips date
+       panel variable:  fips (unbalanced)
+        time variable:  date, 20200122 to 20200612
+                delta:  1 day
+
+. 
+. gen d_pos = d.positive
+(71 missing values generated)
+
+. gen d_neg = d.negative
+(276 missing values generated)
+
+. 
+. // for negative values of new tests: create flag & replace negative values with zeros... cumulative
+>  case counts can't truly drop, so these reflect some sort of reporting error
+. gen smoothed_d_pos = d_pos
+(71 missing values generated)
+
+. replace smoothed_d_pos = d_pos + f.d_pos if f.d_pos < 0
+(19 real changes made)
+
+. replace smoothed_d_pos = 0 if d_pos < 0
+(21 real changes made)
+
+. gen smoothed_d_neg = d_neg
+(276 missing values generated)
+
+. replace smoothed_d_neg = d_neg + f.d_neg if f.d_neg < 0
+(30 real changes made)
+
+. replace smoothed_d_neg = 0 if d_neg < 0
+(31 real changes made)
+
+. // smoothing for 2nd time (allows for 2 consecutive days of artificially inflated reporting):
+. gen doublesmoothed_d_pos = smoothed_d_pos
+(71 missing values generated)
+
+. replace doublesmoothed_d_pos = smoothed_d_pos + f.smoothed_d_pos if f.smoothed_d_pos < 0
+(4 real changes made)
+
+. replace doublesmoothed_d_pos = 0 if smoothed_d_pos < 0
+(4 real changes made)
+
+. gen doublesmoothed_d_neg = smoothed_d_neg
+(276 missing values generated)
+
+. replace doublesmoothed_d_neg = smoothed_d_neg + f.smoothed_d_neg if f.smoothed_d_neg < 0
+(13 real changes made)
+
+. replace doublesmoothed_d_neg = 0 if smoothed_d_neg < 0
+(14 real changes made)
+
+. // smoothing for 3rd time (allows for 3 consecutive days of artificially inflated reporting):
+. gen new_pos = doublesmoothed_d_pos
+(71 missing values generated)
+
+. replace new_pos = doublesmoothed_d_pos + f.doublesmoothed_d_pos if f.doublesmoothed_d_pos < 0
+(3 real changes made)
+
+. replace new_pos = 0 if new_pos < 0
+(5 real changes made)
+
+. gen new_neg = doublesmoothed_d_neg
+(276 missing values generated)
+
+. replace new_neg = doublesmoothed_d_neg + f.doublesmoothed_d_neg if f.doublesmoothed_d_neg < 0
+(8 real changes made)
+
+. replace new_neg = 0 if new_neg < 0
+(14 real changes made)
+
+. 
+. gen new_pos_7d = (new_pos + l.new_pos + l2.new_pos + l3.new_pos + l4.new_pos + l5.new_pos + l6.new_
+> pos)/7
+(407 missing values generated)
+
+. gen new_neg_7d = (new_neg + l.new_neg + l2.new_neg + l3.new_neg + l4.new_neg + l5.new_neg + l6.new_
+> neg)/7
+(613 missing values generated)
+
+. 
+. gen p_pos_7d = new_pos_7d/(new_pos_7d+new_neg_7d)*100
+(651 missing values generated)
+
+. 
+. gen problematic_data = (d_pos<-2|d_neg<-2)
+
+. replace problematic_data = 1 if d_neg <= 0 & l.d_neg <= 0 & l2.d_neg <= 0 & d_pos >= 5 & l.d_pos >=
+>  5 & l2.d_pos >= 5
+(107 real changes made)
+
+. replace problematic_data = 1 if p_pos_7d == 100
+(5 real changes made)
+
+. 
+. gen adj_case_count_pc_7d = new_pos_7d*(1+.026213*p_pos_7d) / population * 100000 // adjustment base
+> d on results from multilevel_and_nonlinear_models_of_covid_severity
+(944 missing values generated)
+
+. 
+. order date fips state problematic_data adj_case_count_pc_7d new_pos_7d new_neg_7d p_pos_7d new_pos 
+> new_neg positive negative population
+
+. keep date-population
+
+. 
+. export delimited using "`dropbox'/covid_trendlines", replace
+(note: file C:\Users\favero\Dropbox\covid-trendlines/covid_trendlines.csv not found)
+file C:\Users\favero\Dropbox\covid-trendlines/covid_trendlines.csv saved
+
+. 
+. drop if population==.
+(445 observations deleted)
+
+. 
+. format date %tdnn/dd
+
+. la var adj_case_count_pc_7d "Estimated severity"
+
+.     //twoway (line adj_case_count_pc_7d date) (scatter adj_case_count_pc_7d date if problematic_dat
+> a==1) if state_id==2, by(state, note("")) title("Relative prevalence of newly confirmed cases," "ad
+> justed for testing volume (7-day rolling average)") xtitle("") ylabel(0 50 100) note("Data sources:
+>  covidtracking.com, US Census Bureau (Social Explorer)") legend(order(2 "Inconsistent data reports"
+> ))
+.         
+. gen cound_7d_available = (adj_case_count_pc_7d!=.)
+
+. replace adj_case_count_pc_7d = 0 if problematic_data == 1 & adj_case_count_pc_7d == .
+(18 real changes made)
+
+. 
+. egen state_id = group(fips)
+
+. forvalues i = 1/51 {
+  2.     quietly sum problematic_data if state_id==`i'
+  3.         if r(mean) == 0 {
+  4.                 twoway (line adj_case_count_pc_7d date) if state_id==`i' & cound_7d_available==1
+> , by(state, note("")) title("Relative prevalence of newly confirmed cases," "adjusted for testing v
+> olume (7-day rolling average)") xtitle("") ylabel(0 50 100) note("Data sources: covidtracking.com (
+> CC BY-NC-4.0), US Census Bureau (Social Explorer)")
+  5.                 graph export "`dropbox'/state`i'.png", replace width(1500)
+  6.             
+.         }
+  7.         else {
+  8.                 twoway (line adj_case_count_pc_7d date if cound_7d_available==1) (scatter adj_ca
+> se_count_pc_7d date if problematic_data==1) if state_id==`i', by(state, note("")) title("Relative p
+> revalence of newly confirmed cases," "adjusted for testing volume (7-day rolling average)") xtitle(
+> "") ylabel(0 50 100) note("Data sources: covidtracking.com (CC BY-NC-4.0), US Census Bureau (Social
+>  Explorer)") legend(order(2 "Inconsistent/suspect data reports"))
+  9.                 graph export "`dropbox'/state`i'.png", replace width(1500)
+ 10.         }
+ 11. }
+(file C:\Users\favero\Dropbox\covid-trendlines/state1.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state2.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state3.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state4.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state5.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state6.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state7.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state8.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state9.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state10.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state11.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state12.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state13.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state14.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state15.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state16.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state17.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state18.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state19.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state20.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state21.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state22.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state23.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state24.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state25.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state26.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state27.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state28.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state29.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state30.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state31.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state32.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state33.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state34.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state35.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state36.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state37.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state38.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state39.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state40.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state41.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state42.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state43.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state44.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state45.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state46.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state47.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state48.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state49.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state50.png written in PNG format)
+(file C:\Users\favero\Dropbox\covid-trendlines/state51.png written in PNG format)
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\7day_rolling_avg_with
+> _coverage_adj.txt
+  log type:  text
+ closed on:  14 Jun 2020, 01:09:35
+-----------------------------------------------------------------------------------------------------

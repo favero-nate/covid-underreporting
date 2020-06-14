@@ -1,0 +1,717 @@
+-----------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\multilevel_and_nonlin
+> ear_models_of_covid_severity.txt
+  log type:  text
+ opened on:  13 Jun 2020, 22:46:20
+
+. 
+. use "..\data\weeklydata.dta"
+
+. 
+. keep if days_to_report > 14 & days_to_report != . & l.p_pos != .
+(19,368 observations deleted)
+
+. 
+. // check if slopes vary much by state or week; looks like there's not much variance in slopes along
+>  these dimensions
+. mixed adj_excess_respir_deaths_pc l.new_pos_pc if l.p_pos != . || _all:R.end_week || fips: l.new_po
+> s_pc
+
+Performing EM optimization: 
+
+Performing gradient-based optimization: 
+
+Iteration 0:   log likelihood = -719.85573  
+Iteration 1:   log likelihood = -718.87138  
+Iteration 2:   log likelihood = -718.86944  
+Iteration 3:   log likelihood = -718.86944  
+
+Computing standard errors:
+
+Mixed-effects ML regression                     Number of obs     =        403
+
+-------------------------------------------------------------
+                |     No. of       Observations per Group
+ Group Variable |     Groups    Minimum    Average    Maximum
+----------------+--------------------------------------------
+           _all |          1        403      403.0        403
+           fips |         49          6        8.2          9
+-------------------------------------------------------------
+
+                                                Wald chi2(1)      =     107.68
+Log likelihood = -718.86944                     Prob > chi2       =     0.0000
+
+---------------------------------------------------------------------------------------------
+adj_excess_respir_deaths_pc |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+----------------------------+----------------------------------------------------------------
+                 new_pos_pc |
+                        L1. |     .05117   .0049312    10.38   0.000     .0415051     .060835
+                            |
+                      _cons |   .0847761   .1889822     0.45   0.654    -.2856222    .4551745
+---------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+  Random-effects Parameters  |   Estimate   Std. Err.     [95% Conf. Interval]
+-----------------------------+------------------------------------------------
+_all: Identity               |
+             var(R.end_week) |     .18525   .1108593      .0573288    .5986089
+-----------------------------+------------------------------------------------
+fips: Independent            |
+           var(L.new_pos_pc) |   .0004653   .0001286      .0002707    .0007999
+                  var(_cons) |   2.46e-20   1.92e-19      5.74e-27    1.05e-13
+-----------------------------+------------------------------------------------
+               var(Residual) |   1.638234   .1272408      1.406901    1.907604
+------------------------------------------------------------------------------
+LR test vs. linear model: chi2(3) = 252.84                Prob > chi2 = 0.0000
+
+Note: LR test is conservative and provided only for reference.
+
+. mixed adj_excess_respir_deaths_pc l.new_pos_pc if l.p_pos != . || _all:R.fips || end_week: l.new_po
+> s_pc
+
+Performing EM optimization: 
+
+Performing gradient-based optimization: 
+
+Iteration 0:   log likelihood = -714.74434  
+Iteration 1:   log likelihood = -714.74434  
+
+Computing standard errors:
+
+Mixed-effects ML regression                     Number of obs     =        403
+
+-------------------------------------------------------------
+                |     No. of       Observations per Group
+ Group Variable |     Groups    Minimum    Average    Maximum
+----------------+--------------------------------------------
+           _all |          1        403      403.0        403
+       end_week |          9         29       44.8         49
+-------------------------------------------------------------
+
+                                                Wald chi2(1)      =      98.30
+Log likelihood = -714.74434                     Prob > chi2       =     0.0000
+
+---------------------------------------------------------------------------------------------
+adj_excess_respir_deaths_pc |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+----------------------------+----------------------------------------------------------------
+                 new_pos_pc |
+                        L1. |   .0643422   .0064896     9.91   0.000     .0516227    .0770616
+                            |
+                      _cons |   .0955119   .2315776     0.41   0.680    -.3583719    .5493957
+---------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+  Random-effects Parameters  |   Estimate   Std. Err.     [95% Conf. Interval]
+-----------------------------+------------------------------------------------
+_all: Identity               |
+                 var(R.fips) |   1.502224   .3884387      .9049709    2.493646
+-----------------------------+------------------------------------------------
+end_week: Independent        |
+           var(L.new_pos_pc) |   .0003141   .0001594      .0001162    .0008493
+                  var(_cons) |   .1051014    .075496      .0257145    .4295759
+-----------------------------+------------------------------------------------
+               var(Residual) |   1.394768   .1091511      1.196435    1.625979
+------------------------------------------------------------------------------
+LR test vs. linear model: chi2(3) = 261.09                Prob > chi2 = 0.0000
+
+Note: LR test is conservative and provided only for reference.
+
+. 
+. mixed adj_excess_respir_deaths_pc l.new_pos_pc if l.p_pos != . || fips: l.new_pos_pc
+
+Performing EM optimization: 
+
+Performing gradient-based optimization: 
+
+Iteration 0:   log likelihood = -729.08149  
+Iteration 1:   log likelihood = -728.61854  
+Iteration 2:   log likelihood = -728.61834  
+Iteration 3:   log likelihood = -728.61833  
+
+Computing standard errors:
+
+Mixed-effects ML regression                     Number of obs     =        403
+Group variable: fips                            Number of groups  =         49
+
+                                                Obs per group:
+                                                              min =          6
+                                                              avg =        8.2
+                                                              max =          9
+
+                                                Wald chi2(1)      =      75.82
+Log likelihood = -728.61833                     Prob > chi2       =     0.0000
+
+---------------------------------------------------------------------------------------------
+adj_excess_respir_deaths_pc |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+----------------------------+----------------------------------------------------------------
+                 new_pos_pc |
+                        L1. |    .043757   .0050254     8.71   0.000     .0339074    .0536065
+                            |
+                      _cons |   .2716996   .1228311     2.21   0.027      .030955    .5124441
+---------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+  Random-effects Parameters  |   Estimate   Std. Err.     [95% Conf. Interval]
+-----------------------------+------------------------------------------------
+fips: Independent            |
+           var(L.new_pos_pc) |   .0005563   .0001523      .0003253    .0009514
+                  var(_cons) |   1.14e-06   .0006879             0           .
+-----------------------------+------------------------------------------------
+               var(Residual) |   1.771437   .1339405      1.527444    2.054405
+------------------------------------------------------------------------------
+LR test vs. linear model: chi2(2) = 233.35                Prob > chi2 = 0.0000
+
+Note: LR test is conservative and provided only for reference.
+
+. mixed adj_excess_respir_deaths_pc c.l.new_pos_pc##c.l.p_pos if l.p_pos != . || fips: l.new_pos_pc
+
+Performing EM optimization: 
+
+Performing gradient-based optimization: 
+
+Iteration 0:   log likelihood = -675.72534  
+Iteration 1:   log likelihood = -675.72534  
+
+Computing standard errors:
+
+Mixed-effects ML regression                     Number of obs     =        403
+Group variable: fips                            Number of groups  =         49
+
+                                                Obs per group:
+                                                              min =          6
+                                                              avg =        8.2
+                                                              max =          9
+
+                                                Wald chi2(3)      =     288.43
+Log likelihood = -675.72534                     Prob > chi2       =     0.0000
+
+---------------------------------------------------------------------------------------------
+adj_excess_respir_deaths_pc |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+----------------------------+----------------------------------------------------------------
+                 new_pos_pc |
+                        L1. |   .0053265   .0047059     1.13   0.258    -.0038969    .0145499
+                            |
+                      p_pos |
+                        L1. |  -.0163078   .0056214    -2.90   0.004    -.0273256   -.0052901
+                            |
+     cL.new_pos_pc#cL.p_pos |   .0015368   .0001209    12.71   0.000     .0012998    .0017738
+                            |
+                      _cons |   1.358658   .2516413     5.40   0.000     .8654503    1.851866
+---------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+  Random-effects Parameters  |   Estimate   Std. Err.     [95% Conf. Interval]
+-----------------------------+------------------------------------------------
+fips: Independent            |
+           var(L.new_pos_pc) |   .0002478    .000089      .0001225    .0005011
+                  var(_cons) |   2.077447   .6599789      1.114587    3.872095
+-----------------------------+------------------------------------------------
+               var(Residual) |   1.090232   .0892055      .9286912    1.279871
+------------------------------------------------------------------------------
+LR test vs. linear model: chi2(2) = 220.67                Prob > chi2 = 0.0000
+
+Note: LR test is conservative and provided only for reference.
+
+. 
+. mixed adj_excess_respir_deaths_pc l.new_pos_pc if l.p_pos != . || end_week: l.new_pos_pc
+
+Performing EM optimization: 
+
+Performing gradient-based optimization: 
+
+Iteration 0:   log likelihood = -767.55569  
+Iteration 1:   log likelihood = -767.55569  
+
+Computing standard errors:
+
+Mixed-effects ML regression                     Number of obs     =        403
+Group variable: end_week                        Number of groups  =          9
+
+                                                Obs per group:
+                                                              min =         29
+                                                              avg =       44.8
+                                                              max =         49
+
+                                                Wald chi2(1)      =     110.28
+Log likelihood = -767.55569                     Prob > chi2       =     0.0000
+
+---------------------------------------------------------------------------------------------
+adj_excess_respir_deaths_pc |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+----------------------------+----------------------------------------------------------------
+                 new_pos_pc |
+                        L1. |   .0804961   .0076651    10.50   0.000     .0654728    .0955195
+                            |
+                      _cons |  -.5192938   .1465852    -3.54   0.000    -.8065955   -.2319922
+---------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+  Random-effects Parameters  |   Estimate   Std. Err.     [95% Conf. Interval]
+-----------------------------+------------------------------------------------
+end_week: Independent        |
+           var(L.new_pos_pc) |   .0004728    .000265      .0001576    .0014185
+                  var(_cons) |   .0976883   .0874507      .0168984    .5647275
+-----------------------------+------------------------------------------------
+               var(Residual) |   2.403237   .1730232      2.086957    2.767449
+------------------------------------------------------------------------------
+LR test vs. linear model: chi2(2) = 155.47                Prob > chi2 = 0.0000
+
+Note: LR test is conservative and provided only for reference.
+
+. mixed adj_excess_respir_deaths_pc c.l.new_pos_pc##c.l.p_pos if l.p_pos != . || end_week: l.new_pos_
+> pc
+
+Performing EM optimization: 
+
+Performing gradient-based optimization: 
+
+Iteration 0:   log likelihood = -750.85691  
+Iteration 1:   log likelihood = -750.85243  
+Iteration 2:   log likelihood = -750.85243  
+
+Computing standard errors:
+
+Mixed-effects ML regression                     Number of obs     =        403
+Group variable: end_week                        Number of groups  =          9
+
+                                                Obs per group:
+                                                              min =         29
+                                                              avg =       44.8
+                                                              max =         49
+
+                                                Wald chi2(3)      =     200.46
+Log likelihood = -750.85243                     Prob > chi2       =     0.0000
+
+---------------------------------------------------------------------------------------------
+adj_excess_respir_deaths_pc |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+----------------------------+----------------------------------------------------------------
+                 new_pos_pc |
+                        L1. |   .0611159   .0069923     8.74   0.000     .0474112    .0748206
+                            |
+                      p_pos |
+                        L1. |  -.0014894   .0062926    -0.24   0.813    -.0138227    .0108438
+                            |
+     cL.new_pos_pc#cL.p_pos |   .0006023   .0001044     5.77   0.000     .0003976    .0008069
+                            |
+                      _cons |  -.2042439   .1428695    -1.43   0.153    -.4842629    .0757752
+---------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+  Random-effects Parameters  |   Estimate   Std. Err.     [95% Conf. Interval]
+-----------------------------+------------------------------------------------
+end_week: Independent        |
+           var(L.new_pos_pc) |   .0003059   .0001881      .0000916    .0010211
+                  var(_cons) |   .0301048   .0551871      .0008284    1.094035
+-----------------------------+------------------------------------------------
+               var(Residual) |   2.249551   .1622638      1.952978    2.591162
+------------------------------------------------------------------------------
+LR test vs. linear model: chi2(2) = 70.42                 Prob > chi2 = 0.0000
+
+Note: LR test is conservative and provided only for reference.
+
+. 
+. 
+. // try different lag values
+. 
+. mixed adj_excess_respir_deaths_pc new_pos_pc l.new_pos_pc l2.new_pos_pc if l.p_pos != . || _all:R.e
+> nd_week || fips: 
+
+Performing EM optimization: 
+
+Performing gradient-based optimization: 
+
+Iteration 0:   log likelihood = -658.35357  
+Iteration 1:   log likelihood = -658.35357  
+
+Computing standard errors:
+
+Mixed-effects ML regression                     Number of obs     =        353
+
+-------------------------------------------------------------
+                |     No. of       Observations per Group
+ Group Variable |     Groups    Minimum    Average    Maximum
+----------------+--------------------------------------------
+           _all |          1        353      353.0        353
+           fips |         49          4        7.2          8
+-------------------------------------------------------------
+
+                                                Wald chi2(3)      =    1032.24
+Log likelihood = -658.35357                     Prob > chi2       =     0.0000
+
+---------------------------------------------------------------------------------------------
+adj_excess_respir_deaths_pc |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+----------------------------+----------------------------------------------------------------
+                 new_pos_pc |
+                        --. |   .0475557   .0050583     9.40   0.000     .0376416    .0574697
+                        L1. |   .0203177   .0067542     3.01   0.003     .0070797    .0335556
+                        L2. |   .0088026   .0039416     2.23   0.026     .0010771    .0165281
+                            |
+                      _cons |  -.7987076   .3086631    -2.59   0.010    -1.403676   -.1937392
+---------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+  Random-effects Parameters  |   Estimate   Std. Err.     [95% Conf. Interval]
+-----------------------------+------------------------------------------------
+_all: Identity               |
+             var(R.end_week) |   .3364661   .1981386      .1060925    1.067083
+-----------------------------+------------------------------------------------
+fips: Identity               |
+                  var(_cons) |   1.557917   .3749172      .9720758    2.496827
+-----------------------------+------------------------------------------------
+               var(Residual) |   1.769543   .1455575      1.506065    2.079115
+------------------------------------------------------------------------------
+LR test vs. linear model: chi2(2) = 131.83                Prob > chi2 = 0.0000
+
+Note: LR test is conservative and provided only for reference.
+
+. mixed adj_excess_respir_deaths_pc c.new_pos_pc##c.p_pos c.l.new_pos_pc##c.l.p_pos || _all:R.end_wee
+> k || end_week: new_pos_pc l.new_pos_pc
+
+Performing EM optimization: 
+
+Performing gradient-based optimization: 
+
+Iteration 0:   log likelihood = -726.02123  
+Iteration 1:   log likelihood = -725.74696  
+Iteration 2:   log likelihood = -725.74331  
+Iteration 3:   log likelihood = -725.74329  
+
+Computing standard errors:
+
+Mixed-effects ML regression                     Number of obs     =        402
+
+-------------------------------------------------------------
+                |     No. of       Observations per Group
+ Group Variable |     Groups    Minimum    Average    Maximum
+----------------+--------------------------------------------
+           _all |          1        402      402.0        402
+       end_week |          9         29       44.7         49
+-------------------------------------------------------------
+
+                                                Wald chi2(6)      =     925.75
+Log likelihood = -725.74329                     Prob > chi2       =     0.0000
+
+---------------------------------------------------------------------------------------------
+adj_excess_respir_deaths_pc |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+----------------------------+----------------------------------------------------------------
+                 new_pos_pc |   .0069362   .0070642     0.98   0.326    -.0069094    .0207817
+                      p_pos |   -.006819   .0084483    -0.81   0.420    -.0233775    .0097394
+                            |
+       c.new_pos_pc#c.p_pos |   .0005018    .000179     2.80   0.005      .000151    .0008527
+                            |
+                 new_pos_pc |
+                        L1. |    .043732   .0072082     6.07   0.000     .0296042    .0578599
+                            |
+                      p_pos |
+                        L1. |   .0000245   .0067084     0.00   0.997    -.0131237    .0131727
+                            |
+     cL.new_pos_pc#cL.p_pos |   .0003602   .0001763     2.04   0.041     .0000147    .0007057
+                            |
+                      _cons |  -.1865344   .1362615    -1.37   0.171     -.453602    .0805332
+---------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+  Random-effects Parameters  |   Estimate   Std. Err.     [95% Conf. Interval]
+-----------------------------+------------------------------------------------
+_all: Identity               |
+             var(R.end_week) |   3.62e-11   1.02e-07             0           .
+-----------------------------+------------------------------------------------
+end_week: Independent        |
+             var(new_pos_pc) |   .0000296   .0000309      3.82e-06    .0002289
+           var(L.new_pos_pc) |   .0000142   .0000276      3.19e-07    .0006352
+                  var(_cons) |   3.62e-11   5.23e-10      1.79e-23    73.40522
+-----------------------------+------------------------------------------------
+               var(Residual) |   2.081039   .1498142      1.807183    2.396394
+------------------------------------------------------------------------------
+LR test vs. linear model: chi2(4) = 16.15                 Prob > chi2 = 0.0028
+
+Note: LR test is conservative and provided only for reference.
+
+. mixed adj_excess_respir_deaths_pc c.new_pos_pc##c.p_pos c.l.new_pos_pc##c.l.p_pos c.l2.new_pos_pc##
+> c.l2.p_pos || _all:R.end_week || end_week: new_pos_pc l.new_pos_pc l2.new_pos_pc
+
+Performing EM optimization: 
+
+Performing gradient-based optimization: 
+
+Iteration 0:   log likelihood = -605.02328  
+Iteration 1:   log likelihood = -604.48719  
+Iteration 2:   log likelihood = -604.45399  
+Iteration 3:   log likelihood = -604.45395  
+
+Computing standard errors:
+
+Mixed-effects ML regression                     Number of obs     =        352
+
+-------------------------------------------------------------
+                |     No. of       Observations per Group
+ Group Variable |     Groups    Minimum    Average    Maximum
+----------------+--------------------------------------------
+           _all |          1        352      352.0        352
+       end_week |          8         29       44.0         49
+-------------------------------------------------------------
+
+                                                Wald chi2(9)      =     401.90
+Log likelihood = -604.45395                     Prob > chi2       =     0.0000
+
+---------------------------------------------------------------------------------------------
+adj_excess_respir_deaths_pc |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+----------------------------+----------------------------------------------------------------
+                 new_pos_pc |   .0184079   .0082184     2.24   0.025     .0023002    .0345157
+                      p_pos |  -.0043005   .0098427    -0.44   0.662    -.0235918    .0149908
+                            |
+       c.new_pos_pc#c.p_pos |   .0004558   .0002367     1.93   0.054    -8.19e-06    .0009197
+                            |
+                 new_pos_pc |
+                        L1. |  -.0174997   .0112346    -1.56   0.119    -.0395191    .0045197
+                            |
+                      p_pos |
+                        L1. |  -.0103187   .0093215    -1.11   0.268    -.0285884    .0079511
+                            |
+     cL.new_pos_pc#cL.p_pos |   .0007702   .0003201     2.41   0.016     .0001428    .0013976
+                            |
+                 new_pos_pc |
+                        L2. |   .0665431   .0073926     9.00   0.000     .0520539    .0810323
+                            |
+                      p_pos |
+                        L2. |   .0129264   .0065808     1.96   0.049     .0000284    .0258245
+                            |
+   cL2.new_pos_pc#cL2.p_pos |  -.0007137   .0001891    -3.77   0.000    -.0010844   -.0003429
+                            |
+                      _cons |  -.4475926   .1412583    -3.17   0.002    -.7244538   -.1707315
+---------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+  Random-effects Parameters  |   Estimate   Std. Err.     [95% Conf. Interval]
+-----------------------------+------------------------------------------------
+_all: Identity               |
+             var(R.end_week) |   1.57e-14          .             .           .
+-----------------------------+------------------------------------------------
+end_week: Independent        |
+             var(new_pos_pc) |    .000108   .0001326      9.75e-06    .0011975
+           var(L.new_pos_pc) |   .0001128   .0001466      8.83e-06    .0014411
+          var(L2.new_pos_pc) |   6.35e-17   2.28e-13             0           .
+                  var(_cons) |   1.57e-14   5.08e-11             0           .
+-----------------------------+------------------------------------------------
+               var(Residual) |   1.664977   .1276752      1.432635    1.934999
+------------------------------------------------------------------------------
+LR test vs. linear model: chi2(5) = 58.42                 Prob > chi2 = 0.0000
+
+Note: LR test is conservative and provided only for reference.
+
+. 
+. // use non-linear least squares to create a single estimate (across multiple lag values) of how muc
+> h to adjust case count by % positive)
+. 
+. reg adj_excess_respir_deaths_pc c.new_pos_pc##c.p_pos c.l.new_pos_pc##c.l.p_pos
+
+      Source |       SS           df       MS      Number of obs   =       402
+-------------+----------------------------------   F(6, 395)       =    544.54
+       Model |   7496.7894         6   1249.4649   Prob > F        =    0.0000
+    Residual |  906.341126       395   2.2945345   R-squared       =    0.8921
+-------------+----------------------------------   Adj R-squared   =    0.8905
+       Total |  8403.13052       401  20.9554377   Root MSE        =    1.5148
+
+----------------------------------------------------------------------------------------
+adj_excess_respir_de~c |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-----------------------+----------------------------------------------------------------
+            new_pos_pc |   .0042539   .0068802     0.62   0.537    -.0092724    .0177802
+                 p_pos |  -.0104738   .0086732    -1.21   0.228    -.0275252    .0065776
+                       |
+  c.new_pos_pc#c.p_pos |   .0007592   .0001651     4.60   0.000     .0004347    .0010837
+                       |
+            new_pos_pc |
+                   L1. |   .0395644   .0069604     5.68   0.000     .0258803    .0532484
+                       |
+                 p_pos |
+                   L1. |   .0005546    .006932     0.08   0.936    -.0130736    .0141828
+                       |
+cL.new_pos_pc#cL.p_pos |   .0003417    .000166     2.06   0.040     .0000154     .000668
+                       |
+                 _cons |   -.076622   .1414192    -0.54   0.588    -.3546505    .2014065
+----------------------------------------------------------------------------------------
+
+. nl (adj_excess_respir_deaths_pc = {b0} + {b1}*new_pos_pc*(1+{a}*p_pos) + {b2}*l.new_pos_pc*(1+{a}*l
+> .p_pos)) if e(sample)==1, cluster(fips)
+(obs = 402)
+
+Iteration 0:  residual SS =  1302.209
+Iteration 1:  residual SS =  1080.684
+Iteration 2:  residual SS =  1002.254
+Iteration 3:  residual SS =  918.6699
+Iteration 4:  residual SS =  918.6688
+Iteration 5:  residual SS =  918.6688
+Iteration 6:  residual SS =  918.6688
+
+
+Nonlinear regression                                Number of obs =        402
+                                                    R-squared     =     0.8907
+                                                    Adj R-squared =     0.8884
+                                                    Root MSE      =    1.51928
+                                                    Res. dev.     =   1473.069
+
+                                  (Std. Err. adjusted for 49 clusters in fips)
+------------------------------------------------------------------------------
+             |               Robust
+a~respir_d~c |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         /b0 |  -.1959294   .1398332    -1.40   0.168    -.4770828    .0852241
+         /b1 |    .017402   .0051088     3.41   0.001     .0071301    .0276739
+          /a |   .0239332   .0083322     2.87   0.006     .0071802    .0406862
+         /b2 |   .0264704    .003401     7.78   0.000     .0196322    .0333086
+------------------------------------------------------------------------------
+  Parameter b0 taken as constant term in model
+
+. 
+. reg adj_excess_respir_deaths_pc c.new_pos_pc##c.p_pos c.l.new_pos_pc##c.l.p_pos c.l2.new_pos_pc##c.
+> l2.p_pos
+
+      Source |       SS           df       MS      Number of obs   =       352
+-------------+----------------------------------   F(9, 342)       =    359.82
+       Model |   7144.8461         9  793.871789   Prob > F        =    0.0000
+    Residual |  754.557101       342  2.20630731   R-squared       =    0.9045
+-------------+----------------------------------   Adj R-squared   =    0.9020
+       Total |  7899.40321       351  22.5054222   Root MSE        =    1.4854
+
+------------------------------------------------------------------------------------------
+adj_excess_respir_deat~c |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------------------+----------------------------------------------------------------
+              new_pos_pc |    .006581    .007672     0.86   0.392    -.0085091    .0216712
+                   p_pos |   -.008561    .010752    -0.80   0.426    -.0297094    .0125874
+                         |
+    c.new_pos_pc#c.p_pos |   .0008971   .0002239     4.01   0.000     .0004567    .0013375
+                         |
+              new_pos_pc |
+                     L1. |   -.005647   .0110484    -0.51   0.610    -.0273783    .0160843
+                         |
+                   p_pos |
+                     L1. |  -.0130163   .0100074    -1.30   0.194    -.0327002    .0066675
+                         |
+  cL.new_pos_pc#cL.p_pos |   .0009594   .0003069     3.13   0.002     .0003557    .0015631
+                         |
+              new_pos_pc |
+                     L2. |   .0486348   .0074994     6.49   0.000     .0338839    .0633856
+                         |
+                   p_pos |
+                     L2. |   .0185516   .0074031     2.51   0.013     .0039903    .0331129
+                         |
+cL2.new_pos_pc#cL2.p_pos |  -.0008152   .0001881    -4.33   0.000    -.0011852   -.0004451
+                         |
+                   _cons |  -.2480249   .1603072    -1.55   0.123    -.5633372    .0672874
+------------------------------------------------------------------------------------------
+
+. nl (adj_excess_respir_deaths_pc = {b0} + {b1}*new_pos_pc*(1+{a}*p_pos) + {b2}*l.new_pos_pc*(1+{a}*l
+> .p_pos) + {b3}*l2.new_pos_pc*(1+{a}*l2.p_pos)) if e(sample)==1, cluster(fips)
+(obs = 352)
+
+Iteration 0:  residual SS =  1247.007
+Iteration 1:  residual SS =  1034.541
+Iteration 2:  residual SS =  965.2241
+Iteration 3:  residual SS =  859.5014
+Iteration 4:  residual SS =   859.466
+Iteration 5:  residual SS =  859.4659
+Iteration 6:  residual SS =  859.4659
+Iteration 7:  residual SS =  859.4659
+
+
+Nonlinear regression                                Number of obs =        352
+                                                    R-squared     =     0.8912
+                                                    Adj R-squared =     0.8889
+                                                    Root MSE      =     1.5738
+                                                    Res. dev.     =   1313.156
+
+                                  (Std. Err. adjusted for 49 clusters in fips)
+------------------------------------------------------------------------------
+             |               Robust
+a~respir_d~c |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         /b0 |  -.2619117   .1768254    -1.48   0.145     -.617443    .0936195
+         /b1 |   .0211824   .0063122     3.36   0.002     .0084909    .0338739
+          /a |    .026213    .011116     2.36   0.022     .0038628    .0485633
+         /b2 |   .0156299   .0046891     3.33   0.002     .0062019    .0250579
+         /b3 |    .006576   .0033098     1.99   0.053    -.0000788    .0132309
+------------------------------------------------------------------------------
+  Parameter b0 taken as constant term in model
+
+. 
+. // robustness check:
+. reg adj_excess_respir_deaths_pc c.new_pos_pc##c.p_pos c.l.new_pos_pc##c.l.p_pos c.l2.new_pos_pc##c.
+> l2.p_pos if p_pos!=100 & l.p_pos!=100 & l2.p_pos!=100
+
+      Source |       SS           df       MS      Number of obs   =       344
+-------------+----------------------------------   F(9, 334)       =    354.32
+       Model |   7112.2345         9  790.248278   Prob > F        =    0.0000
+    Residual |  744.920806       334  2.23030181   R-squared       =    0.9052
+-------------+----------------------------------   Adj R-squared   =    0.9026
+       Total |  7857.15531       343  22.9071583   Root MSE        =    1.4934
+
+------------------------------------------------------------------------------------------
+adj_excess_respir_deat~c |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------------------+----------------------------------------------------------------
+              new_pos_pc |   .0063945   .0078398     0.82   0.415     -.009027     .021816
+                   p_pos |  -.0028398    .022408    -0.13   0.899    -.0469183    .0412388
+                         |
+    c.new_pos_pc#c.p_pos |   .0008687   .0002403     3.61   0.000     .0003959    .0013414
+                         |
+              new_pos_pc |
+                     L1. |  -.0072445   .0112711    -0.64   0.521    -.0294159    .0149269
+                         |
+                   p_pos |
+                     L1. |  -.0068184   .0183617    -0.37   0.711    -.0429376    .0293008
+                         |
+  cL.new_pos_pc#cL.p_pos |   .0009744   .0003255     2.99   0.003     .0003342    .0016147
+                         |
+              new_pos_pc |
+                     L2. |    .049525   .0077317     6.41   0.000     .0343161     .064734
+                         |
+                   p_pos |
+                     L2. |   .0265799   .0123281     2.16   0.032     .0023294    .0508304
+                         |
+cL2.new_pos_pc#cL2.p_pos |  -.0008523    .000198    -4.31   0.000    -.0012417   -.0004629
+                         |
+                   _cons |  -.3674341   .1782468    -2.06   0.040    -.7180619   -.0168063
+------------------------------------------------------------------------------------------
+
+. nl (adj_excess_respir_deaths_pc = {b0} + {b1}*new_pos_pc*(1+{a}*p_pos) + {b2}*l.new_pos_pc*(1+{a}*l
+> .p_pos) + {b3}*l2.new_pos_pc*(1+{a}*l2.p_pos)) if e(sample)==1, cluster(fips)
+(obs = 344)
+
+Iteration 0:  residual SS =  1240.002
+Iteration 1:  residual SS =  1027.675
+Iteration 2:  residual SS =  960.7707
+Iteration 3:  residual SS =  849.0797
+Iteration 4:  residual SS =  849.0432
+Iteration 5:  residual SS =  849.0432
+Iteration 6:  residual SS =  849.0432
+Iteration 7:  residual SS =  849.0432
+
+
+Nonlinear regression                                Number of obs =        344
+                                                    R-squared     =     0.8919
+                                                    Adj R-squared =     0.8897
+                                                    Root MSE      =   1.582578
+                                                    Res. dev.     =   1287.023
+
+                                  (Std. Err. adjusted for 49 clusters in fips)
+------------------------------------------------------------------------------
+             |               Robust
+a~respir_d~c |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         /b0 |  -.2359214   .1797643    -1.31   0.196    -.5973617    .1255188
+         /b1 |   .0212813   .0064577     3.30   0.002     .0082973    .0342654
+          /a |   .0267641   .0115165     2.32   0.024     .0036086    .0499197
+         /b2 |   .0150675   .0046925     3.21   0.002     .0056326    .0245024
+         /b3 |   .0066148   .0032952     2.01   0.050    -.0000107    .0132403
+------------------------------------------------------------------------------
+  Parameter b0 taken as constant term in model
+
+. 
+. 
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\multilevel_and_nonlin
+> ear_models_of_covid_severity.txt
+  log type:  text
+ closed on:  13 Jun 2020, 22:46:33
+-----------------------------------------------------------------------------------------------------

@@ -3,7 +3,7 @@
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\7day_rolling_avg_with
 > _coverage_adj.txt
   log type:  text
- opened on:  14 Jun 2020, 01:07:26
+ opened on:  14 Jun 2020, 01:46:02
 
 . 
 . use "..\data\population.dta"
@@ -163,18 +163,18 @@ file C:\Users\favero\Dropbox\covid-trendlines/covid_trendlines.csv saved
   2.     quietly sum problematic_data if state_id==`i'
   3.         if r(mean) == 0 {
   4.                 twoway (line adj_case_count_pc_7d date) if state_id==`i' & cound_7d_available==1
-> , by(state, note("")) title("Relative prevalence of newly confirmed cases," "adjusted for testing v
-> olume (7-day rolling average)") xtitle("") ylabel(0 50 100) note("Data sources: covidtracking.com (
-> CC BY-NC-4.0), US Census Bureau (Social Explorer)")
+> , by(state, note("Graph by covidtrendlines.com; data from covidtracking.com (CC BY-NC-4.0)")) title
+> ("Relative prevalence of newly confirmed cases," "adjusted for testing volume (7-day rolling averag
+> e)") xtitle("") ylabel(0 50 100)
   5.                 graph export "`dropbox'/state`i'.png", replace width(1500)
   6.             
 .         }
   7.         else {
   8.                 twoway (line adj_case_count_pc_7d date if cound_7d_available==1) (scatter adj_ca
-> se_count_pc_7d date if problematic_data==1) if state_id==`i', by(state, note("")) title("Relative p
-> revalence of newly confirmed cases," "adjusted for testing volume (7-day rolling average)") xtitle(
-> "") ylabel(0 50 100) note("Data sources: covidtracking.com (CC BY-NC-4.0), US Census Bureau (Social
->  Explorer)") legend(order(2 "Inconsistent/suspect data reports"))
+> se_count_pc_7d date if problematic_data==1) if state_id==`i', by(state, note("Graph by covidtrendli
+> nes.com; data from covidtracking.com (CC BY-NC-4.0)")) title("Relative prevalence of newly confirme
+> d cases," "adjusted for testing volume (7-day rolling average)") xtitle("") ylabel(0 50 100) legend
+> (order(2 "Inconsistent/suspect data reports"))
   9.                 graph export "`dropbox'/state`i'.png", replace width(1500)
  10.         }
  11. }
@@ -236,5 +236,5 @@ file C:\Users\favero\Dropbox\covid-trendlines/covid_trendlines.csv saved
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\7day_rolling_avg_with
 > _coverage_adj.txt
   log type:  text
- closed on:  14 Jun 2020, 01:09:35
+ closed on:  14 Jun 2020, 01:47:21
 -----------------------------------------------------------------------------------------------------

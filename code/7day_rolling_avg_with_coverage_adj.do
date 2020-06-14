@@ -66,12 +66,12 @@ egen state_id = group(fips)
 forvalues i = 1/51 {
     quietly sum problematic_data if state_id==`i'
 	if r(mean) == 0 {
-		twoway (line adj_case_count_pc_7d date) if state_id==`i' & cound_7d_available==1, by(state, note("")) title("Relative prevalence of newly confirmed cases," "adjusted for testing volume (7-day rolling average)") xtitle("") ylabel(0 50 100) note("Data sources: covidtracking.com (CC BY-NC-4.0), US Census Bureau (Social Explorer)")
+		twoway (line adj_case_count_pc_7d date) if state_id==`i' & cound_7d_available==1, by(state, note("Graph by covidtrendlines.com; data from covidtracking.com (CC BY-NC-4.0)")) title("Relative prevalence of newly confirmed cases," "adjusted for testing volume (7-day rolling average)") xtitle("") ylabel(0 50 100)
 		graph export "`dropbox'/state`i'.png", replace width(1500)
 	    
 	}
 	else {
-		twoway (line adj_case_count_pc_7d date if cound_7d_available==1) (scatter adj_case_count_pc_7d date if problematic_data==1) if state_id==`i', by(state, note("")) title("Relative prevalence of newly confirmed cases," "adjusted for testing volume (7-day rolling average)") xtitle("") ylabel(0 50 100) note("Data sources: covidtracking.com (CC BY-NC-4.0), US Census Bureau (Social Explorer)") legend(order(2 "Inconsistent/suspect data reports"))
+		twoway (line adj_case_count_pc_7d date if cound_7d_available==1) (scatter adj_case_count_pc_7d date if problematic_data==1) if state_id==`i', by(state, note("Graph by covidtrendlines.com; data from covidtracking.com (CC BY-NC-4.0)")) title("Relative prevalence of newly confirmed cases," "adjusted for testing volume (7-day rolling average)") xtitle("") ylabel(0 50 100) legend(order(2 "Inconsistent/suspect data reports"))
 		graph export "`dropbox'/state`i'.png", replace width(1500)
 	}
 }

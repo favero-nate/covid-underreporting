@@ -6,8 +6,10 @@ use "..\data\population.dta" // start from this file because it has both fips co
 
 merge 1:m fips using "..\data\covidtracking.dta", keep(2 3)
 drop _merge population risk_standardized_population // merge population back in later because want it merged to all observations, even those missing from the current dataset
+replace state = "Puerto Rico" if state == "PR"
+replace fips = 72 if state=="Puerto Rico"
 
-merge 1:1 state date using "..\data\past_reports\12 Jun 2020 cdc_deaths.dta"
+merge 1:1 state date using "..\data\past_reports\19 Jun 2020 cdc_deaths.dta"
 drop _merge
 
 merge 1:1 state date using "..\data\cdc_historical_deaths.dta"
@@ -29,7 +31,7 @@ merge m:1 state days_to_report using "..\data\delay_multipliers.dta", keep(1 3)
 drop _merge
 replace delay_multiplier = 1 if days_to_report >= 118 & delay_multiplier == . & days_to_report != .
 
-drop if fips > 56
+drop if fips == . & state != "United States"
 
 //drop if fips == 9 | fips == 37 // Connecticut and North Carolina's provisional death data look highly problematic, so they are not included in analyses using death counts; however, they are kept in the dataset for analysis of hospitalizations
 
@@ -141,6 +143,8 @@ gen excess_deaths = log_allcause-log_expected
 
 save "..\data\weeklydata.dta", replace
 
+preserve
+drop if fips==. | fips==72
 
 reg excess_deaths_pc covid_deaths_pc [aweight=population] if days_to_report > 14, cluster(fips) nocons
 margins, dydx(covid_deaths_pc)
@@ -168,6 +172,8 @@ reg excess_deaths_pc c.excess_respir_deaths_pc##c.p_pos c.covid_deaths_pc##c.end
 
 reg f.adj_excess_deaths_pc c.new_pos_pc##c.p_pos [aweight=population] if days_to_report > 14, cluster(fips)
 reg f.adj_excess_respir_deaths_pc c.new_pos_pc##c.p_pos [aweight=population] if days_to_report > 14, cluster(fips)
+
+restore
 
 log close
 

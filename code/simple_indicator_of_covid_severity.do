@@ -8,7 +8,7 @@ gen l_new_pos_pc = l.new_pos_pc
 gen l_p_pos = l.p_pos 
 
 preserve
-keep if days_to_report > 14 & days_to_report != . & l_p_pos != .
+keep if days_to_report > 14 & days_to_report != . & l_p_pos != . & fips != . & fips != 72
 
 set scheme s2mono
 format end_week %tdnn/dd
@@ -59,7 +59,8 @@ tab end_week if e(sample)==1
 
 // covid hospitalizations
 restore
-keep if dayscollapsed==7
+preserve
+keep if dayscollapsed==7 & fips != . & fips != 72
 gen hospitalizedcurrently_pc = hospitalizedcurrently * 100000 / population
 
 reg hospitalizedcurrently_pc c.l_new_pos_pc if l_p_pos != ., cluster(fips) nocons
@@ -71,5 +72,6 @@ margins, dydx(l_new_pos_pc) at(l_p_pos=(5 15 25 35 45))
 gen hospitalization_sample = e(sample)
 tab state hospitalization_sample
 
+restore
 
 log close

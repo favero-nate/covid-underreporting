@@ -80,5 +80,19 @@ forvalues i = 1/51 {
 	}
 }
 
+// national analysis
+	gen full_reporting = (new_neg_7d!=. & new_pos_7d!=.)
+	collapse (sum) new_pos_7d new_neg_7d population full_reporting, by(date)
+	drop if full_reporting == 0
+	drop if population < 327167434
+
+	gen p_pos_7d = new_pos_7d/(new_pos_7d+new_neg_7d)*100
+	gen adj_case_count_7d = new_pos_7d*(1+.026213*p_pos_7d) // adjustment based on results from multilevel_and_nonlinear_models_of_covid_severity
+	gen cound_7d_available = (adj_case_count_pc_7d!=.)
+	la var adj_case_count_pc_7d "Estimated prevalence"
+
+	twoway (line adj_case_count_7d date) if cound_7d_available==1, title("United States (50 states + DC)") subtitle("Prevalence of newly confirmed COVID-19 cases, adjusted for" "testing volume (lags 2-4 weeks behind initial infections)") note("Estimates by covidtrendlines.com; data from covidtracking.com (CC BY-NC-4.0)") xtitle("") tlabel(1mar2020(14)21jun2020) tmtick(##2) xsize(5.5) ysize(4)
+	graph export "`dropbox'/USA_`c_date'.png", replace width(1500)
+
 log close
 

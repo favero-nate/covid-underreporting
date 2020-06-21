@@ -6,8 +6,6 @@ use "..\data\population.dta" // start from this file because it has both fips co
 
 merge 1:m fips using "..\data\covidtracking.dta", keep(2 3)
 drop _merge population risk_standardized_population // merge population back in later because want it merged to all observations, even those missing from the current dataset
-replace state = "Puerto Rico" if state == "PR"
-replace fips = 72 if state=="Puerto Rico"
 
 merge 1:1 state date using "..\data\past_reports\19 Jun 2020 cdc_deaths.dta"
 drop _merge
@@ -18,6 +16,8 @@ drop _merge
 drop fips
 merge m:1 state using "..\data\population.dta", keep(1 3)
 drop _merge
+replace state = "Puerto Rico" if state == "PR"
+replace fips = 72 if state=="Puerto Rico"
 order date fips
 sort fips state date
 
@@ -132,6 +132,7 @@ gen new_pos_pc = new_pos*100000/population
 gen new_neg_pc = new_neg*100000/population
 gen new_tests_pc = new_pos_pc + new_neg_pc
 gen deathincrease_pc = deathincrease*100000/risk_standardized_population
+gen hospitalizedcurrently_pc = hospitalizedcurrently * 100000 / population
 
 /*
 gen log_covid_death = log(covid_deaths)

@@ -107,6 +107,12 @@ la var p_pos_7d "Percent positive tests"
 twoway (line p_pos_7d date) if cound_7d_available==1, subtitle("Percent positive tests, used to adjust simple" "confirmed case count (50 states + DC)") note("Estimates by covidtrendlines.com; data from covidtracking.com (CC BY-NC-4.0)") ylabel(0(10)20) xtitle("") tlabel(1mar2020(14)21jun2020) tmtick(##2) xsize(5.5) ysize(4)
 graph export "`dropbox'/methodology2_`c_date'.png", replace width(1500)
 
+gen total_tests_7d = new_pos_7d + new_neg_7d
+la var total_tests_7d "Total tests per day (7-day rolling avg.)"
+
+twoway (line total_tests_7d date) if cound_7d_available==1, subtitle("Percent positive tests, used to adjust simple" "confirmed case count (50 states + DC)") note("Estimates by covidtrendlines.com; data from covidtracking.com (CC BY-NC-4.0)") xtitle("") tlabel(1mar2020(14)21jun2020) ylabel(0(250000)500000) tmtick(##2) xsize(5.5) ysize(4)
+graph export "`dropbox'/methodology3_`c_date'.png", replace width(1500)
+
 
 log close
 

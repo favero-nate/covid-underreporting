@@ -106,7 +106,7 @@ la var cov_adj_prediction "Prediction from detection-adjusted cases"
 
 twoway (line adj_covid_deaths end_week) (line naive_count_prediction end_week) (line cov_adj_prediction end_week), tlabel(21mar2020(7)30may2020)
 
-list end_week adj_covid_deaths naive_count_prediction cov_adj_prediction state_reporting
+list end_week adj_covid_deaths naive_count_prediction cov_adj_prediction state_reporting l_p_pos
 
 
 // make tables

@@ -1,0 +1,365 @@
+------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\early_detection.txt
+  log type:  text
+ opened on:   7 Jul 2020, 15:55:29
+
+. 
+. use "..\data\population.dta" // start from this file because it has both fips codes and state names
+
+. 
+. merge 1:m fips using "..\data\covidtracking.dta", keep(2 3)
+
+    Result                           # of obs.
+    -----------------------------------------
+    not matched                           560
+        from master                         0  (_merge==1)
+        from using                        560  (_merge==2)
+
+    matched                             6,289  (_merge==3)
+    -----------------------------------------
+
+. drop _merge
+
+. 
+. replace state = "Puerto Rico" if state == "PR"
+(112 real changes made)
+
+. replace fips = 72 if state=="Puerto Rico"
+(0 real changes made)
+
+. order date fips
+
+. sort fips state date
+
+. 
+. gen end_week = date + mod(6 - dow(date), 7)
+
+. format end_week %tdCCYYNNDD
+
+. order end_week, after(date)
+
+. 
+. encode dataqualitygrade, gen(datagrade)
+
+. order datagrade, after(dataqualitygrade)
+
+. drop dataqualitygrade
+
+. 
+. drop hash datechecked // new variables added to more recent versions of covidtracking's data that interfere with
+>  following code:
+
+. foreach var of varlist positive-datagrade death-grade {
+  2.         gen `var'_mis = (`var'==.)
+  3. }
+
+. gen dayscollapsed = 1
+
+. sort fips state date
+
+. collapse (firstnm) state (lastnm) positive-datagrade population risk_standardized_population (sum) deathincrease
+> -dayscollapsed, by(end_week fips)
+
+. foreach var of varlist positive-datagrade deathincrease-grade {
+  2.         replace `var' = . if `var'_mis == dayscollapsed
+  3. }
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(1,059 real changes made, 1,059 to missing)
+
+. drop *_mis
+
+. 
+. xtset fips end_week, delta(7)
+       panel variable:  fips (unbalanced)
+        time variable:  end_week, 20200125 to 20200711
+                delta:  7 days
+
+. 
+. gen new_pos = d.positive if d.positive>=0
+(58 missing values generated)
+
+. gen new_neg = d.negative if d.negative>=0
+(95 missing values generated)
+
+. gen p_pos = new_pos/(new_pos+new_neg)*100
+(113 missing values generated)
+
+. order new_pos-p_pos, after(negative)
+
+. 
+. gen new_pos_pc = new_pos*100000/population
+(136 missing values generated)
+
+. gen new_neg_pc = new_neg*100000/population
+(161 missing values generated)
+
+. gen new_tests_pc = new_pos_pc + new_neg_pc
+(161 missing values generated)
+
+. gen deathincrease_pc = deathincrease*100000/risk_standardized_population
+(85 missing values generated)
+
+. gen hospitalizedcurrently_pc = hospitalizedcurrently * 100000 / population
+(397 missing values generated)
+
+. 
+. drop if fips==. | fips==72
+(17 observations deleted)
+
+. keep if dayscollapsed == 7
+(108 observations deleted)
+
+. 
+. 
+. // four lags
+. reg deathincrease_pc c.new_pos_pc##c.p_pos l.c.new_pos_pc##c.l.p_pos l2.c.new_pos_pc##c.l2.p_pos l3.c.new_pos_pc
+> ##c.l3.p_pos l4.c.new_pos_pc##c.l4.p_pos, cluster(fips)
+
+Linear regression                               Number of obs     =        625
+                                                F(15, 50)         =     316.86
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.7509
+                                                Root MSE          =     1.6795
+
+                                              (Std. Err. adjusted for 51 clusters in fips)
+------------------------------------------------------------------------------------------
+                         |               Robust
+        deathincrease_pc |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------------------+----------------------------------------------------------------
+              new_pos_pc |   -.012976    .006805    -1.91   0.062    -.0266443    .0006923
+                   p_pos |   .0073221   .0154469     0.47   0.638     -.023704    .0383481
+                         |
+    c.new_pos_pc#c.p_pos |   .0005903   .0005198     1.14   0.262    -.0004538    .0016344
+                         |
+              new_pos_pc |
+                     L1. |  -.0047675   .0097246    -0.49   0.626       -.0243     .014765
+                         |
+                   p_pos |
+                     L1. |  -.0015142   .0121913    -0.12   0.902    -.0260011    .0229728
+                         |
+  cL.new_pos_pc#cL.p_pos |    .000694   .0004539     1.53   0.133    -.0002176    .0016057
+                         |
+              new_pos_pc |
+                     L2. |   .0192944    .008452     2.28   0.027     .0023181    .0362707
+                         |
+                   p_pos |
+                     L2. |   .0009543   .0084271     0.11   0.910    -.0159721    .0178807
+                         |
+cL2.new_pos_pc#cL2.p_pos |   .0003634   .0002935     1.24   0.221    -.0002261    .0009529
+                         |
+              new_pos_pc |
+                     L3. |   .0139594   .0076382     1.83   0.074    -.0013823    .0293011
+                         |
+                   p_pos |
+                     L3. |   .0153141   .0050288     3.05   0.004     .0052135    .0254147
+                         |
+cL3.new_pos_pc#cL3.p_pos |  -.0004796   .0002185    -2.19   0.033    -.0009186   -.0000407
+                         |
+              new_pos_pc |
+                     L4. |   .0064402   .0083851     0.77   0.446    -.0104017    .0232821
+                         |
+                   p_pos |
+                     L4. |   .0060153   .0070095     0.86   0.395    -.0080636    .0200943
+                         |
+cL4.new_pos_pc#cL4.p_pos |   .0001575   .0001417     1.11   0.272    -.0001272    .0004422
+                         |
+                   _cons |    .117839   .1970659     0.60   0.553    -.2779795    .5136575
+------------------------------------------------------------------------------------------
+
+. margins, dydx(new_pos_pc l.new_pos_pc l2.new_pos_pc l3.new_pos_pc l4.new_pos_pc) at(p_pos=(5) l.p_pos=(5) l2.p_p
+> os=(5) l3.p_pos=(5) l4.p_pos=(5))
+
+Average marginal effects                        Number of obs     =        625
+Model VCE    : Robust
+
+Expression   : Linear prediction, predict()
+dy/dx w.r.t. : new_pos_pc L.new_pos_pc L2.new_pos_pc L3.new_pos_pc L4.new_pos_pc
+at           : p_pos           =           5
+               L.p_pos         =           5
+               L2.p_pos        =           5
+               L3.p_pos        =           5
+               L4.p_pos        =           5
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |      dy/dx   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+  new_pos_pc |
+         --. |  -.0100246   .0046009    -2.18   0.034    -.0192658   -.0007834
+         L1. |  -.0012974    .008128    -0.16   0.874     -.017623    .0150283
+         L2. |   .0211115   .0074945     2.82   0.007     .0060584    .0361646
+         L3. |   .0115612   .0070731     1.63   0.108    -.0026455    .0257679
+         L4. |   .0072277   .0078008     0.93   0.359    -.0084406     .022896
+------------------------------------------------------------------------------
+
+. margins, dydx(new_pos_pc l.new_pos_pc l2.new_pos_pc l3.new_pos_pc l4.new_pos_pc) at(p_pos=(45) l.p_pos=(45) l2.p
+> _pos=(45) l3.p_pos=(45) l4.p_pos=(45))
+
+Average marginal effects                        Number of obs     =        625
+Model VCE    : Robust
+
+Expression   : Linear prediction, predict()
+dy/dx w.r.t. : new_pos_pc L.new_pos_pc L2.new_pos_pc L3.new_pos_pc L4.new_pos_pc
+at           : p_pos           =          45
+               L.p_pos         =          45
+               L2.p_pos        =          45
+               L3.p_pos        =          45
+               L4.p_pos        =          45
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |      dy/dx   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+  new_pos_pc |
+         --. |   .0135866    .017506     0.78   0.441    -.0215751    .0487484
+         L1. |   .0264638   .0144514     1.83   0.073    -.0025628    .0554904
+         L2. |   .0356483    .009438     3.78   0.000     .0166914    .0546051
+         L3. |  -.0076246   .0083358    -0.91   0.365    -.0243675    .0091182
+         L4. |   .0135277   .0046214     2.93   0.005     .0042452    .0228101
+------------------------------------------------------------------------------
+
+. 
+. // five lags
+. reg deathincrease_pc c.new_pos_pc##c.p_pos l.c.new_pos_pc##c.l.p_pos l2.c.new_pos_pc##c.l2.p_pos l3.c.new_pos_pc
+> ##c.l3.p_pos l4.c.new_pos_pc##c.l4.p_pos l5.c.new_pos_pc##c.l5.p_pos, cluster(fips)
+
+Linear regression                               Number of obs     =        571
+                                                F(18, 50)         =     112.84
+                                                Prob > F          =     0.0000
+                                                R-squared         =     0.7229
+                                                Root MSE          =     1.6756
+
+                                              (Std. Err. adjusted for 51 clusters in fips)
+------------------------------------------------------------------------------------------
+                         |               Robust
+        deathincrease_pc |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------------------+----------------------------------------------------------------
+              new_pos_pc |  -.0102315   .0067942    -1.51   0.138    -.0238781    .0034151
+                   p_pos |   .0218537   .0282036     0.77   0.442     -.034795    .0785024
+                         |
+    c.new_pos_pc#c.p_pos |   .0004816   .0005636     0.85   0.397    -.0006504    .0016136
+                         |
+              new_pos_pc |
+                     L1. |  -.0047468   .0097312    -0.49   0.628    -.0242925     .014799
+                         |
+                   p_pos |
+                     L1. |    .007686   .0097896     0.79   0.436     -.011977    .0273491
+                         |
+  cL.new_pos_pc#cL.p_pos |   .0003627   .0003691     0.98   0.331    -.0003787     .001104
+                         |
+              new_pos_pc |
+                     L2. |   .0074205   .0094402     0.79   0.436    -.0115407    .0263816
+                         |
+                   p_pos |
+                     L2. |  -.0078928   .0103121    -0.77   0.448    -.0286052    .0128196
+                         |
+cL2.new_pos_pc#cL2.p_pos |   .0008578   .0003198     2.68   0.010     .0002153    .0015002
+                         |
+              new_pos_pc |
+                     L3. |   .0227943   .0090171     2.53   0.015      .004683    .0409056
+                         |
+                   p_pos |
+                     L3. |   .0138522   .0078839     1.76   0.085    -.0019831    .0296876
+                         |
+cL3.new_pos_pc#cL3.p_pos |  -.0005572    .000253    -2.20   0.032    -.0010653   -.0000491
+                         |
+              new_pos_pc |
+                     L4. |    .008748   .0060331     1.45   0.153    -.0033699    .0208659
+                         |
+                   p_pos |
+                     L4. |   .0099812   .0039281     2.54   0.014     .0020914    .0178709
+                         |
+cL4.new_pos_pc#cL4.p_pos |  -.0000979   .0001921    -0.51   0.613    -.0004838    .0002881
+                         |
+              new_pos_pc |
+                     L5. |  -.0013204   .0043941    -0.30   0.765    -.0101462    .0075054
+                         |
+                   p_pos |
+                     L5. |   .0018458   .0070784     0.26   0.795    -.0123716    .0160632
+                         |
+cL5.new_pos_pc#cL5.p_pos |   .0001335   .0000872     1.53   0.132    -.0000416    .0003086
+                         |
+                   _cons |  -.0317232   .1961755    -0.16   0.872    -.4257532    .3623068
+------------------------------------------------------------------------------------------
+
+. margins, dydx(new_pos_pc l.new_pos_pc l2.new_pos_pc l3.new_pos_pc l4.new_pos_pc l5.new_pos_pc) at(p_pos=(5) l.p_
+> pos=(5) l2.p_pos=(5) l3.p_pos=(5) l4.p_pos=(5) l5.p_pos=(5))
+
+Average marginal effects                        Number of obs     =        571
+Model VCE    : Robust
+
+Expression   : Linear prediction, predict()
+dy/dx w.r.t. : new_pos_pc L.new_pos_pc L2.new_pos_pc L3.new_pos_pc L4.new_pos_pc L5.new_pos_pc
+at           : p_pos           =           5
+               L.p_pos         =           5
+               L2.p_pos        =           5
+               L3.p_pos        =           5
+               L4.p_pos        =           5
+               L5.p_pos        =           5
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |      dy/dx   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+  new_pos_pc |
+         --. |  -.0078235   .0044692    -1.75   0.086    -.0168001    .0011532
+         L1. |  -.0029335   .0088583    -0.33   0.742     -.020726     .014859
+         L2. |   .0117092   .0081747     1.43   0.158      -.00471    .0281285
+         L3. |   .0200081   .0082513     2.42   0.019     .0034349    .0365813
+         L4. |   .0082586   .0054773     1.51   0.138     -.002743    .0192601
+         L5. |  -.0006531   .0041305    -0.16   0.875    -.0089493    .0076432
+------------------------------------------------------------------------------
+
+. margins, dydx(new_pos_pc l.new_pos_pc l2.new_pos_pc l3.new_pos_pc l4.new_pos_pc l5.new_pos_pc) at(p_pos=(45) l.p
+> _pos=(45) l2.p_pos=(45) l3.p_pos=(45) l4.p_pos=(45) l5.p_pos=(45))
+
+Average marginal effects                        Number of obs     =        571
+Model VCE    : Robust
+
+Expression   : Linear prediction, predict()
+dy/dx w.r.t. : new_pos_pc L.new_pos_pc L2.new_pos_pc L3.new_pos_pc L4.new_pos_pc L5.new_pos_pc
+at           : p_pos           =          45
+               L.p_pos         =          45
+               L2.p_pos        =          45
+               L3.p_pos        =          45
+               L4.p_pos        =          45
+               L5.p_pos        =          45
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |      dy/dx   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+  new_pos_pc |
+         --. |   .0114405   .0195505     0.59   0.561    -.0278279    .0507089
+         L1. |   .0115728   .0139244     0.83   0.410    -.0163951    .0395406
+         L2. |   .0460193    .008522     5.40   0.000     .0289024    .0631363
+         L3. |  -.0022818   .0088022    -0.26   0.797    -.0199616    .0153979
+         L4. |    .004343    .006729     0.65   0.522    -.0091726    .0178587
+         L5. |   .0046856   .0035725     1.31   0.196    -.0024899    .0118612
+------------------------------------------------------------------------------
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\early_detection.txt
+  log type:  text
+ closed on:   7 Jul 2020, 15:55:32
+------------------------------------------------------------------------------------------------------------------

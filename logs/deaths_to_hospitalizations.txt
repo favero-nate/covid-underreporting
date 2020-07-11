@@ -2,7 +2,7 @@
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\deaths_to_hospitalizations.txt
   log type:  text
- opened on:  10 Jul 2020, 15:37:23
+ opened on:  11 Jul 2020, 10:18:45
 
 . 
 . use "..\data\covidtracking.dta"
@@ -145,12 +145,12 @@ state                                                                           
 
 . 
 . tsset date
-        time variable:  date, 20200122 to 20200709
+        time variable:  date, 20200122 to 20200710
                 delta:  1 day
 
 . 
 . keep if date >= date("2020/03/17", "YMD") &  date < date("2020/07/07", "YMD")
-(58 observations deleted)
+(59 observations deleted)
 
 . 
 . forvalues i = 1/6 {
@@ -195,8 +195,8 @@ state                                                                           
 . twoway (bar hosp_in_10s date, yaxis(1) color(gs14)) (bar deathincrease date, yaxis(1) color(blue)) (line deaths_as_p_of_hosp_
 > 7d date, yaxis(2) color(orange)), tlabel(17mar2020(14)7jul2020) legend(col(1)) ylabel(0(1000)7000, axis(1) angle(0)) ylabel(0
 >  "0%" 1 "1%" 2 "2%" 3 "3%" 4 "4%" 5 "5%" 6 "6%" 7 "7%" 8 "8%", axis(2) angle(0)) ytitle("") ytitle("", axis(2)) xtitle("") ti
-> tle("Original (highly misleading) graph") note("covidtrendlines.com; data from covidtracking.com (CC BY-NC-4.0)" "original gr
-> aph at https://bit.ly/3eh5QXS")
+> tle("Replication of original (highly misleading) graph") note("covidtrendlines.com; data from covidtracking.com (CC BY-NC-4.0
+> )" "original graph at https://bit.ly/3eh5QXS")
 
 . graph export "`dropbox'/misleading_graph.png", replace
 (file C:\Users\favero\Dropbox\covid-trendlines/misleading_graph.png written in PNG format)
@@ -236,7 +236,7 @@ state                                                                           
 . 
 . //Repeat process except now I drop any observations were current hospitalizations variable is missing:
 . keep if hospitalizedcurrently != .
-(2,611 observations deleted)
+(2,623 observations deleted)
 
 . 
 . tab state if date == date("2020/03/17", "YMD")
@@ -299,12 +299,12 @@ state                                                                           
 
 . 
 . tsset date
-        time variable:  date, 20200317 to 20200709
+        time variable:  date, 20200317 to 20200710
                 delta:  1 day
 
 . 
 . keep if date >= date("2020/03/17", "YMD") &  date < date("2020/07/07", "YMD")
-(3 observations deleted)
+(4 observations deleted)
 
 . 
 . forvalues i = 1/6 {
@@ -360,5 +360,5 @@ state                                                                           
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\deaths_to_hospitalizations.txt
   log type:  text
- closed on:  10 Jul 2020, 15:37:30
+ closed on:  11 Jul 2020, 10:19:03
 -------------------------------------------------------------------------------------------------------------------------------

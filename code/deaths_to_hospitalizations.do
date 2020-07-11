@@ -49,7 +49,7 @@ la var hosp_in_10s "COVID-19 Hospitalization (Divided by 10 for Comparison)"
 la var deaths_as_p_of_hosp_7d "Deaths as a share of Hospitalizations (7-Day Average)"
 format date %tdnn/dd
 
-twoway (bar hosp_in_10s date, yaxis(1) color(gs14)) (bar deathincrease date, yaxis(1) color(blue)) (line deaths_as_p_of_hosp_7d date, yaxis(2) color(orange)), tlabel(17mar2020(14)7jul2020) legend(col(1)) ylabel(0(1000)7000, axis(1) angle(0)) ylabel(0 "0%" 1 "1%" 2 "2%" 3 "3%" 4 "4%" 5 "5%" 6 "6%" 7 "7%" 8 "8%", axis(2) angle(0)) ytitle("") ytitle("", axis(2)) xtitle("") title("Original (highly misleading) graph") note("covidtrendlines.com; data from covidtracking.com (CC BY-NC-4.0)" "original graph at https://bit.ly/3eh5QXS")
+twoway (bar hosp_in_10s date, yaxis(1) color(gs14)) (bar deathincrease date, yaxis(1) color(blue)) (line deaths_as_p_of_hosp_7d date, yaxis(2) color(orange)), tlabel(17mar2020(14)7jul2020) legend(col(1)) ylabel(0(1000)7000, axis(1) angle(0)) ylabel(0 "0%" 1 "1%" 2 "2%" 3 "3%" 4 "4%" 5 "5%" 6 "6%" 7 "7%" 8 "8%", axis(2) angle(0)) ytitle("") ytitle("", axis(2)) xtitle("") title("Replication of original (highly misleading) graph") note("covidtrendlines.com; data from covidtracking.com (CC BY-NC-4.0)" "original graph at https://bit.ly/3eh5QXS")
 graph export "`dropbox'/misleading_graph.png", replace
 
 list date deaths_as_p_of_hosp_7d if deaths_as_p_of_hosp_7d >= 6

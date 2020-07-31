@@ -2,11 +2,11 @@
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\pulldata.txt
   log type:  text
- opened on:  29 Jul 2020, 14:19:25
+ opened on:  31 Jul 2020, 10:38:16
 
 . 
 . import delimited "https://covidtracking.com/api/v1/states/daily.csv", stringcols(1)
-(41 vars, 8,137 obs)
+(41 vars, 8,249 obs)
 
 . rename date olddate
 
@@ -67,8 +67,8 @@ file ..\data\cdc_historical_deaths.dta saved
 (14 vars, 404 obs)
 
 . export delimited using "..\data\past_reports\unprocessed_files/$S_DATE cdc_deaths_raw2", replace
-(note: file ..\data\past_reports\unprocessed_files/29 Jul 2020 cdc_deaths_raw2.csv not found)
-file ..\data\past_reports\unprocessed_files/29 Jul 2020 cdc_deaths_raw2.csv saved
+(note: file ..\data\past_reports\unprocessed_files/31 Jul 2020 cdc_deaths_raw2.csv not found)
+file ..\data\past_reports\unprocessed_files/31 Jul 2020 cdc_deaths_raw2.csv saved
 
 . save "..\data\cdc_deaths.dta", replace
 file ..\data\cdc_deaths.dta saved
@@ -77,8 +77,8 @@ file ..\data\cdc_deaths.dta saved
 (14 vars, 1,000 obs)
 
 . export delimited using "..\data\past_reports\unprocessed_files/$S_DATE cdc_deaths_raw1", replace
-(note: file ..\data\past_reports\unprocessed_files/29 Jul 2020 cdc_deaths_raw1.csv not found)
-file ..\data\past_reports\unprocessed_files/29 Jul 2020 cdc_deaths_raw1.csv saved
+(note: file ..\data\past_reports\unprocessed_files/31 Jul 2020 cdc_deaths_raw1.csv not found)
+file ..\data\past_reports\unprocessed_files/31 Jul 2020 cdc_deaths_raw1.csv saved
 
 . append using "..\data\cdc_deaths.dta"
 
@@ -93,7 +93,7 @@ file ..\data\past_reports\unprocessed_files/29 Jul 2020 cdc_deaths_raw1.csv save
 . order date report_date
 
 . gen expected_deaths = total_deaths / percent_of_expected_deaths
-(16 missing values generated)
+(10 missing values generated)
 
 . order expected_deaths, after(total_deaths)
 
@@ -108,13 +108,13 @@ file ..\data\past_reports\unprocessed_files/29 Jul 2020 cdc_deaths_raw1.csv save
 . foreach var of varlist covid_deaths-pneumon_influ_or_covid {
   2.         replace `var' = 5 if `var' == .
   3. }
-(233 real changes made)
-(11 real changes made)
-(16 real changes made)
-(147 real changes made)
-(324 real changes made)
-(542 real changes made)
-(111 real changes made)
+(226 real changes made)
+(7 real changes made)
+(10 real changes made)
+(135 real changes made)
+(322 real changes made)
+(543 real changes made)
+(108 real changes made)
 
 . collapse (sum) covid_deaths-pneumon_influ_or_covid (first) report_date, by(state date)
 
@@ -123,8 +123,8 @@ file ..\data\past_reports\unprocessed_files/29 Jul 2020 cdc_deaths_raw1.csv save
 file ..\data\cdc_deaths.dta saved
 
 . save "..\data\past_reports/$S_DATE cdc_deaths.dta", replace
-(note: file ..\data\past_reports/29 Jul 2020 cdc_deaths.dta not found)
-file ..\data\past_reports/29 Jul 2020 cdc_deaths.dta saved
+(note: file ..\data\past_reports/31 Jul 2020 cdc_deaths.dta not found)
+file ..\data\past_reports/31 Jul 2020 cdc_deaths.dta saved
 
 . 
 . insheet using "..\data\source_files\R12565679_SL040.txt", clear
@@ -210,5 +210,5 @@ file ..\data\population.dta saved
       name:  <unnamed>
        log:  C:\Users\favero\Documents\GitHub\covid-underreporting\code\..\logs\pulldata.txt
   log type:  text
- closed on:  29 Jul 2020, 14:19:35
+ closed on:  31 Jul 2020, 10:38:27
 -------------------------------------------------------------------------------------------------------------------------------

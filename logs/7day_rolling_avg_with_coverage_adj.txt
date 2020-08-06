@@ -2,7 +2,7 @@
       name:  <unnamed>
        log:  U:\Documents\GitHub\covid-underreporting\code\..\logs\7day_rolling_avg_with_coverage_adj.txt
   log type:  text
- opened on:   5 Aug 2020, 11:49:42
+ opened on:   6 Aug 2020, 13:22:36
 
 . 
 . use "..\data\population.dta"
@@ -12,11 +12,11 @@
 
     Result                           # of obs.
     -----------------------------------------
-    not matched                           710
+    not matched                           715
         from master                         0  (_merge==1)
-        from using                        710  (_merge==2)
+        from using                        715  (_merge==2)
 
-    matched                             7,819  (_merge==3)
+    matched                             7,870  (_merge==3)
     -----------------------------------------
 
 . 
@@ -27,7 +27,7 @@
 . 
 . xtset fips date
        panel variable:  fips (unbalanced)
-        time variable:  date, 20200122 to 20200804
+        time variable:  date, 20200122 to 20200805
                 delta:  1 day
 
 . 
@@ -113,14 +113,14 @@
 . gen problematic_data = (d_pos<-2|d_neg<-2)
 
 . replace problematic_data = 1 if d_neg <= 0 & l.d_neg <= 0 & l2.d_neg <= 0 & d_pos >= 5 & l.d_pos >= 5 & l2.d_pos >= 5
-(189 real changes made)
+(190 real changes made)
 
 . // entent out through 7 days
 . gen problematic_data_7d = problematic_data
 
 . replace problematic_data_7d = 1 if l.problematic_data==1 | l2.problematic_data==1 | l3.problematic_data==1 | l4.problematic_data==1 
 > | l5.problematic_data==1 | l6.problematic_data==1 | l7.problematic_data==1
-(507 real changes made)
+(509 real changes made)
 
 . // add one last check based on 7 day average
 . replace problematic_data = 1 if p_pos_7d == 100
@@ -133,7 +133,7 @@
 . 
 . gen adj_case_count_pc_7d = new_pos_7d*(1+.026213*p_pos_7d) / population * 100000 // adjustment based on results from multilevel_and_
 > nonlinear_models_of_covid_severity
-(1,168 missing values generated)
+(1,173 missing values generated)
 
 . 
 . order date fips state problematic_data problematic_data_7d adj_case_count_pc_7d new_pos_7d new_neg_7d p_pos_7d new_pos new_neg posit
@@ -147,7 +147,7 @@ file C:\Users\au660726\Dropbox\covid-trendlines/covid_trendlines.csv saved
 
 . 
 . drop if population==.
-(710 observations deleted)
+(715 observations deleted)
 
 . 
 . format date %tdnn/dd
@@ -190,108 +190,108 @@ file C:\Users\au660726\Dropbox\covid-trendlines/covid_trendlines.csv saved
  10.                 graph export "`dropbox'/`state'_`c_date'.png", replace width(1500)
  11.         }
  12. }
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Alabama__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Alabama__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Alaska__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Alaska__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Arizona__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Arizona__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Arkansas__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Arkansas__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/California__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/California__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Colorado__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Colorado__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Connecticut__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Connecticut__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Delaware__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Delaware__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/District of Columbia__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/District of Columbia__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Florida__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Florida__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Georgia__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Georgia__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Hawaii__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Hawaii__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Idaho__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Idaho__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Illinois__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Illinois__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Indiana__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Indiana__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Iowa__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Iowa__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Kansas__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Kansas__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Kentucky__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Kentucky__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Louisiana__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Louisiana__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Maine__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Maine__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Maryland__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Maryland__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Massachusetts__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Massachusetts__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Michigan__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Michigan__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Minnesota__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Minnesota__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Mississippi__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Mississippi__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Missouri__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Missouri__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Montana__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Montana__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Nebraska__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Nebraska__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Nevada__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Nevada__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/New Hampshire__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/New Hampshire__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/New Jersey__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/New Jersey__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/New Mexico__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/New Mexico__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/New York__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/New York__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/North Carolina__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/North Carolina__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/North Dakota__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/North Dakota__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Ohio__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Ohio__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Oklahoma__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Oklahoma__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Oregon__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Oregon__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Pennsylvania__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Pennsylvania__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Rhode Island__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Rhode Island__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/South Carolina__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/South Carolina__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/South Dakota__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/South Dakota__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Tennessee__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Tennessee__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Texas__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Texas__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Utah__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Utah__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Vermont__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Vermont__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Virginia__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Virginia__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Washington__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Washington__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/West Virginia__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/West Virginia__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Wisconsin__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Wisconsin__5_Aug_2020.png written in PNG format)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/Wyoming__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/Wyoming__5_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Alabama__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Alabama__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Alaska__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Alaska__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Arizona__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Arizona__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Arkansas__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Arkansas__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/California__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/California__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Colorado__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Colorado__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Connecticut__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Connecticut__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Delaware__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Delaware__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/District of Columbia__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/District of Columbia__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Florida__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Florida__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Georgia__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Georgia__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Hawaii__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Hawaii__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Idaho__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Idaho__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Illinois__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Illinois__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Indiana__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Indiana__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Iowa__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Iowa__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Kansas__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Kansas__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Kentucky__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Kentucky__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Louisiana__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Louisiana__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Maine__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Maine__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Maryland__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Maryland__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Massachusetts__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Massachusetts__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Michigan__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Michigan__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Minnesota__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Minnesota__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Mississippi__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Mississippi__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Missouri__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Missouri__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Montana__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Montana__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Nebraska__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Nebraska__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Nevada__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Nevada__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/New Hampshire__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/New Hampshire__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/New Jersey__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/New Jersey__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/New Mexico__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/New Mexico__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/New York__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/New York__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/North Carolina__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/North Carolina__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/North Dakota__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/North Dakota__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Ohio__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Ohio__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Oklahoma__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Oklahoma__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Oregon__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Oregon__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Pennsylvania__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Pennsylvania__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Rhode Island__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Rhode Island__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/South Carolina__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/South Carolina__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/South Dakota__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/South Dakota__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Tennessee__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Tennessee__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Texas__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Texas__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Utah__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Utah__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Vermont__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Vermont__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Virginia__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Virginia__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Washington__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Washington__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/West Virginia__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/West Virginia__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Wisconsin__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Wisconsin__6_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/Wyoming__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/Wyoming__6_Aug_2020.png written in PNG format)
 
 . 
 . 
@@ -324,8 +324,8 @@ file C:\Users\au660726\Dropbox\covid-trendlines/covid_trendlines.csv saved
 > e(4)
 
 . graph export "`dropbox'/USA_`c_date'.png", replace width(1500)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/USA__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/USA__5_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/USA__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/USA__6_Aug_2020.png written in PNG format)
 
 . 
 . la var new_pos_7d "How many cases are reported"
@@ -339,8 +339,8 @@ file C:\Users\au660726\Dropbox\covid-trendlines/covid_trendlines.csv saved
 > )2aug2020) tmtick(##2) xsize(5.5) ysize(4) legend(col(1))
 
 . graph export "`dropbox'/methodology1_`c_date'.png", replace width(1500)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/methodology1__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/methodology1__5_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/methodology1__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/methodology1__6_Aug_2020.png written in PNG format)
 
 . 
 . la var p_pos_7d "Percent positive tests"
@@ -351,8 +351,8 @@ file C:\Users\au660726\Dropbox\covid-trendlines/covid_trendlines.csv saved
 > tlabel(1mar2020(14)2aug2020) tmtick(##2) xsize(5.5) ysize(4)
 
 . graph export "`dropbox'/methodology2_`c_date'.png", replace width(1500)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/methodology2__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/methodology2__5_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/methodology2__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/methodology2__6_Aug_2020.png written in PNG format)
 
 . 
 . gen total_tests_7d = new_pos_7d + new_neg_7d
@@ -365,8 +365,8 @@ file C:\Users\au660726\Dropbox\covid-trendlines/covid_trendlines.csv saved
 > ck(##2) xsize(5.5) ysize(4)
 
 . graph export "`dropbox'/methodology3_`c_date'.png", replace width(1500)
-(note: file C:\Users\au660726\Dropbox\covid-trendlines/methodology3__5_Aug_2020.png not found)
-(file C:\Users\au660726\Dropbox\covid-trendlines/methodology3__5_Aug_2020.png written in PNG format)
+(note: file C:\Users\au660726\Dropbox\covid-trendlines/methodology3__6_Aug_2020.png not found)
+(file C:\Users\au660726\Dropbox\covid-trendlines/methodology3__6_Aug_2020.png written in PNG format)
 
 . 
 . 
@@ -374,5 +374,5 @@ file C:\Users\au660726\Dropbox\covid-trendlines/covid_trendlines.csv saved
       name:  <unnamed>
        log:  U:\Documents\GitHub\covid-underreporting\code\..\logs\7day_rolling_avg_with_coverage_adj.txt
   log type:  text
- closed on:   5 Aug 2020, 11:51:06
+ closed on:   6 Aug 2020, 13:23:34
 --------------------------------------------------------------------------------------------------------------------------------------

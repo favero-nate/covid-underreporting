@@ -16,7 +16,7 @@ xtset fips date
 // - see https://covidtracking.com/screenshots/RI/RI-20200807-182433.png
 // - see https://covidtracking.com/screenshots/RI/RI-20200808-182358.png
 // - see https://covidtracking.com/screenshots/RI/RI-20200809-182713.png
-replace positive = l.positive if fips==44 & ( date==date("2020/08/08", "YMD") | date==date("2020/08/09", "YMD") )
+replace positive = l.positive if positive==. & fips==44 & ( date==date("2020/08/08", "YMD") | date==date("2020/08/09", "YMD") )
 
 
 gen d_pos = d.positive

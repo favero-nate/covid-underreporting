@@ -1,6 +1,7 @@
 clear all
 capture log close
-local dropbox "C:\Users\favero\Dropbox\covid-trendlines"
+//local dropbox "C:\Users\favero\Dropbox\covid-trendlines"
+local dropbox "C:\Users\au660726\Dropbox\covid-trendlines"
 log using "..\logs\7day_rolling_avg_with_coverage_adj.txt", text replace
 
 use "..\data\population.dta"

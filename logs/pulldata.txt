@@ -2,11 +2,11 @@
       name:  <unnamed>
        log:  U:\Documents\GitHub\covid-underreporting\code\..\logs\pulldata.txt
   log type:  text
- opened on:   9 Sep 2020, 21:42:01
+ opened on:  10 Sep 2020, 14:29:39
 
 . 
 . import delimited "https://covidtracking.com/api/v1/states/daily.csv", stringcols(1)
-(54 vars, 10,570 obs)
+(54 vars, 10,626 obs)
 
 . rename date olddate
 
@@ -67,8 +67,8 @@ file ..\data\cdc_historical_deaths.dta saved
 (14 vars, 728 obs)
 
 . export delimited using "..\data\past_reports\unprocessed_files/$S_DATE cdc_deaths_raw2", replace
-(note: file ..\data\past_reports\unprocessed_files/ 9 Sep 2020 cdc_deaths_raw2.csv not found)
-file ..\data\past_reports\unprocessed_files/ 9 Sep 2020 cdc_deaths_raw2.csv saved
+(note: file ..\data\past_reports\unprocessed_files/10 Sep 2020 cdc_deaths_raw2.csv not found)
+file ..\data\past_reports\unprocessed_files/10 Sep 2020 cdc_deaths_raw2.csv saved
 
 . save "..\data\cdc_deaths.dta", replace
 file ..\data\cdc_deaths.dta saved
@@ -77,8 +77,8 @@ file ..\data\cdc_deaths.dta saved
 (14 vars, 1,000 obs)
 
 . export delimited using "..\data\past_reports\unprocessed_files/$S_DATE cdc_deaths_raw1", replace
-(note: file ..\data\past_reports\unprocessed_files/ 9 Sep 2020 cdc_deaths_raw1.csv not found)
-file ..\data\past_reports\unprocessed_files/ 9 Sep 2020 cdc_deaths_raw1.csv saved
+(note: file ..\data\past_reports\unprocessed_files/10 Sep 2020 cdc_deaths_raw1.csv not found)
+file ..\data\past_reports\unprocessed_files/10 Sep 2020 cdc_deaths_raw1.csv saved
 
 . append using "..\data\cdc_deaths.dta"
 
@@ -123,8 +123,8 @@ file ..\data\past_reports\unprocessed_files/ 9 Sep 2020 cdc_deaths_raw1.csv save
 file ..\data\cdc_deaths.dta saved
 
 . save "..\data\past_reports/$S_DATE cdc_deaths.dta", replace
-(note: file ..\data\past_reports/ 9 Sep 2020 cdc_deaths.dta not found)
-file ..\data\past_reports/ 9 Sep 2020 cdc_deaths.dta saved
+(note: file ..\data\past_reports/10 Sep 2020 cdc_deaths.dta not found)
+file ..\data\past_reports/10 Sep 2020 cdc_deaths.dta saved
 
 . 
 . insheet using "..\data\source_files\R12565679_SL040.txt", clear
@@ -211,5 +211,5 @@ file ..\data\population.dta saved
       name:  <unnamed>
        log:  U:\Documents\GitHub\covid-underreporting\code\..\logs\pulldata.txt
   log type:  text
- closed on:   9 Sep 2020, 21:42:12
+ closed on:  10 Sep 2020, 14:29:50
 ----------------------------------------------------------------------------------------------------

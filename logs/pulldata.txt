@@ -1,12 +1,14 @@
----------------------------------------------------------------------------------------------------
+---------------------------------------------------------
       name:  <unnamed>
-       log:  U:\Documents\GitHub\covid-underreporting\code\..\logs\pulldata.txt
+       log:  U:\Documents\GitHub\covid-underreporting\cod
+> e\..\logs\pulldata.txt
   log type:  text
- opened on:  14 Sep 2020, 14:01:58
+ opened on:  16 Sep 2020, 13:37:10
 
 . 
-. import delimited "https://covidtracking.com/api/v1/states/daily.csv", stringcols(1)
-(54 vars, 10,850 obs)
+. import delimited "https://covidtracking.com/api/v1/stat
+> es/daily.csv", stringcols(1)
+(54 vars, 10,962 obs)
 
 . rename date olddate
 
@@ -22,7 +24,8 @@
 file ..\data\covidtracking.dta saved
 
 . 
-. insheet using "..\data\source_files\State_Custom_Data.csv", clear
+. insheet using "..\data\source_files\State_Custom_Data.c
+> sv", clear
 (10 vars, 20,124 obs)
 
 . gen week_str = string(week,"%02.0f")
@@ -35,11 +38,13 @@ file ..\data\covidtracking.dta saved
 
 . gen epi_week = "20"+yr+"w"+week_str
 
-. epiweek2 epi_week, start(weekstartingdate) end(date) // requires userwritten package EPIWEEK
+. epiweek2 epi_week, start(weekstartingdate) end(date) //
+>  requires userwritten package EPIWEEK
 
 . format date %tdCCYYNNDD
 
-. destring numinfluenzadeaths-percentcomplete, replace ignore("Insufficient Data" "," ">" "<" "%")
+. destring numinfluenzadeaths-percentcomplete, replace ig
+> nore("Insufficient Data" "," ">" "<" "%")
 numinfluenzadeaths: characters I n s u f i c e t space D a removed; replaced as int
 (22 missing values generated)
 numpneumoniadeaths: characters I n s u f i c e t space D a , removed; replaced as int
@@ -64,11 +69,12 @@ file ..\data\cdc_historical_deaths.dta saved
 
 . 
 . insheet using "https://data.cdc.gov/resource/r8kw-7aab.csv?%24offset=1000", clear
-(14 vars, 728 obs)
+(14 vars, 782 obs)
 
-. export delimited using "..\data\past_reports\unprocessed_files/$S_DATE cdc_deaths_raw2", replace
-(note: file ..\data\past_reports\unprocessed_files/14 Sep 2020 cdc_deaths_raw2.csv not found)
-file ..\data\past_reports\unprocessed_files/14 Sep 2020 cdc_deaths_raw2.csv saved
+. export delimited using "..\data\past_reports\unprocessed_files/$S_DATE cdc_deaths_raw2", rep
+> lace
+(note: file ..\data\past_reports\unprocessed_files/16 Sep 2020 cdc_deaths_raw2.csv not found)
+file ..\data\past_reports\unprocessed_files/16 Sep 2020 cdc_deaths_raw2.csv saved
 
 . save "..\data\cdc_deaths.dta", replace
 file ..\data\cdc_deaths.dta saved
@@ -76,9 +82,10 @@ file ..\data\cdc_deaths.dta saved
 . insheet using "https://data.cdc.gov/resource/r8kw-7aab.csv?%24offset=0", clear
 (14 vars, 1,000 obs)
 
-. export delimited using "..\data\past_reports\unprocessed_files/$S_DATE cdc_deaths_raw1", replace
-(note: file ..\data\past_reports\unprocessed_files/14 Sep 2020 cdc_deaths_raw1.csv not found)
-file ..\data\past_reports\unprocessed_files/14 Sep 2020 cdc_deaths_raw1.csv saved
+. export delimited using "..\data\past_reports\unprocessed_files/$S_DATE cdc_deaths_raw1", rep
+> lace
+(note: file ..\data\past_reports\unprocessed_files/16 Sep 2020 cdc_deaths_raw1.csv not found)
+file ..\data\past_reports\unprocessed_files/16 Sep 2020 cdc_deaths_raw1.csv saved
 
 . append using "..\data\cdc_deaths.dta"
 
@@ -93,14 +100,14 @@ file ..\data\past_reports\unprocessed_files/14 Sep 2020 cdc_deaths_raw1.csv save
 . order date report_date
 
 . gen expected_deaths = total_deaths / percent_of_expected_deaths
-(7 missing values generated)
+(11 missing values generated)
 
 . order expected_deaths, after(total_deaths)
 
 . drop start_week group indicator percent_of_expected_deaths footnote
 
 . replace state = "New York" if state == "New York City"
-(32 real changes made)
+(33 real changes made)
 
 . rename pneumonia_influenza_or_covid pneumon_influ_or_covid
 
@@ -108,13 +115,13 @@ file ..\data\past_reports\unprocessed_files/14 Sep 2020 cdc_deaths_raw1.csv save
 . foreach var of varlist covid_deaths-pneumon_influ_or_covid {
   2.         replace `var' = 5 if `var' == .
   3. }
-(293 real changes made)
-(4 real changes made)
+(317 real changes made)
 (7 real changes made)
-(167 real changes made)
-(415 real changes made)
-(589 real changes made)
-(131 real changes made)
+(11 real changes made)
+(186 real changes made)
+(433 real changes made)
+(593 real changes made)
+(145 real changes made)
 
 . collapse (sum) covid_deaths-pneumon_influ_or_covid (first) report_date, by(state date)
 
@@ -123,8 +130,8 @@ file ..\data\past_reports\unprocessed_files/14 Sep 2020 cdc_deaths_raw1.csv save
 file ..\data\cdc_deaths.dta saved
 
 . save "..\data\past_reports/$S_DATE cdc_deaths.dta", replace
-(note: file ..\data\past_reports/14 Sep 2020 cdc_deaths.dta not found)
-file ..\data\past_reports/14 Sep 2020 cdc_deaths.dta saved
+(note: file ..\data\past_reports/16 Sep 2020 cdc_deaths.dta not found)
+file ..\data\past_reports/16 Sep 2020 cdc_deaths.dta saved
 
 . 
 . insheet using "..\data\source_files\R12565679_SL040.txt", clear
@@ -194,8 +201,8 @@ file ..\data\population.dta saved
 . egen deaths_us = rowtotal(deaths_*_us)
 
 . foreach var of varlist _* {
-  2.         gen weighted_pop`var' = (pop`var' * deaths`var'_us * population_us) / (deaths_us * pop
-> `var'_us)
+  2.         gen weighted_pop`var' = (pop`var' * deaths`var'_us * population_us) / (deaths_us 
+> * pop`var'_us)
   3. }
 
 . egen risk_standardized_population = rowtotal(weighted_pop*)
@@ -211,5 +218,5 @@ file ..\data\population.dta saved
       name:  <unnamed>
        log:  U:\Documents\GitHub\covid-underreporting\code\..\logs\pulldata.txt
   log type:  text
- closed on:  14 Sep 2020, 14:02:12
----------------------------------------------------------------------------------------------------
+ closed on:  16 Sep 2020, 13:37:20
+----------------------------------------------------------------------------------------------

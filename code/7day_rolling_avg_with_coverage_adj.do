@@ -89,11 +89,11 @@ forvalues i = 1/51 {
     local state : label state_id `i'
 	quietly sum problematic_data_7d if state_id==`i'
 	if r(mean) == 0 {
-		twoway (line adj_case_count_pc_7d date) if state_id==`i' & cound_7d_available==1, title("`state'") subtitle("Prevalence of newly confirmed COVID-19 cases, adjusted for" "testing volume (lags 2-4 weeks behind initial infections)") note("Estimates by covidtrendlines.com; data from covidtracking.com (CC BY-NC-4.0)") xtitle("") ylabel(0 55 110) tlabel(8mar2020(14)6sep2020) tmtick(##2) xsize(5.5) ysize(4)
+		twoway (line adj_case_count_pc_7d date) if state_id==`i' & cound_7d_available==1, title("`state'") subtitle("Prevalence of newly confirmed COVID-19 cases, adjusted for" "testing volume (lags 2-4 weeks behind initial infections)") note("Estimates by covidtrendlines.com; data from covidtracking.com (CC BY-NC-4.0)") xtitle("") ylabel(0 55 110) tlabel(8mar2020(14)20sep2020) tmtick(##2) xsize(5.5) ysize(4)
 		graph export "`dropbox'/`state'_`c_date'.png", replace width(1500)
 	}
 	else {
-		twoway (line adj_case_count_pc_7d date if cound_7d_available==1) (scatter adj_case_count_pc_7d date if problematic_data_7d==1) if state_id==`i', title("`state'") subtitle("Prevalence of newly confirmed COVID-19 cases, adjusted for" "testing volume (lags 2-4 weeks behind initial infections)") note("Estimates by covidtrendlines.com; data from covidtracking.com (CC BY-NC-4.0)") xtitle("") ylabel(0 55 110) tlabel(8mar2020(14)6sep2020) tmtick(##2) xsize(5.5) ysize(4) legend(order(2 "Inconsistent or unusual data reported") position(6))
+		twoway (line adj_case_count_pc_7d date if cound_7d_available==1) (scatter adj_case_count_pc_7d date if problematic_data_7d==1) if state_id==`i', title("`state'") subtitle("Prevalence of newly confirmed COVID-19 cases, adjusted for" "testing volume (lags 2-4 weeks behind initial infections)") note("Estimates by covidtrendlines.com; data from covidtracking.com (CC BY-NC-4.0)") xtitle("") ylabel(0 55 110) tlabel(8mar2020(14)20sep2020) tmtick(##2) xsize(5.5) ysize(4) legend(order(2 "Inconsistent or unusual data reported") position(6))
 		graph export "`dropbox'/`state'_`c_date'.png", replace width(1500)
 	}
 }
@@ -111,24 +111,24 @@ gen adj_case_count_7d = new_pos_7d*(1+.026213*p_pos_7d) // adjustment based on r
 gen cound_7d_available = (adj_case_count_7d!=.)
 la var adj_case_count_7d "Estimated prevalence"
 
-twoway (line adj_case_count_7d date) if cound_7d_available==1, title("United States (50 states + DC)") subtitle("Prevalence of newly confirmed COVID-19 cases, adjusted for" "testing volume (lags 2-4 weeks behind initial infections)") note("Estimates by covidtrendlines.com; data from covidtracking.com (CC BY-NC-4.0)") ylabel(0) xtitle("") tlabel(8mar2020(14)6sep2020) tmtick(##2) xsize(5.5) ysize(4)
+twoway (line adj_case_count_7d date) if cound_7d_available==1, title("United States (50 states + DC)") subtitle("Prevalence of newly confirmed COVID-19 cases, adjusted for" "testing volume (lags 2-4 weeks behind initial infections)") note("Estimates by covidtrendlines.com; data from covidtracking.com (CC BY-NC-4.0)") ylabel(0) xtitle("") tlabel(8mar2020(14)20sep2020) tmtick(##2) xsize(5.5) ysize(4)
 graph export "`dropbox'/USA_`c_date'.png", replace width(1500)
 
 la var new_pos_7d "How many cases are reported"
 la var adj_case_count_7d "My estimates of how many cases we'd find under broader testing"
 
-twoway (line adj_case_count_7d date) (line new_pos_7d date, lpattern(dash)) if cound_7d_available==1, subtitle("Comparison of my adjusted case estimates to how" "many cases were reported (50 states + DC)") note("Estimates by covidtrendlines.com; data from covidtracking.com (CC BY-NC-4.0)") ylabel(0(25000)50000) xtitle("") ytitle("Detected cases per day (7-day rolling avg.)") tlabel(8mar2020(14)6sep2020) tmtick(##2) xsize(5.5) ysize(4) legend(col(1))
+twoway (line adj_case_count_7d date) (line new_pos_7d date, lpattern(dash)) if cound_7d_available==1, subtitle("Comparison of my adjusted case estimates to how" "many cases were reported (50 states + DC)") note("Estimates by covidtrendlines.com; data from covidtracking.com (CC BY-NC-4.0)") ylabel(0(25000)50000) xtitle("") ytitle("Detected cases per day (7-day rolling avg.)") tlabel(8mar2020(14)20sep2020) tmtick(##2) xsize(5.5) ysize(4) legend(col(1))
 graph export "`dropbox'/methodology1_`c_date'.png", replace width(1500)
 
 la var p_pos_7d "Percent positive tests"
 
-twoway (line p_pos_7d date) if cound_7d_available==1, subtitle("Percent positive tests, used to adjust simple" "confirmed case count (50 states + DC)") note("Estimates by covidtrendlines.com; data from covidtracking.com (CC BY-NC-4.0)") ylabel(0(10)20) xtitle("") tlabel(8mar2020(14)6sep2020) tmtick(##2) xsize(5.5) ysize(4)
+twoway (line p_pos_7d date) if cound_7d_available==1, subtitle("Percent positive tests, used to adjust simple" "confirmed case count (50 states + DC)") note("Estimates by covidtrendlines.com; data from covidtracking.com (CC BY-NC-4.0)") ylabel(0(10)20) xtitle("") tlabel(8mar2020(14)20sep2020) tmtick(##2) xsize(5.5) ysize(4)
 graph export "`dropbox'/methodology2_`c_date'.png", replace width(1500)
 
 gen total_tests_7d = new_pos_7d + new_neg_7d
 la var total_tests_7d "Total tests per day (7-day rolling avg.)"
 
-twoway (line total_tests_7d date) if cound_7d_available==1, subtitle("Total number of tests (50 states + DC)") note("Estimates by covidtrendlines.com; data from covidtracking.com (CC BY-NC-4.0)") xtitle("") tlabel(8mar2020(14)6sep2020) ylabel(0(250000)500000) tmtick(##2) xsize(5.5) ysize(4)
+twoway (line total_tests_7d date) if cound_7d_available==1, subtitle("Total number of tests (50 states + DC)") note("Estimates by covidtrendlines.com; data from covidtracking.com (CC BY-NC-4.0)") xtitle("") tlabel(8mar2020(14)20sep2020) ylabel(0(250000)500000) tmtick(##2) xsize(5.5) ysize(4)
 graph export "`dropbox'/methodology3_`c_date'.png", replace width(1500)
 
 
